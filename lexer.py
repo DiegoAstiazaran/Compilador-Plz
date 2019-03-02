@@ -95,13 +95,8 @@ def t_ID(t):
   return t
 
 def t_CLASS_NAME(t):
-  r'[A-Z][a-z]'
+  r'[A-Z][a-z]*'
   t.type = reserved.get(t.value,'CLASS_NAME')
-  return t
-
-def t_SUB_NAME(t):
-  r'[a-z][a-zA-Z]'
-  t.type = reserved.get(t.value,'SUB_NAME')
   return t
 
 def t_CTE_F(t):
@@ -137,7 +132,7 @@ while True:
     while True:
       tok = lexer.token()
       if not tok: 
-          break      # No more input
+          break
       print(tok)
   except EOFError:
     break
