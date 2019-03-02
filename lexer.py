@@ -37,6 +37,7 @@ reserved = {
 }
 
 tokens = [
+  'ID',
 	'COLON',
 	'PLUS',
 	'MINUS',
@@ -81,3 +82,35 @@ t_EQ_TO     = r'=='
 t_OR_OP     = r'\|'
 t_AND_OP    = r'&'
 t_NOT_OP    = r'~'
+
+
+def t_ID(t):
+    r'[a-z][a-zA-Z_0-9]*'
+    return t
+
+def t_CTE_F(t):
+    r'\d+\.\d+'
+    t.value = float(t.value)
+    return t
+
+def t_CTE_I(t):
+    r'\d+'
+    t.value = int(t.value)
+    return t
+
+def t_CTE_STR(t):
+    r'"[^"]*" | \'[^\']*\''
+    t.value = t.value[1:-1]
+    return t
+
+def t_newline(t):
+    r'\n+'
+    t.lexer.lineno += len(t.value)
+
+t_ignore  = ' \t'
+
+def t_error(t):
+    print("Illegal character '%s'" % t.value[0])
+    t.lexer.skip(1)
+
+lexer = lex.lex()
