@@ -4,21 +4,21 @@
 import ply.lex as lex
 
 reserved = {
-  'return' : "RETURN",
-  'class' : "CLASS",
-  'under' : "UNDER",
-  'end' : "END",
-  'private' : "PRIVATE",
-  'public' : "PUBLIC",
-  'sub' : "SUB",
-  'void' : "VOID",
-  'if' : "IF",
-  'elsif' : "ELSIF",
-  'else' : "ELSE",
-  'while' : "WHILE",
-  'repeat' : "REPEAT",
-  'for' : "FOR",
-  'from' : "FROM",
+  'return' : 'RETURN',
+  'class' : 'CLASS',
+  'under' : 'UNDER',
+  'end' : 'END',
+  'private' : 'PRIVATE',
+  'public' : 'PUBLIC',
+  'sub' : 'SUB',
+  'void' : 'VOID',
+  'if' : 'IF',
+  'elsif' : 'ELSIF',
+  'else' : 'ELSE',
+  'while' : 'WHILE',
+  'repeat' : 'REPEAT',
+  'for' : 'FOR',
+  'from' : 'FROM',
   'by' : 'BY',
   'read' : 'READ',
   'or' : 'OR',
@@ -92,6 +92,7 @@ t_NOT_OP    = r'~'
 
 def t_ID(t):
   r'[a-z][a-zA-Z_0-9]*'
+  t.type = reserved.get(t.value,'ID')
   return t
 
 def t_CLASS_NAME(t):
@@ -131,7 +132,7 @@ while True:
     lexer.input(data)
     while True:
       tok = lexer.token()
-      if not tok: 
+      if not tok:
           break
       print(tok)
   except EOFError:
