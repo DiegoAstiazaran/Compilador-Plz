@@ -37,18 +37,27 @@ reserved = {
 }
 
 tokens = [
-	"COLON",
-	"PLUS",
-	"MINUS",
-	"MULTIPLY",
-	"DIVIDE",
-	"L_PAREN",
-	"R_PAREN",
-	"DOT",
-	"EQUAL",
-	"L_BRACKET",
-	"R_BRACKET",
-
+	'COLON',
+	'PLUS',
+	'MINUS',
+	'MULTIPLY',
+	'DIVIDE',
+	'L_PAREN',
+	'R_PAREN',
+	'DOT',
+	'EQUAL',
+	'L_BRACKET',
+	'R_BRACKET',
+  'COMMA',
+  'L_THAN',
+  'G_THAN',
+  'NOT_EQ',
+  'L_THAN_EQ',
+  'G_THAN_EQ',
+  'EQ_TO',
+  'OR_OP',
+  'AND_OP',
+  'NOT_OP',
 ] + list(reserved.values())
 
 t_COLON     = r':'
@@ -62,3 +71,13 @@ t_DOT       = r'\.'
 t_EQUAL     = r'='
 t_L_BRACKET = r'{'
 t_R_BRACKET = r'}'
+t_COMMA     = r','
+t_L_THAN    = r'<'
+t_G_THAN    = r'>'
+t_NOT_EQ    = r'~='
+t_L_THAN_EQ = r'<='
+t_G_THAN_EQ = r'>='
+t_EQ_TO     = r'=='
+t_OR_OP     = r'\|'
+t_AND_OP    = r'&'
+t_NOT_OP    = r'~'
