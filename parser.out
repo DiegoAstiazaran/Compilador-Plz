@@ -1,0 +1,239 @@
+Created by PLY version 3.11 (http://www.dabeaz.com/ply)
+
+Unused terminals:
+
+    AND
+    AND_OP
+    BOOL
+    BY
+    COMMA
+    CTE_F
+    CTE_STR
+    ELSE
+    ELSIF
+    EQ
+    EQUAL
+    EQ_TO
+    FALSE
+    FLT
+    FOR
+    FROM
+    GT
+    GTE
+    G_THAN
+    G_THAN_EQ
+    IF
+    INT
+    LT
+    LTE
+    L_BRACKET
+    L_THAN
+    L_THAN_EQ
+    NEQ
+    NOT
+    NOT_EQ
+    NOT_OP
+    OR
+    OR_OP
+    PRINT
+    READ
+    REPEAT
+    R_BRACKET
+    SUB
+    SUB_NAME
+    TRUE
+    VOID
+    WHILE
+
+Grammar
+
+Rule 0     S' -> program
+Rule 1     program -> program_p program_class program_subroutine block
+Rule 2     program_p -> initialization
+Rule 3     program_p -> declaration
+Rule 4     program_p -> assignment
+Rule 5     program_class -> class program_class
+Rule 6     program_class -> empty
+Rule 7     program_subroutine -> subroutine program_subroutine
+Rule 8     program_subroutine -> empty
+Rule 9     block -> statement block_statement
+Rule 10    block_statement -> statement block_statement
+Rule 11    block_statement -> empty
+Rule 12    statement -> read
+Rule 13    statement -> assignment
+Rule 14    statement -> conditional
+Rule 15    statement -> write
+Rule 16    statement -> cycle
+Rule 17    statement -> subcall
+Rule 18    statement -> return
+Rule 19    statement -> attr_call
+Rule 20    return -> RETURN return_expression DOT
+Rule 21    return_expression -> expression
+Rule 22    return_expression -> empty
+Rule 23    class -> CLASS CLASS_NAME class_p COLON class_block END
+Rule 24    class_p -> UNDER CLASS_NAME
+Rule 25    class_p -> empty
+Rule 26    expression -> exp expression_p
+Rule 27    expression_p -> expression_pp exp
+Rule 28    expression_p -> empty
+Rule 29    expression_pp -> relational
+Rule 30    expression_pp -> logical
+Rule 31    exp -> term exp_p
+Rule 32    exp_p -> exp_pp exp
+Rule 33    exp_p -> empty
+Rule 34    exp_pp -> PLUS
+Rule 35    exp_pp -> MINUS
+Rule 36    term -> factor term_p
+Rule 37    term_p -> term_pp term
+Rule 38    term_p -> empty
+Rule 39    term_pp -> MULTIPLY
+Rule 40    term_pp -> DIVIDE
+Rule 41    factor -> L_PAREN expression R_PAREN
+Rule 42    factor -> factor_p var_cte_4
+Rule 43    factor_p -> PLUS
+Rule 44    factor_p -> MINUS
+Rule 45    factor_p -> empty
+Rule 46    class_block -> class_block_private class_block_public
+Rule 47    class_block_private -> private
+Rule 48    class_block_private -> empty
+Rule 49    class_block_public -> public
+Rule 50    class_block_public -> empty
+Rule 51    private -> private_declaration private_subroutine
+Rule 52    private_declaration -> PRIVATE declaration private_declaration
+Rule 53    private_declaration -> empty
+Rule 54    private_subroutine -> PRIVATE subroutine private_subroutine
+Rule 55    private_subroutine -> empty
+Rule 56    public -> public_declaration public_subroutine
+Rule 57    public_declaration -> PUBLIC declaration public_declaration
+Rule 58    public_declaration -> empty
+Rule 59    public_subroutine -> PUBLIC subroutine public_subroutine
+Rule 60    public_subroutine -> empty
+Rule 61    declaration -> declaration_p DOT
+Rule 62    declaration_p -> dec_var
+Rule 63    declaration_p -> dec_arr
+Rule 64    declaration_p -> dec_mat
+Rule 65    declaration_p -> dec_dict
+Rule 66    dec_var -> type ID
+Rule 67    dec_arr -> type ID L_PAREN CTE_I R_PAREN
+Rule 68    dec_mat -> type ID L_PAREN CTE_I R_PAREN L_PAREN CTE_I R_PAREN
+Rule 69    dec_dict -> DICT ID
+Rule 70    empty -> <empty>
+
+Terminals, with rules where they appear
+
+AND                  : 
+AND_OP               : 
+BOOL                 : 
+BY                   : 
+CLASS                : 23
+CLASS_NAME           : 23 24
+COLON                : 23
+COMMA                : 
+CTE_F                : 
+CTE_I                : 67 68 68
+CTE_STR              : 
+DICT                 : 69
+DIVIDE               : 40
+DOT                  : 20 61
+ELSE                 : 
+ELSIF                : 
+END                  : 23
+EQ                   : 
+EQUAL                : 
+EQ_TO                : 
+FALSE                : 
+FLT                  : 
+FOR                  : 
+FROM                 : 
+GT                   : 
+GTE                  : 
+G_THAN               : 
+G_THAN_EQ            : 
+ID                   : 66 67 68 69
+IF                   : 
+INT                  : 
+LT                   : 
+LTE                  : 
+L_BRACKET            : 
+L_PAREN              : 41 67 68 68
+L_THAN               : 
+L_THAN_EQ            : 
+MINUS                : 35 44
+MULTIPLY             : 39
+NEQ                  : 
+NOT                  : 
+NOT_EQ               : 
+NOT_OP               : 
+OR                   : 
+OR_OP                : 
+PLUS                 : 34 43
+PRINT                : 
+PRIVATE              : 52 54
+PUBLIC               : 57 59
+READ                 : 
+REPEAT               : 
+RETURN               : 20
+R_BRACKET            : 
+R_PAREN              : 41 67 68 68
+SUB                  : 
+SUB_NAME             : 
+TRUE                 : 
+UNDER                : 24
+VOID                 : 
+WHILE                : 
+error                : 
+
+Nonterminals, with rules where they appear
+
+assignment           : 4 13
+attr_call            : 19
+block                : 1
+block_statement      : 9 10
+class                : 5
+class_block          : 23
+class_block_private  : 46
+class_block_public   : 46
+class_p              : 23
+conditional          : 14
+cycle                : 16
+dec_arr              : 63
+dec_dict             : 65
+dec_mat              : 64
+dec_var              : 62
+declaration          : 3 52 57
+declaration_p        : 61
+empty                : 6 8 11 22 25 28 33 38 45 48 50 53 55 58 60
+exp                  : 26 27 32
+exp_p                : 31
+exp_pp               : 32
+expression           : 21 41
+expression_p         : 26
+expression_pp        : 27
+factor               : 36
+factor_p             : 42
+initialization       : 2
+logical              : 30
+private              : 47
+private_declaration  : 51 52
+private_subroutine   : 51 54
+program              : 0
+program_class        : 1 5
+program_p            : 1
+program_subroutine   : 1 7
+public               : 49
+public_declaration   : 56 57
+public_subroutine    : 56 59
+read                 : 12
+relational           : 29
+return               : 18
+return_expression    : 20
+statement            : 9 10
+subcall              : 17
+subroutine           : 7 54 59
+term                 : 31 37
+term_p               : 36
+term_pp              : 37
+type                 : 66 67 68
+var_cte_4            : 42
+write                : 15
+

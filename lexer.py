@@ -36,6 +36,7 @@ reserved = {
   'neq' : 'NEQ',
   'True' : 'TRUE',
   'False' : 'FALSE',
+  'dict' : 'DICT',
 }
 
 tokens = [
@@ -125,15 +126,15 @@ def t_error(t):
   print("Illegal character '%s'" % t.value[0])
   t.lexer.skip(1)
 
-while True:
-  try:
-    lexer = lex.lex()
-    data = input('data > ')
-    lexer.input(data)
-    while True:
-      tok = lexer.token()
-      if not tok:
-          break
-      print(tok)
-  except EOFError:
-    break
+# while True:
+#   try:
+#     lexer = lex.lex()
+#     data = input('data > ')
+#     lexer.input(data)
+#     while True:
+#       tok = lexer.token()
+#       if not tok:
+#           break
+#       print(tok)
+#   except EOFError:
+#     break
