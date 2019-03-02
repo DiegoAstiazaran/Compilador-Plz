@@ -63,6 +63,9 @@ tokens = [
   'OR_OP',
   'AND_OP',
   'NOT_OP',
+  'CTE_I',
+  'CTE_F',
+  'CTE_STR',
 ] + list(reserved.values())
 
 t_COLON     = r':'
@@ -126,4 +129,15 @@ def t_error(t):
   print("Illegal character '%s'" % t.value[0])
   t.lexer.skip(1)
 
-lexer = lex.lex()
+while True:
+  try:
+    lexer = lex.lex()
+    data = input('data > ')
+    lexer.input(data)
+    while True:
+      tok = lexer.token()
+      if not tok: 
+          break      # No more input
+      print(tok)
+  except EOFError:
+    break
