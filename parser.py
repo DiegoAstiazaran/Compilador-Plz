@@ -13,7 +13,7 @@ def p_program(p):
   '''
   program : program_p program_class program_subroutine block
   program_p : initialization
-            | declaration 
+            | declaration
             | assignment
   program_class : class program_class
                 | empty
@@ -210,57 +210,75 @@ def p_public(p):
     p[0] = p[1] + space + p[2] + newline + p[3]
   else:
     raise Exception('Invalid expression for parser in p_public')
-  
-# def p_declaration(p):
-#   '''
-#   declaration : declaration_p DOT
-#   declaration_p : dec_var
-#                 | dec_arr
-#                 | dec_mat
-#                 | dec_dict
-#   '''
-#   if len(p) == 2:
-#     p[0] = p[1]
-#   elif len(p) == 3:
-#     p[0] = p[1] + p[2]
-#   else:
-#     raise Exception('Invalid expression for parser in p_declaration')
 
-# def p_dec_var(p):
-#   '''
-#   dec_var : type ID
-#   '''
-#   if len(p) == 3:
-#     p[0] = p[1] + space + p[2]
-#   else:
-#     raise Exception('Invalid expression for parser in p_dec_var')
+def p_declaration(p):
+  '''
+  declaration : declaration_p DOT
+  declaration_p : type ID declaration_pp
+                | DICT ID
+  declaration_pp : array_size declaration_ppp
+                 | empty
+  declaration_ppp : array_size
+                  | empty
+  '''
+  if p[0] == None:
+    p[0] = ""
+  elif len(p) == 2:
+    p[0] = p[1]
+  elif len(p) == 3:
+    p[0] = p[1] + p[2]
+  elif len(p) == 5:
+    p[0] = p[1] + space + p[2] + p[3] + p[4]
+  else:
+    raise Exception('Invalid expression for parser in p_declaration')
 
-# def p_dec_arr(p):
-#   '''
-#   dec_arr : type ID L_PAREN CTE_I R_PAREN
-#   '''
-#   if len(p) == 6:
-#     p[0] = p[1] + space + p[2] + p[3] + p[4] + p[5]
-#   else:
-#     raise Exception('Invalid expression for parser in dec_arr')
+def p_array_size(p):
+  '''
+  array_size : L_PAREN CTE_I R_PAREN
+  '''
+  if len(p) == 4:
+    p[0] = p[1] + p[2] + p[3]
+  else:
+    raise Exception('Invalid expression for parser in p_array_size')
 
-# def p_dec_mat(p):
-#   '''
-#   dec_mat : type ID L_PAREN CTE_I R_PAREN L_PAREN CTE_I R_PAREN
-#   '''
-#   if len(p) == 9:
-#     p[0] = p[1] + space + p[2] + p[3] + p[4] + p[5] + p[6] + p[7] + p[8]
-#   else:
-#     raise Exception('Invalid expression for parser in dec_mat')
-
-# def p_dec_dict(p):
-#   '''
-#   dec_dict : DICT ID
-#   '''
-#   if len(p) == 3:
-#     p[0] = p[1] + space + p[2]
-#   else:
-#     raise Exception('Invalid expression for parser in dec_dict')
+def p_initialization(p):
+  '''
+  initialization : initialization_p DOT
+  initialization_p : type ID initialization_array
+                   | DICT ID EQUAL L_BRACKET initialization_dict R_BRACKET
+                   | CLASS_NAME ID EQUAL CLASS_NAME L_PAREN initialization_const R_PAREN
+  initialization_array : array_size initialization_array_p
+  initialization_array_p : EQUAL L_BRACKET array_content R_BRACKET
+                         | array_size EQUAL L_BRACKET matrix_content R_BRACKET
+  array_content : expression array_content_p
+  array_content_p : COMMA array_content
+                  | empty
+  matrix_content : L_BRACKET array_content R_BRACKET matrix_content_p
+  matrix_content_p : COMMA matrix_content
+                   | empty
+  initialization_dict : var_cte_5 COLON expression initialization_dict_p
+  initialization_p : COMMA initialization_dict
+                   | empty
+  initialization_const : expression initialization_const_p
+  initialization_const_p : COMMA initialization_const
+                         | empty
+  '''
+  if p[0] == None:
+    p[0] = ""
+  elif len(p) == 3:
+    p[0] = p[1] + p[2]
+  elif len(p) == 4:
+    p[0] = p[1] + space + p[2] + p[3]
+  elif len(p) == 5:
+    p[0] = p[1] + space + p[2] + p[3] + p[4]
+  elif len(p) == 6:
+    p[0] = p[1] + space + p[2] + space + p[3] + p[4] + p[5]
+  elif len(p) == 7:
+    p[0] = p[1] + space + p[2] + space + p[3] + space + p[4] + space + p[5] + space + p[6]
+  elif len(p) == 7:
+    p[0] = p[1] + space + p[2] + space + p[3] + space + p[4] + p[5] + p[6] + p[7]
+  else:
+    raise Exception('Invalid expression for parser in p_initialization')
 
 def p_relational(p):
   '''
@@ -358,6 +376,37 @@ def p_cte_b(p):
     p[0] = p[1]
   else:
     raise Exception('Invalid expression for parser in p_cte_b')
+
+def p_subroutine(p):
+  '''
+  subroutine : SUB subroutine_return_type ID L_PAREN subroutine_params R_PAREN COLON subroutine_p block END
+  subroutine_return_type : type
+                         | VOID
+  subroutine_params : type id subroutine_params_p
+  subroutine_params : COMMA subroutine_params
+                    | empty
+  subroutine_p : subroutine_pp subroutine_ppp
+               | empty
+  subroutine_pp : initialization
+                | declaration
+  subroutine_ppp : subroutine_p
+                 | empty
+  '''
+  if p[0] == None:
+    p[0] = ""
+  elif len(p) == 2:
+    p[0] = p[1]
+  elif len(p) == 3:
+    p[0] = p[1] + p[2]
+  elif len(p) == 4:
+    p[0] = p[1] + space + p[2] + space + p[3]
+  elif len(p) == 11:
+    p[0] = p[1] + space + p[2] + space + p[3] + space + p[4] + p[5] + p[6] + p[7] + newline + p[8] + newline + p[9] + newline + p[10]
+  else:
+    raise Exception('Invalid expression for parser in p_subroutine')
+
+
+
 
 def p_empty(p):
   'empty :'
