@@ -211,56 +211,153 @@ def p_public(p):
   else:
     raise Exception('Invalid expression for parser in p_public')
   
-def p_declaration(p):
+# def p_declaration(p):
+#   '''
+#   declaration : declaration_p DOT
+#   declaration_p : dec_var
+#                 | dec_arr
+#                 | dec_mat
+#                 | dec_dict
+#   '''
+#   if len(p) == 2:
+#     p[0] = p[1]
+#   elif len(p) == 3:
+#     p[0] = p[1] + p[2]
+#   else:
+#     raise Exception('Invalid expression for parser in p_declaration')
+
+# def p_dec_var(p):
+#   '''
+#   dec_var : type ID
+#   '''
+#   if len(p) == 3:
+#     p[0] = p[1] + space + p[2]
+#   else:
+#     raise Exception('Invalid expression for parser in p_dec_var')
+
+# def p_dec_arr(p):
+#   '''
+#   dec_arr : type ID L_PAREN CTE_I R_PAREN
+#   '''
+#   if len(p) == 6:
+#     p[0] = p[1] + space + p[2] + p[3] + p[4] + p[5]
+#   else:
+#     raise Exception('Invalid expression for parser in dec_arr')
+
+# def p_dec_mat(p):
+#   '''
+#   dec_mat : type ID L_PAREN CTE_I R_PAREN L_PAREN CTE_I R_PAREN
+#   '''
+#   if len(p) == 9:
+#     p[0] = p[1] + space + p[2] + p[3] + p[4] + p[5] + p[6] + p[7] + p[8]
+#   else:
+#     raise Exception('Invalid expression for parser in dec_mat')
+
+# def p_dec_dict(p):
+#   '''
+#   dec_dict : DICT ID
+#   '''
+#   if len(p) == 3:
+#     p[0] = p[1] + space + p[2]
+#   else:
+#     raise Exception('Invalid expression for parser in dec_dict')
+
+def p_relational(p):
   '''
-  declaration : declaration_p DOT
-  declaration_p : dec_var
-                | dec_arr
-                | dec_mat
-                | dec_dict
+  relational : L_THAN
+             | G_THAN
+             | NOT_EQ
+             | L_THAN_EQ
+             | G_THAN_EQ
+             | EQ_TO
+             | GT
+             | LT
+             | GTE
+             | LTE
+             | EQ
+             | NEQ
   '''
   if len(p) == 2:
     p[0] = p[1]
-  elif len(p) == 3:
-    p[0] = p[1] + p[2]
   else:
-    raise Exception('Invalid expression for parser in p_declaration')
+    raise Exception('Invalid expression for parser in p_relational')
 
-def p_dec_var(p):
+def p_logical(p):
   '''
-  dec_var : type ID
+  logical : OR_OP
+          | AND_OP
+          | NOT_OP
+          | OR
+          | AND
+          | NOT
   '''
-  if len(p) == 3:
-    p[0] = p[1] + space + p[2]
+  if len(p) == 2:
+    p[0] = p[1]
   else:
-    raise Exception('Invalid expression for parser in p_dec_var')
+    raise Exception('Invalid expression for parser in p_logical')
 
-def p_dec_arr(p):
+def p_var_cte_1(p):
   '''
-  dec_arr : type ID L_PAREN CTE_I R_PAREN
+  var_cte_1 : ID
+            | CTE_I
   '''
-  if len(p) == 6:
-    p[0] = p[1] + space + p[2] + p[3] + p[4] + p[5]
+  if len(p) == 2:
+    p[0] = p[1]
   else:
-    raise Exception('Invalid expression for parser in dec_arr')
+    raise Exception('Invalid expression for parser in p_var_cte_1')
 
-def p_dec_mat(p):
+def p_var_cte_2(p):
   '''
-  dec_mat : type ID L_PAREN CTE_I R_PAREN L_PAREN CTE_I R_PAREN
+  var_cte_2 : var_cte_1
+            | CTE_F
+            | CTE_S
+            | CTE_B
   '''
-  if len(p) == 9:
-    p[0] = p[1] + space + p[2] + p[3] + p[4] + p[5] + p[6] + p[7] + p[8]
+  if len(p) == 2:
+    p[0] = p[1]
   else:
-    raise Exception('Invalid expression for parser in dec_mat')
+    raise Exception('Invalid expression for parser in p_var_cte_2')
 
-def p_dec_dict(p):
+def p_var_cte_3(p):
   '''
-  dec_dict : DICT ID
+  var_cte_3 : var_cte_2
+            | access
   '''
-  if len(p) == 3:
-    p[0] = p[1] + space + p[2]
+  if len(p) == 2:
+    p[0] = p[1]
   else:
-    raise Exception('Invalid expression for parser in dec_dict')
+    raise Exception('Invalid expression for parser in p_var_cte_3')
+
+def p_var_cte_4(p):
+  '''
+  var_cte_4 : var_cte_3
+            | sub_call
+            | attr_call
+  '''
+  if len(p) == 2:
+    p[0] = p[1]
+  else:
+    raise Exception('Invalid expression for parser in p_var_cte_4')
+
+def p_var_cte_5(p):
+  '''
+  var_cte_5 : var_cte_1
+            | CTE_S
+  '''
+  if len(p) == 2:
+    p[0] = p[1]
+  else:
+    raise Exception('Invalid expression for parser in p_var_cte_5')
+
+def p_cte_b(p):
+  '''
+  cte_b : TRUE
+        | FALSE
+  '''
+  if len(p) == 2:
+    p[0] = p[1]
+  else:
+    raise Exception('Invalid expression for parser in p_cte_b')
 
 def p_empty(p):
   'empty :'
