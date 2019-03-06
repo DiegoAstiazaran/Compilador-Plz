@@ -63,13 +63,22 @@ def p_statement(p):
       p[0] = p[1]
   else:
     raise Exception('Invalid expression for parser in p_statement')
+
 def p_sub_call_args(p):
   '''
-  sub_call_args : expression sub_call_args_p
-                | empty
-  sub_call_args_p : COMMA sub_call_args
+  sub_call_args : L_PAREN sub_call_args_p R_PAREN
+  sub_call_args_p : expression sub_call_args_pp
+                  | empty
+  sub_call_args_pp : COMMA sub_call_args_p
                   | empty
   '''
+  if p[0] == None:
+    p[0] = ""
+  elif len(p) == 3:
+    p[0] = p[1] + space + p[2]
+  else:
+    raise Exception('Invalid expression for parser in p_sub_call_args')
+
 def p_return(p):
   '''
   return : RETURN return_expression DOT
@@ -181,11 +190,11 @@ def p_class_block(p):
 
 def p_private(p):
   '''
-  private : private_declaration private_subroutine
-  private_declaration : PRIVATE declaration private_declaration
+  private : PRIVATE COLON private_declaration private_sub END
+  private_declaration : declaration private_declaration
                       | empty
-  private_subroutine : PRIVATE subroutine private_subroutine
-                     | empty
+  private_sub : subroutine private_sub
+              | empty  
   '''
   if p[0] == None:
     p[0] = ""
@@ -198,11 +207,11 @@ def p_private(p):
 
 def p_public(p):
   '''
-  public : public_declaration public_subroutine
-  public_declaration : PUBLIC declaration public_declaration
-                     | empty
-  public_subroutine : PUBLIC subroutine public_subroutine
-                    | empty
+  public : PUBLIC COLON public_declaration public_sub END
+  public_declaration : declaration public_declaration
+                      | empty
+  public_sub : subroutine public_sub
+              | empty  
   '''
   if p[0] == None:
     p[0] = ""
@@ -552,8 +561,10 @@ def p_repeat(p):
 def p_for(p):
   '''
   for : FOR ID FROM for_p BY for_operator var_cte_1 WHILE3 expression COLON block END
-  for_p : var_cte_1
-        | ID sub_call_args
+  for_p : ID for_pp
+        | CTE_I
+  for_pp : sub_call_args
+         | empty
   for_operator : operator
                | empty
   '''
