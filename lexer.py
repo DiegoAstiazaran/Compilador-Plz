@@ -67,6 +67,9 @@ tokens = [
   'CTE_I',
   'CTE_F',
   'CTE_STR',
+  'L_SQ_BRACKET'
+  'R_SQ_BRACKET'
+
 ] + list(reserved.values())
 
 t_COLON     = r':'
@@ -90,6 +93,9 @@ t_EQ_TO     = r'=='
 t_OR_OP     = r'\|'
 t_AND_OP    = r'&'
 t_NOT_OP    = r'~'
+t_L_SQ_BRACKET = r'\['
+t_R_SQ_BRACKET = r'\]'
+
 
 def t_ID(t):
   r'[a-z][a-zA-Z_0-9]*'

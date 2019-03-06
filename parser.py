@@ -51,9 +51,8 @@ def p_statement(p):
             | conditional
             | write
             | cycle
-            | subcall
+            | sub_call
             | return
-            | attr_call
   '''
   if len(p) == 2:
       p[0] = p[1]
@@ -280,6 +279,77 @@ def p_initialization(p):
   else:
     raise Exception('Invalid expression for parser in p_initialization')
 
+def p_assignment(p):
+  '''
+  assignment : assignment_p DOT
+  assignment_p : assig_var
+               | assig_cont
+               | assig_attr
+  '''
+  if len(p) == 3:
+    p[0] = p[1]
+  elif len(p) == 3:
+    p[0] = p[1] + p[2]
+  else:
+    raise Exception('Invalid expression for parser in p_assignment')
+
+def p_assig_var(p):
+  '''
+  assig_var : ID EQUAL expression
+  '''
+  if len(p) == 4:
+    p[0] = p[1] + p[2] + p[3]
+  else:
+    raise Exception('Invalid expression for parser in p_assig_var')
+
+def p_assig_cont(p):
+  '''
+  assig_cont : access EQUAL expression
+  '''
+  if len(p) == 4:
+    p[0] = p[1] + space + p[2] + space + p[3]
+  else:
+    raise Exception('Invalid expression for parser in p_assig_cont')
+
+def p_assig_attr(p):
+  '''
+  assig_attr : ID COLON assig_attr_p EQUAL expression
+  assig_attr_p : ID
+               | access
+  '''
+  if len(p) == 6:
+    p[0] = p[1] + p[2] + p[3] + p[4] + p[5]
+  elif len(p) == 2:
+    p[0] = p[1]
+  else:
+    raise Exception('Invalid expression for parser in p_assig_attr')
+
+def p_constructor(p):
+  '''
+  constructor : SUB CLASS_NAME L_PAREN constructor_params R_PAREN COLON constructor_p block END
+  constructor_params : type ID constructor_params_p
+  constructor_params_p : COMMA constructor_params
+                       | empty
+  constructor_p : constructor_pp constructor_ppp
+               | empty
+  constructor_pp : initialization
+                | declaration
+  constructor_ppp : constructor_p
+                 | empty
+  '''
+  if p[0] == None:
+    p[0] = ""
+  elif len(p) == 2:
+    p[0] = p[1]
+  elif len(p) == 3:
+    p[0] = p[1] + p[2]
+  elif len(p) == 4:
+    p[0] = p[1] + space + p[2] + p[3]
+  elif len(p) == 10:
+    p[0] = p[1] + space + p[2] + p[3] + p[4] + p[5] + p[6] + p[7] + endline + p[8] + endline + p[9]
+  else:
+    raise Exception('Invalid expression for parser in p_constructor')
+
 def p_relational(p):
   '''
   relational : L_THAN
@@ -405,7 +475,108 @@ def p_subroutine(p):
   else:
     raise Exception('Invalid expression for parser in p_subroutine')
 
+def p_write(p):
+  '''
+  write : PRINT COLON write_p END
+  write_p : expression write_pp
+  write_pp : COMMA write_p
+           | empty
+  '''
+  if p[0] == None:
+    p[0] = ""
+  elif len(p) == 3:
+    p[0] = p[1] + p[2]
+  elif len(p) == 4:
+    p[0] = p[1] + p[2] + space + p[3]
+  else:
+    raise Exception('Invalid expression for parser in p_write')
 
+def p_condition(p):
+  '''
+  condition : IF condition_p condition_ppp END
+  condition_p : expression COLON block condition_pp
+  condition_pp : ELSIF condition_p
+               | empty
+  condition_ppp : ELSE block
+                : empty
+  '''
+  if p[0] == None:
+    p[0] = ""
+  elif len(p) == 3:
+    p[0] = p[1] + space + p[2]
+  elif len(p) == 5:
+    p[0] = p[1] + space + p[2] + p[3] + space + p[4]
+  else:
+    raise Exception('Invalid expression for parser in p_write')
+
+def p_cycle(p):
+  '''
+  cycle : while
+        | repeat
+        | for
+  '''
+
+
+def p_operator(p):
+  '''
+  operator : PLUS
+           | MINUS
+           | MULTIPLY
+           | DIVIDE
+  '''
+
+def p_access(p):
+  '''
+  access : ID L_SQ_BRACKET expression R_SQ_BRACKET access_p
+  access_p : L_SQ_BRACKET expression R_SQ_BRACKET
+  '''
+
+def p_while(p):
+  '''
+  while : WHILE expression REPEAT COLON block END
+  '''
+
+def p_repeat(p):
+  '''
+  repeat : REPEAT COLON block WHILE expression END
+  '''
+
+def p_for(p):
+  '''
+  for : FOR ID FROM for_p BY for_operator var_cte_1 WHILE expression COLON block END
+  for_p : var_cte_1
+        | sub_call
+  for_operator : operator
+               | empty
+  '''
+
+def p_sub_call(p):
+  '''
+  sub_call : sub_call_object ID L_PAREN sub_call_args R_PAREN
+  sub_call_object : ID COLON
+                  | empty
+  sub_call_args : expression sub_call_args_p
+                | empty
+  sub_call_args_p : COMMA sub_call_args
+                  | empty
+  '''
+
+def p_read(p):
+  '''
+  read : READ COLON read_p END
+  read_p : read_pp read_ppp
+  read_pp : ID
+          | access
+  read_ppp : COMMA read_p
+  '''
+
+def p_type(p):
+  '''
+  type : INT
+       | FLT
+       | BOOL
+       | STR
+  '''
 
 
 def p_empty(p):
