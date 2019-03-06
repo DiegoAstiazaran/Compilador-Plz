@@ -506,7 +506,7 @@ def p_condition(p):
 
 def p_cycle(p):
   '''
-  cycle : while
+  cycle : when
         | repeat
         | for
   '''
@@ -540,18 +540,18 @@ def p_access(p):
   else:
     raise Exception('Invalid expression for parser in p_access')
 
-def p_while(p):
+def p_when(p):
   '''
-  while : WHILE expression REPEAT COLON block END
+  when : WHEN expression REPEAT COLON block END
   '''
   if len(p) == 7:
     p[0] = p[1] + space + p[2] + space + p[3] + p[4] + newline + p[5] + newline + p[6]
   else:
-    raise Exception('Invalid expression for parser in p_while')
+    raise Exception('Invalid expression for parser in p_when')
 
 def p_repeat(p):
   '''
-  repeat : REPEAT COLON block WHILE2 expression END
+  repeat : REPEAT COLON block WHILE expression END
   '''
   if len(p) == 7:
     p[0] = p[1] + p[2] + newline + p[3] + newline + p[4] + space + p[5] + space + p[6]
@@ -560,7 +560,7 @@ def p_repeat(p):
 
 def p_for(p):
   '''
-  for : FOR ID FROM for_p BY for_operator var_cte_1 WHILE3 expression COLON block END
+  for : FOR ID FROM for_p BY for_operator var_cte_1 WHILE expression COLON block END
   for_p : ID for_pp
         | CTE_I
   for_pp : sub_call_args
