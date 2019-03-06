@@ -28,6 +28,7 @@ reserved = {
   'int' : 'INT',
   'flt' : 'FLT',
   'bool' : 'BOOL',
+  'str' : 'STR',
   'gt' : 'GT',
   'lt' : 'LT',
   'gte' : 'GTE',
@@ -42,7 +43,6 @@ reserved = {
 tokens = [
   'ID',
   'CLASS_NAME',
-  'SUB_NAME',
 	'COLON',
 	'PLUS',
 	'MINUS',
@@ -67,32 +67,31 @@ tokens = [
   'CTE_I',
   'CTE_F',
   'CTE_STR',
-  'L_SQ_BRACKET'
+  'L_SQ_BRACKET',
   'R_SQ_BRACKET'
-
 ] + list(reserved.values())
 
-t_COLON     = r':'
-t_PLUS      = r'\+'
-t_MINUS     = r'-'
-t_MULTIPLY  = r'\*'
-t_DIVIDE    = r'/'
-t_L_PAREN   = r'\('
-t_R_PAREN   = r'\)'
-t_DOT       = r'\.'
-t_EQUAL     = r'='
-t_L_BRACKET = r'{'
-t_R_BRACKET = r'}'
-t_COMMA     = r','
-t_L_THAN    = r'<'
-t_G_THAN    = r'>'
-t_NOT_EQ    = r'~='
-t_L_THAN_EQ = r'<='
-t_G_THAN_EQ = r'>='
-t_EQ_TO     = r'=='
-t_OR_OP     = r'\|'
-t_AND_OP    = r'&'
-t_NOT_OP    = r'~'
+t_COLON        = r':'
+t_PLUS         = r'\+'
+t_MINUS        = r'-'
+t_MULTIPLY     = r'\*'
+t_DIVIDE       = r'/'
+t_L_PAREN      = r'\('
+t_R_PAREN      = r'\)'
+t_DOT          = r'\.'
+t_EQUAL        = r'='
+t_L_BRACKET    = r'{'
+t_R_BRACKET    = r'}'
+t_COMMA        = r','
+t_L_THAN       = r'<'
+t_G_THAN       = r'>'
+t_NOT_EQ       = r'~='
+t_L_THAN_EQ    = r'<='
+t_G_THAN_EQ    = r'>='
+t_EQ_TO        = r'=='
+t_OR_OP        = r'\|'
+t_AND_OP       = r'&'
+t_NOT_OP       = r'~'
 t_L_SQ_BRACKET = r'\['
 t_R_SQ_BRACKET = r'\]'
 
