@@ -9,6 +9,8 @@ from lexer import tokens # Import tokens defined in lexer
 space = " "
 newline = "\n"
 
+start = 'program'
+
 def p_program(p):
   '''
   program : program_p program_class program_subroutine block
@@ -51,14 +53,23 @@ def p_statement(p):
             | condition
             | write
             | cycle
-            | sub_call DOT
+            | statement_sub_call DOT
             | return
+  statement_sub_call : ID statement_sub_call_p
+  statement_sub_call_p : sub_call_args
+                       | COLON ID sub_call_args
   '''
   if len(p) == 2:
       p[0] = p[1]
   else:
     raise Exception('Invalid expression for parser in p_statement')
-
+def p_sub_call_args(p):
+  '''
+  sub_call_args : expression sub_call_args_p
+                | empty
+  sub_call_args_p : COMMA sub_call_args
+                  | empty
+  '''
 def p_return(p):
   '''
   return : RETURN return_expression DOT
@@ -161,18 +172,10 @@ def p_factor(p):
 
 def p_class_block(p):
   '''
-  class_block : constructor class_block_private class_block_public
-  class_block_private : private
-                      | empty
-   class_block_public : public
-                      | empty
+  class_block : constructor private public
   '''
-  if p[0] == None:
-    p[0] = ""
-  elif len(p) == 2:
-    p[0] = p[1]
-  elif len(p) == 3:
-    p[0] = p[1] + newline + p[2]
+  if len(p) == 4:
+    p[0] = p[1] + newline + p[2] + newline + p[3]
   else:
     raise Exception('Invalid expression for parser in p_class_block')
 
@@ -286,7 +289,7 @@ def p_assignment(p):
                | assig_cont
                | assig_attr
   '''
-  if len(p) == 3:
+  if len(p) == 2:
     p[0] = p[1]
   elif len(p) == 3:
     p[0] = p[1] + p[2]
@@ -304,7 +307,7 @@ def p_assig_var(p):
 
 def p_assig_cont(p):
   '''
-  assig_cont : access EQUAL expression
+  assig_cont : ID access EQUAL expression
   '''
   if len(p) == 4:
     p[0] = p[1] + space + p[2] + space + p[3]
@@ -314,8 +317,9 @@ def p_assig_cont(p):
 def p_assig_attr(p):
   '''
   assig_attr : ID COLON assig_attr_p EQUAL expression
-  assig_attr_p : ID
-               | access
+  assig_attr_p : ID assig_attr_pp
+  assig_attr_pp : access
+                | empty
   '''
   if len(p) == 6:
     p[0] = p[1] + p[2] + p[3] + p[4] + p[5]
@@ -335,7 +339,6 @@ def p_constructor(p):
   constructor_pp : initialization
                  | declaration
   constructor_ppp : constructor_p
-                  | empty
   '''
   if p[0] == None:
     p[0] = ""
@@ -394,33 +397,17 @@ def p_var_cte_1(p):
   else:
     raise Exception('Invalid expression for parser in p_var_cte_1')
 
-def p_var_cte_2(p):
+def p_var_cte_4(p):
   '''
-  var_cte_2 : var_cte_1
+  var_cte_4 : CTE_I
             | CTE_F
             | CTE_STR
             | cte_b
-  '''
-  if len(p) == 2:
-    p[0] = p[1]
-  else:
-    raise Exception('Invalid expression for parser in p_var_cte_2')
-
-def p_var_cte_3(p):
-  '''
-  var_cte_3 : var_cte_2
-            | access
-  '''
-  if len(p) == 2:
-    p[0] = p[1]
-  else:
-    raise Exception('Invalid expression for parser in p_var_cte_3')
-
-def p_var_cte_4(p):
-  '''
-  var_cte_4 : var_cte_3
-            | sub_call
-            | attr_call
+            | ID var_cte_4_p
+  var_cte_4_p : sub_call_args
+              | COLON ID var_cte_4_pp
+  var_cte_4_pp : access
+               | sub_call_args
   '''
   if len(p) == 2:
     p[0] = p[1]
@@ -460,7 +447,6 @@ def p_subroutine(p):
   subroutine_pp : initialization
                 | declaration
   subroutine_ppp : subroutine_p
-                 | empty
   '''
   if p[0] == None:
     p[0] = ""
@@ -534,8 +520,9 @@ def p_operator(p):
 
 def p_access(p):
   '''
-  access : ID L_SQ_BRACKET expression R_SQ_BRACKET access_p
+  access : L_SQ_BRACKET expression R_SQ_BRACKET access_p
   access_p : L_SQ_BRACKET expression R_SQ_BRACKET
+           | empty
   '''
   if len(p) == 4:
     p[0] = p[1] + p[2] + p[3]
@@ -555,7 +542,7 @@ def p_while(p):
 
 def p_repeat(p):
   '''
-  repeat : REPEAT COLON block WHILE expression END
+  repeat : REPEAT COLON block WHILE2 expression END
   '''
   if len(p) == 7:
     p[0] = p[1] + p[2] + newline + p[3] + newline + p[4] + space + p[5] + space + p[6]
@@ -564,9 +551,9 @@ def p_repeat(p):
 
 def p_for(p):
   '''
-  for : FOR ID FROM for_p BY for_operator var_cte_1 WHILE expression COLON block END
+  for : FOR ID FROM for_p BY for_operator var_cte_1 WHILE3 expression COLON block END
   for_p : var_cte_1
-        | sub_call
+        | ID sub_call_args
   for_operator : operator
                | empty
   '''
@@ -579,32 +566,14 @@ def p_for(p):
   else:
     raise Exception('Invalid expression for parser in p_for')
 
-def p_sub_call(p):
-  '''
-  sub_call : sub_call_object ID L_PAREN sub_call_args R_PAREN
-  sub_call_object : ID COLON
-                  | empty
-  sub_call_args : expression sub_call_args_p
-                | empty
-  sub_call_args_p : COMMA sub_call_args
-                  | empty
-  '''
-  if p[0] == None:
-    p[0] = ""
-  elif len(p) == 3:
-    p[0] = p[1] + space + p[2]
-  elif len(p) == 6:
-    p[0] = p[1] + space + p[2] + p[3] + p[4] + p[5]
-  else:
-    raise Exception('Invalid expression for parser in p_sub_call')
-
 def p_read(p):
   '''
   read : READ COLON read_p END
-  read_p : read_pp read_ppp
-  read_pp : ID
-          | access
-  read_ppp : COMMA read_p
+  read_p : read_pp read_pppp
+  read_pp : ID read_ppp
+  read_ppp : access
+           | empty
+  read_pppp : COMMA read_p
            | empty
   '''
   if len(p) == 2:
@@ -627,19 +596,6 @@ def p_type(p):
     p[0] = p[1]
   else:
     raise Exception('Invalid expression for parser in p_type')
-
-def p_attr_call(p):
-  '''
-  attr_call : ID COLON attr_call_p 
-  attr_call_p : ID
-              | access
-  '''
-  if len(p) == 2:
-    p[0] = p[1]
-  elif len(p) == 4:
-    p[0] = p[1] + p[2] + p[3]
-  else:
-    raise Exception('Invalid expression for parser in p_attr_call')
 
 def p_empty(p):
   'empty :'
