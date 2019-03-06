@@ -9,7 +9,7 @@ from lexer import tokens # Import tokens defined in lexer
 space = " "
 newline = "\n"
 
-start = 'program'
+start = 'for'
 
 def p_program(p):
   '''
@@ -55,12 +55,18 @@ def p_statement(p):
             | cycle
             | statement_sub_call DOT
             | return
-  statement_sub_call : ID statement_sub_call_p
-  statement_sub_call_p : sub_call_args
-                       | COLON ID sub_call_args
+  statement_sub_call : ID statement_sub_call_p sub_call_args
+  statement_sub_call_p : COLON ID
+                       | empty
   '''
-  if len(p) == 2:
-      p[0] = p[1]
+  if p[0] == None:
+    p[0] = ""
+  elif len(p) == 2:
+    p[0] = p[1]
+  elif len(p) == 3:
+    p[0] = p[1] + p[2]
+  elif len(p) == 4:
+    p[0] = p[1] + space + p[2] + p[3]
   else:
     raise Exception('Invalid expression for parser in p_statement')
 
@@ -76,6 +82,8 @@ def p_sub_call_args(p):
     p[0] = ""
   elif len(p) == 3:
     p[0] = p[1] + space + p[2]
+  elif len(p) == 4:
+    p[0] = p[1] + p[2] + p[3]
   else:
     raise Exception('Invalid expression for parser in p_sub_call_args')
 
@@ -163,7 +171,7 @@ def p_term(p):
 def p_factor(p):
   '''
   factor : L_PAREN expression R_PAREN
-         | factor_p var_cte_4
+         | factor_p var_cte_2
   factor_p : PLUS
            | MINUS
            | empty
@@ -267,7 +275,7 @@ def p_initialization(p):
   matrix_content : L_BRACKET array_content R_BRACKET matrix_content_p
   matrix_content_p : COMMA matrix_content
                    | empty
-  initialization_dict : var_cte_5 COLON expression initialization_dict_p
+  initialization_dict : var_cte_3 COLON expression initialization_dict_p
   initialization_dict_p : COMMA initialization_dict
                    | empty
   initialization_const : expression initialization_const_p
@@ -325,9 +333,8 @@ def p_assig_cont(p):
 
 def p_assig_attr(p):
   '''
-  assig_attr : ID COLON assig_attr_p EQUAL expression
-  assig_attr_p : ID assig_attr_pp
-  assig_attr_pp : access
+  assig_attr : ID COLON ID assig_attr_p EQUAL expression
+  assig_attr_p : access
                 | empty
   '''
   if len(p) == 6:
@@ -406,32 +413,42 @@ def p_var_cte_1(p):
   else:
     raise Exception('Invalid expression for parser in p_var_cte_1')
 
-def p_var_cte_4(p):
+def p_var_cte_2(p):
   '''
-  var_cte_4 : CTE_I
+  var_cte_2 : CTE_I
             | CTE_F
             | CTE_STR
             | cte_b
-            | ID var_cte_4_p
-  var_cte_4_p : sub_call_args
-              | COLON ID var_cte_4_pp
-  var_cte_4_pp : access
-               | sub_call_args
+            | id_calls
   '''
   if len(p) == 2:
     p[0] = p[1]
   else:
-    raise Exception('Invalid expression for parser in p_var_cte_4')
+    raise Exception('Invalid expression for parser in p_var_cte_2')
 
-def p_var_cte_5(p):
+def p_id_calls(p):
   '''
-  var_cte_5 : var_cte_1
+  id_calls : ID id_calls_p
+  id_calls_p : sub_call_args
+             | COLON ID id_calls_pp
+             | empty
+  id_calls_pp : access
+              | sub_call_args
+  '''
+  if len(p) == 2:
+    p[0] = p[1]
+  else:
+    raise Exception('Invalid expression for parser in p_id_calls')
+
+def p_var_cte_3(p):
+  '''
+  var_cte_3 : var_cte_1
             | CTE_STR
   '''
   if len(p) == 2:
     p[0] = p[1]
   else:
-    raise Exception('Invalid expression for parser in p_var_cte_5')
+    raise Exception('Invalid expression for parser in p_var_cte_3')
 
 def p_cte_b(p):
   '''
@@ -560,11 +577,7 @@ def p_repeat(p):
 
 def p_for(p):
   '''
-  for : FOR ID FROM for_p BY for_operator var_cte_1 WHILE expression COLON block END
-  for_p : ID for_pp
-        | CTE_I
-  for_pp : sub_call_args
-         | empty
+  for : FOR ID FROM id_calls BY for_operator var_cte_1 WHILE expression COLON block END
   for_operator : operator
                | empty
   '''
@@ -580,11 +593,10 @@ def p_for(p):
 def p_read(p):
   '''
   read : READ COLON read_p END
-  read_p : read_pp read_pppp
-  read_pp : ID read_ppp
-  read_ppp : access
-           | empty
-  read_pppp : COMMA read_p
+  read_p : ID read_pp read_ppp
+  read_pp : access
+          | empty
+  read_ppp : COMMA read_p
            | empty
   '''
   if len(p) == 2:
