@@ -18,7 +18,6 @@ def p_program(p):
             | empty
   program_pp : initialization
              | declaration
-             | assignment
   program_class : class program_class
                 | empty
   program_subroutine : subroutine program_subroutine
@@ -31,7 +30,7 @@ def p_program(p):
   elif len(p) == 3:
     p[0] = p[1] + newline + p[2]
   elif len(p) == 5:
-    p[0] = p[1] + newline + p[2] + newline + p[3] + newline + p[4] + newline + p[5]
+    p[0] = p[1] + newline + p[2] + newline + p[3] + newline + p[4]
   else:
     raise Exception('Invalid expression for parser in p_program')
 
@@ -58,7 +57,7 @@ def p_statement(p):
             | statement_sub_call DOT
             | return
   statement_sub_call : ID statement_sub_call_p sub_call_args
-  statement_sub_call_p : COLON ID
+  statement_sub_call_p : MONEY ID
                        | empty
   '''
   if p[0] == None:
@@ -335,7 +334,7 @@ def p_assig_cont(p):
 
 def p_assig_attr(p):
   '''
-  assig_attr : ID COLON ID assig_attr_p EQUAL expression
+  assig_attr : ID MONEY ID assig_attr_p EQUAL expression
   assig_attr_p : access
                 | empty
   '''
@@ -434,7 +433,7 @@ def p_id_calls(p):
   '''
   id_calls : ID id_calls_p
   id_calls_p : sub_call_args
-             | COLON ID id_calls_pp
+             | MONEY ID id_calls_pp
              | empty
   id_calls_pp : access
               | sub_call_args
