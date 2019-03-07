@@ -257,7 +257,7 @@ def p_array_size(p):
   array_size : L_PAREN CTE_I R_PAREN
   '''
   if len(p) == 4:
-    p[0] = p[1] + p[2] + p[3]
+    p[0] = p[1] + str(p[2]) + p[3]
   else:
     raise Exception('Invalid expression for parser in p_array_size')
 
@@ -412,7 +412,7 @@ def p_var_cte_1(p):
             | CTE_I
   '''
   if len(p) == 2:
-    p[0] = p[1]
+    p[0] = str(p[1])
   else:
     raise Exception('Invalid expression for parser in p_var_cte_1')
 
@@ -425,7 +425,7 @@ def p_var_cte_2(p):
             | id_calls
   '''
   if len(p) == 2:
-    p[0] = p[1]
+    p[0] = str(p[1])
   else:
     raise Exception('Invalid expression for parser in p_var_cte_2')
 
