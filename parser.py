@@ -9,7 +9,7 @@ from lexer import tokens # Import tokens defined in lexer
 space = " "
 newline = "\n"
 
-# start = 'program'
+start = 'de'
 
 def p_program(p):
   '''
@@ -208,8 +208,8 @@ def p_private(p):
     p[0] = ""
   elif len(p) == 3:
     p[0] = p[1] + newline + p[2]
-  elif len(p) == 4:
-    p[0] = p[1] + space + p[2] + newline + p[3]
+  elif len(p) == 6:
+    p[0] = p[1] + p[2] + newline + p[3] + newline + p[4] + newline + p[5]
   else:
     raise Exception('Invalid expression for parser in p_private')
 
@@ -225,8 +225,8 @@ def p_public(p):
     p[0] = ""
   elif len(p) == 3:
     p[0] = p[1] + newline + p[2]
-  elif len(p) == 4:
-    p[0] = p[1] + space + p[2] + newline + p[3]
+  elif len(p) == 6:
+    p[0] = p[1] + p[2] + newline + p[3] + newline + p[4] + newline + p[5]
   else:
     raise Exception('Invalid expression for parser in p_public')
 
@@ -246,8 +246,8 @@ def p_declaration(p):
     p[0] = p[1]
   elif len(p) == 3:
     p[0] = p[1] + p[2]
-  elif len(p) == 5:
-    p[0] = p[1] + space + p[2] + p[3] + p[4]
+  elif len(p) == 4:
+    p[0] = p[1] + space + p[2] + p[3]
   else:
     raise Exception('Invalid expression for parser in p_declaration')
 
@@ -294,7 +294,7 @@ def p_initialization(p):
     p[0] = p[1] + space + p[2] + space + p[3] + p[4] + p[5]
   elif len(p) == 7:
     p[0] = p[1] + space + p[2] + space + p[3] + space + p[4] + space + p[5] + space + p[6]
-  elif len(p) == 7:
+  elif len(p) == 8:
     p[0] = p[1] + space + p[2] + space + p[3] + space + p[4] + p[5] + p[6] + p[7]
   else:
     raise Exception('Invalid expression for parser in p_initialization')
