@@ -9,7 +9,7 @@ from lexer import tokens # Import tokens defined in lexer
 space = " "
 newline = "\n"
 
-start = 'for'
+# start = 'program'
 
 def p_program(p):
   '''
@@ -56,7 +56,7 @@ def p_statement(p):
             | statement_sub_call DOT
             | return
   statement_sub_call : ID statement_sub_call_p sub_call_args
-  statement_sub_call_p : COLON ID
+  statement_sub_call_p : MONEY ID
                        | empty
   '''
   if p[0] == None:
@@ -333,7 +333,7 @@ def p_assig_cont(p):
 
 def p_assig_attr(p):
   '''
-  assig_attr : ID COLON ID assig_attr_p EQUAL expression
+  assig_attr : ID MONEY ID assig_attr_p EQUAL expression
   assig_attr_p : access
                 | empty
   '''
@@ -430,7 +430,7 @@ def p_id_calls(p):
   '''
   id_calls : ID id_calls_p
   id_calls_p : sub_call_args
-             | COLON ID id_calls_pp
+             | MONEY ID id_calls_pp
              | empty
   id_calls_pp : access
               | sub_call_args

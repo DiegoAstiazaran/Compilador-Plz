@@ -45,6 +45,7 @@ tokens = [
   'ID',
   'CLASS_NAME',
 	'COLON',
+	'MONEY',
 	'PLUS',
 	'MINUS',
 	'MULTIPLY',
@@ -73,6 +74,7 @@ tokens = [
 ] + list(reserved.values())
 
 t_COLON        = r':'
+t_MONEY        = r'\$'
 t_PLUS         = r'\+'
 t_MINUS        = r'-'
 t_MULTIPLY     = r'\*'
