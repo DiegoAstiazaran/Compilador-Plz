@@ -9,7 +9,7 @@ from lexer import tokens # Import tokens defined in lexer
 space = " "
 newline = "\n"
 
-start = 'expression'
+start = 'program'
 
 def p_program(p):
   '''
@@ -36,9 +36,8 @@ def p_program(p):
 
 def p_block(p):
   '''
-  block : statement block_statement
-  block_statement : statement block_statement
-                  | empty
+  block : statement block
+        | empty
   '''
   if p[1] == None:
     p[0] = ""
@@ -200,6 +199,7 @@ def p_class_block(p):
 def p_private(p):
   '''
   private : PRIVATE COLON private_declaration private_sub END
+          | empty
   private_declaration : declaration private_declaration
                       | empty
   private_sub : subroutine private_sub
@@ -217,6 +217,7 @@ def p_private(p):
 def p_public(p):
   '''
   public : PUBLIC COLON public_declaration public_sub END
+         | empty
   public_declaration : declaration public_declaration
                       | empty
   public_sub : subroutine public_sub
@@ -246,7 +247,7 @@ def p_declaration(p):
   elif len(p) == 2:
     p[0] = p[1]
   elif len(p) == 3:
-    p[0] = p[1] + p[2]
+    p[0] = p[1] + space + p[2]
   elif len(p) == 4:
     p[0] = p[1] + space + p[2] + p[3]
   else:
@@ -264,9 +265,11 @@ def p_array_size(p):
 def p_initialization(p):
   '''
   initialization : initialization_p DOT
-  initialization_p : type ID initialization_array
+  initialization_p : type ID initialization_var
                    | DICT ID EQUAL L_BRACKET initialization_dict R_BRACKET
                    | CLASS_NAME ID EQUAL CLASS_NAME L_PAREN initialization_const R_PAREN
+  initialization_var : EQUAL expression
+                     | initialization_array
   initialization_array : array_size initialization_array_p
   initialization_array_p : EQUAL L_BRACKET array_content R_BRACKET
                          | array_size EQUAL L_BRACKET matrix_content R_BRACKET
@@ -285,6 +288,8 @@ def p_initialization(p):
   '''
   if p[1] == None:
     p[0] = ""
+  elif len(p) == 2:
+    p[0] = p[1]
   elif len(p) == 3:
     p[0] = p[1] + p[2]
   elif len(p) == 4:
@@ -351,6 +356,7 @@ def p_constructor(p):
   '''
   constructor : SUB CLASS_NAME L_PAREN constructor_params R_PAREN COLON constructor_p block END
   constructor_params : type ID constructor_params_p
+                     | empty
   constructor_params_p : COMMA constructor_params
                        | empty
   constructor_p : constructor_pp constructor_ppp
@@ -476,6 +482,7 @@ def p_subroutine(p):
   subroutine_return_type : type
                          | VOID
   subroutine_params : type ID subroutine_params_p
+                    | empty
   subroutine_params_p : COMMA subroutine_params
                     | empty
   subroutine_p : subroutine_pp subroutine_ppp
@@ -519,13 +526,15 @@ def p_condition(p):
   condition_p : expression COLON block condition_pp
   condition_pp : ELSIF condition_p
                | empty
-  condition_ppp : ELSE block
+  condition_ppp : ELSE COLON block
                 | empty
   '''
   if p[1] == None:
     p[0] = ""
   elif len(p) == 3:
     p[0] = p[1] + space + p[2]
+  elif len(p) == 4:
+    p[0] = p[1] + p[2] + newline + p[3]
   elif len(p) == 5:
     p[0] = p[1] + space + p[2] + p[3] + space + p[4]
   else:
@@ -560,7 +569,10 @@ def p_access(p):
   access_p : L_SQ_BRACKET expression R_SQ_BRACKET
            | empty
   '''
-  if len(p) == 4:
+
+  if p[1] == None:
+    p[0] = ""
+  elif len(p) == 4:
     p[0] = p[1] + p[2] + p[3]
   elif len(p) == 5:
     p[0] = p[1] + space + p[2] + space + p[3] + p[4]
@@ -587,7 +599,9 @@ def p_repeat(p):
 
 def p_for(p):
   '''
-  for : FOR ID FROM id_calls BY for_operator var_cte_1 WHILE expression COLON block END
+  for : FOR ID FROM for_p BY for_operator var_cte_1 WHILE expression COLON block END
+  for_p : id_calls
+        | CTE_I
   for_operator : operator
                | empty
   '''
@@ -602,13 +616,18 @@ def p_for(p):
 
 def p_read(p):
   '''
-  read : READ COLON read_p END
-  read_p : ID read_pp read_ppp
-  read_pp : access
+  read : READ COLON read_list END
+  read_list : read_p read_list_p
+  read_list_p : COMMA read_list
+              | empty
+  read_p : ID read_pp
+  read_pp : MONEY ID read_ppp
+          | access
           | empty
-  read_ppp : COMMA read_p
+  read_ppp : access
            | empty
   '''
+
   if p[1] == None:
     p[0] = ""
   elif len(p) == 2:
@@ -647,9 +666,11 @@ parser = yacc.yacc()
 
 while True:
   try:
-    s = input('input > ')
+      file = input('Filename: ')
+      with open(file, 'r') as myfile:
+          s = myfile.read()
   except EOFError:
-    break
-  if not s: continue
+      break
+  if not file: continue
   result = parser.parse(s)
   print(result)
