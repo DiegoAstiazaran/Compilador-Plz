@@ -9,7 +9,7 @@ from lexer import tokens # Import tokens defined in lexer
 space = " "
 newline = "\n"
 
-# start = 'program'
+start = 'for'
 
 def p_program(p):
   '''
@@ -56,7 +56,7 @@ def p_statement(p):
             | statement_sub_call DOT
             | return
   statement_sub_call : ID statement_sub_call_p sub_call_args
-  statement_sub_call_p : MONEY ID
+  statement_sub_call_p : COLON ID
                        | empty
   '''
   if p[0] == None:
@@ -202,7 +202,7 @@ def p_private(p):
   private_declaration : declaration private_declaration
                       | empty
   private_sub : subroutine private_sub
-              | empty  
+              | empty
   '''
   if p[0] == None:
     p[0] = ""
@@ -219,7 +219,7 @@ def p_public(p):
   public_declaration : declaration public_declaration
                       | empty
   public_sub : subroutine public_sub
-              | empty  
+              | empty
   '''
   if p[0] == None:
     p[0] = ""
@@ -326,19 +326,21 @@ def p_assig_cont(p):
   '''
   assig_cont : ID access EQUAL expression
   '''
-  if len(p) == 4:
-    p[0] = p[1] + space + p[2] + space + p[3]
+  if len(p) == 5:
+    p[0] = p[1] + space + p[2] + space + p[3] + p[4]
   else:
     raise Exception('Invalid expression for parser in p_assig_cont')
 
 def p_assig_attr(p):
   '''
-  assig_attr : ID MONEY ID assig_attr_p EQUAL expression
+  assig_attr : ID COLON ID assig_attr_p EQUAL expression
   assig_attr_p : access
                 | empty
   '''
-  if len(p) == 6:
-    p[0] = p[1] + p[2] + p[3] + p[4] + p[5]
+  if p[0] == None:
+    p[0] = ""
+  elif len(p) == 7:
+    p[0] = p[1] + p[2] + p[3] + p[4] + p[5] + p[6]
   elif len(p) == 2:
     p[0] = p[1]
   else:
@@ -430,13 +432,19 @@ def p_id_calls(p):
   '''
   id_calls : ID id_calls_p
   id_calls_p : sub_call_args
-             | MONEY ID id_calls_pp
+             | COLON ID id_calls_pp
              | empty
   id_calls_pp : access
               | sub_call_args
   '''
-  if len(p) == 2:
+  if p[0] == None:
+    p[0] = ""
+  elif len(p) == 2:
     p[0] = p[1]
+  elif len(p) == 3:
+    p[0] = p[1] + p[2]
+  elif len(p) == 4:
+    p[0] = p[1] + p[2] + space + p[3]
   else:
     raise Exception('Invalid expression for parser in p_id_calls')
 
@@ -498,8 +506,8 @@ def p_write(p):
     p[0] = ""
   elif len(p) == 3:
     p[0] = p[1] + p[2]
-  elif len(p) == 4:
-    p[0] = p[1] + p[2] + space + p[3]
+  elif len(p) == 5:
+    p[0] = p[1] + p[2] + space + p[3] + p[4]
   else:
     raise Exception('Invalid expression for parser in p_write')
 
@@ -552,8 +560,8 @@ def p_access(p):
   '''
   if len(p) == 4:
     p[0] = p[1] + p[2] + p[3]
-  elif len(p) == 6:
-    p[0] = p[1] + space + p[2] + p[3] + p[4] + p[5]
+  elif len(p) == 5:
+    p[0] = p[1] + space + p[2] + space + p[3] + p[4]
   else:
     raise Exception('Invalid expression for parser in p_access')
 
@@ -599,10 +607,14 @@ def p_read(p):
   read_ppp : COMMA read_p
            | empty
   '''
-  if len(p) == 2:
+  if p[0] == None:
+    p[0] = ""
+  elif len(p) == 2:
     p[0] = p[1]
   elif len(p) == 3:
     p[0] = p[1] + space + p[2]
+  elif len(p) == 4:
+    p[0] = p[1] + space + p[2] + p[3]
   elif len(p) == 5:
     p[0] = p[1] + p[2] + space + p[3] + space + p[4]
   else:
