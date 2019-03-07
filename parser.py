@@ -14,9 +14,11 @@ start = 'program'
 def p_program(p):
   '''
   program : program_p program_class program_subroutine block
-  program_p : initialization
-            | declaration
-            | assignment
+  program_p : program_pp program_p
+            | empty
+  program_pp : initialization
+             | declaration
+             | assignment
   program_class : class program_class
                 | empty
   program_subroutine : subroutine program_subroutine
