@@ -9,7 +9,7 @@ from lexer import tokens # Import tokens defined in lexer
 space = " "
 newline = "\n"
 
-start = 'factor'
+start = 'expression'
 
 def p_program(p):
   '''
@@ -182,7 +182,7 @@ def p_factor(p):
   elif len(p) == 2:
     p[0] = p[1]
   elif len(p) == 3:
-    p[0] = p[1] + space + p[2]
+    p[0] = p[1] + p[2]
   elif len(p) == 4:
     p[0] = p[1] + space + p[2] + space + p[3]
   else:
@@ -319,7 +319,7 @@ def p_assig_var(p):
   assig_var : ID EQUAL expression
   '''
   if len(p) == 4:
-    p[0] = p[1] + p[2] + p[3]
+    p[0] = p[1] + space + p[2] + space + p[3]
   else:
     raise Exception('Invalid expression for parser in p_assig_var')
 
@@ -437,6 +437,7 @@ def p_id_calls(p):
              | empty
   id_calls_pp : access
               | sub_call_args
+              | empty
   '''
   if p[1] == None:
     p[0] = ""
