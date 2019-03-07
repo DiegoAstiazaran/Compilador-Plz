@@ -9,7 +9,7 @@ from lexer import tokens # Import tokens defined in lexer
 space = " "
 newline = "\n"
 
-start = 'program'
+start = 'factor'
 
 def p_program(p):
   '''
@@ -60,7 +60,7 @@ def p_statement(p):
   statement_sub_call_p : MONEY ID
                        | empty
   '''
-  if p[0] == None:
+  if p[1] == None:
     p[0] = ""
   elif len(p) == 2:
     p[0] = p[1]
@@ -79,7 +79,7 @@ def p_sub_call_args(p):
   sub_call_args_pp : COMMA sub_call_args_p
                   | empty
   '''
-  if p[0] == None:
+  if p[1] == None:
     p[0] = ""
   elif len(p) == 3:
     p[0] = p[1] + space + p[2]
@@ -94,7 +94,7 @@ def p_return(p):
   return_expression : expression
                     | empty
   '''
-  if p[0] == None:
+  if p[1] == None:
     p[0] = ""
   elif len(p) == 2:
     p[0] = p[1]
@@ -109,7 +109,7 @@ def p_class(p):
   class_p : UNDER CLASS_NAME
           | empty
   '''
-  if p[0] == None:
+  if p[1] == None:
     p[0] = ""
   elif len(p) == 3:
     p[0] = p[1] + space + p[2]
@@ -126,7 +126,7 @@ def p_expression(p):
   expression_pp : relational
                 | logical
   '''
-  if p[0] == None:
+  if p[1] == None:
     p[0] = ""
   elif len(p) == 2:
     p[0] = p[1]
@@ -143,7 +143,7 @@ def p_exp(p):
   exp_pp : PLUS
          | MINUS
   '''
-  if p[0] == None:
+  if p[1] == None:
     p[0] = ""
   elif len(p) == 2:
     p[0] = p[1]
@@ -160,7 +160,7 @@ def p_term(p):
   term_pp : MULTIPLY
           | DIVIDE
   '''
-  if p[0] == None:
+  if p[1] == None:
     p[0] = ""
   elif len(p) == 2:
     p[0] = p[1]
@@ -177,7 +177,7 @@ def p_factor(p):
            | MINUS
            | empty
   '''
-  if p[0] == None:
+  if p[1] == None:
     p[0] = ""
   elif len(p) == 2:
     p[0] = p[1]
@@ -205,7 +205,7 @@ def p_private(p):
   private_sub : subroutine private_sub
               | empty
   '''
-  if p[0] == None:
+  if p[1] == None:
     p[0] = ""
   elif len(p) == 3:
     p[0] = p[1] + newline + p[2]
@@ -222,7 +222,7 @@ def p_public(p):
   public_sub : subroutine public_sub
               | empty
   '''
-  if p[0] == None:
+  if p[1] == None:
     p[0] = ""
   elif len(p) == 3:
     p[0] = p[1] + newline + p[2]
@@ -241,7 +241,7 @@ def p_declaration(p):
   declaration_ppp : array_size
                   | empty
   '''
-  if p[0] == None:
+  if p[1] == None:
     p[0] = ""
   elif len(p) == 2:
     p[0] = p[1]
@@ -283,7 +283,7 @@ def p_initialization(p):
   initialization_const_p : COMMA initialization_const
                          | empty
   '''
-  if p[0] == None:
+  if p[1] == None:
     p[0] = ""
   elif len(p) == 3:
     p[0] = p[1] + p[2]
@@ -338,7 +338,7 @@ def p_assig_attr(p):
   assig_attr_p : access
                 | empty
   '''
-  if p[0] == None:
+  if p[1] == None:
     p[0] = ""
   elif len(p) == 7:
     p[0] = p[1] + p[2] + p[3] + p[4] + p[5] + p[6]
@@ -359,7 +359,7 @@ def p_constructor(p):
                  | declaration
   constructor_ppp : constructor_p
   '''
-  if p[0] == None:
+  if p[1] == None:
     p[0] = ""
   elif len(p) == 2:
     p[0] = p[1]
@@ -438,7 +438,7 @@ def p_id_calls(p):
   id_calls_pp : access
               | sub_call_args
   '''
-  if p[0] == None:
+  if p[1] == None:
     p[0] = ""
   elif len(p) == 2:
     p[0] = p[1]
@@ -483,7 +483,7 @@ def p_subroutine(p):
                 | declaration
   subroutine_ppp : subroutine_p
   '''
-  if p[0] == None:
+  if p[1] == None:
     p[0] = ""
   elif len(p) == 2:
     p[0] = p[1]
@@ -503,7 +503,7 @@ def p_write(p):
   write_pp : COMMA write_p
            | empty
   '''
-  if p[0] == None:
+  if p[1] == None:
     p[0] = ""
   elif len(p) == 3:
     p[0] = p[1] + p[2]
@@ -521,7 +521,7 @@ def p_condition(p):
   condition_ppp : ELSE block
                 | empty
   '''
-  if p[0] == None:
+  if p[1] == None:
     p[0] = ""
   elif len(p) == 3:
     p[0] = p[1] + space + p[2]
@@ -590,7 +590,7 @@ def p_for(p):
   for_operator : operator
                | empty
   '''
-  if p[0] == None:
+  if p[1] == None:
     p[0] = ""
   elif len(p) == 2:
     p[0] = p[1]
@@ -608,7 +608,7 @@ def p_read(p):
   read_ppp : COMMA read_p
            | empty
   '''
-  if p[0] == None:
+  if p[1] == None:
     p[0] = ""
   elif len(p) == 2:
     p[0] = p[1]
