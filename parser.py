@@ -49,15 +49,14 @@ def p_block(p):
 def p_statement(p):
   '''
   statement : read
+            | write
             | assignment
             | condition
-            | write
             | cycle
-            | statement_sub_call DOT
             | return
-  statement_sub_call : ID statement_sub_call_p sub_call_args
-  statement_sub_call_p : MONEY ID
-                       | empty
+            | ID statement_sub_call sub_call_args DOT
+  statement_sub_call : MONEY ID
+                     | empty
   '''
   if p[1] == None:
     p[0] = ""
@@ -189,7 +188,11 @@ def p_factor(p):
 
 def p_class_block(p):
   '''
-  class_block : constructor private public
+  class_block : constructor class_block_private class_block_public
+  class_block_private : private
+                      | empty
+  class_block_public : public
+                     | empty
   '''
   if len(p) == 4:
     p[0] = p[1] + newline + p[2] + newline + p[3]
@@ -199,7 +202,6 @@ def p_class_block(p):
 def p_private(p):
   '''
   private : PRIVATE COLON private_declaration private_sub END
-          | empty
   private_declaration : declaration private_declaration
                       | empty
   private_sub : subroutine private_sub
@@ -217,11 +219,10 @@ def p_private(p):
 def p_public(p):
   '''
   public : PUBLIC COLON public_declaration public_sub END
-         | empty
   public_declaration : declaration public_declaration
-                      | empty
+                     | empty
   public_sub : subroutine public_sub
-              | empty
+             | empty
   '''
   if p[1] == None:
     p[0] = ""
@@ -281,8 +282,9 @@ def p_initialization(p):
                    | empty
   initialization_dict : var_cte_3 COLON expression initialization_dict_p
   initialization_dict_p : COMMA initialization_dict
-                   | empty
+                        | empty
   initialization_const : expression initialization_const_p
+                       | empty
   initialization_const_p : COMMA initialization_const
                          | empty
   '''
@@ -307,10 +309,11 @@ def p_initialization(p):
 
 def p_assignment(p):
   '''
-  assignment : assignment_p DOT
-  assignment_p : assig_var
-               | assig_cont
-               | assig_attr
+  assignment : ID assignment_obj assignment_access EQUAL expression DOT
+  assignment_obj : MONEY ID
+                 | empty
+  assignment_access : access
+                    | empty
   '''
   if len(p) == 2:
     p[0] = p[1]
@@ -319,39 +322,6 @@ def p_assignment(p):
   else:
     raise Exception('Invalid expression for parser in p_assignment')
 
-def p_assig_var(p):
-  '''
-  assig_var : ID EQUAL expression
-  '''
-  if len(p) == 4:
-    p[0] = p[1] + space + p[2] + space + p[3]
-  else:
-    raise Exception('Invalid expression for parser in p_assig_var')
-
-def p_assig_cont(p):
-  '''
-  assig_cont : ID access EQUAL expression
-  '''
-  if len(p) == 5:
-    p[0] = p[1] + space + p[2] + space + p[3] + p[4]
-  else:
-    raise Exception('Invalid expression for parser in p_assig_cont')
-
-def p_assig_attr(p):
-  '''
-  assig_attr : ID MONEY ID assig_attr_p EQUAL expression
-  assig_attr_p : access
-                | empty
-  '''
-  if p[1] == None:
-    p[0] = ""
-  elif len(p) == 7:
-    p[0] = p[1] + p[2] + p[3] + p[4] + p[5] + p[6]
-  elif len(p) == 2:
-    p[0] = p[1]
-  else:
-    raise Exception('Invalid expression for parser in p_assig_attr')
-
 def p_constructor(p):
   '''
   constructor : SUB CLASS_NAME L_PAREN constructor_params R_PAREN COLON constructor_p block END
@@ -359,11 +329,10 @@ def p_constructor(p):
                      | empty
   constructor_params_p : COMMA constructor_params
                        | empty
-  constructor_p : constructor_pp constructor_ppp
+  constructor_p : constructor_pp constructor_p
                 | empty
   constructor_pp : initialization
                  | declaration
-  constructor_ppp : constructor_p
   '''
   if p[1] == None:
     p[0] = ""
