@@ -54,9 +54,7 @@ def p_statement(p):
             | condition
             | cycle
             | return
-            | ID statement_sub_call sub_call_args DOT
-  statement_sub_call : MONEY ID
-                     | empty
+            | sub_call
   '''
   if p[1] == None:
     p[0] = ""
@@ -64,10 +62,25 @@ def p_statement(p):
     p[0] = p[1]
   elif len(p) == 3:
     p[0] = p[1] + p[2]
-  elif len(p) == 4:
-    p[0] = p[1] + space + p[2] + p[3]
+  elif len(p) == 5:
+    p[0] = p[1] + space + p[2] + p[3] + p[4]
   else:
     raise Exception('Invalid expression for parser in p_statement')
+
+def p_sub_call(p):
+  '''
+  sub_call : ID sub_call_p sub_call_args DOT
+  sub_call_p : MONEY ID
+             | empty
+  '''
+  if p[1] == None:
+    p[0] = ""
+  elif len(p) == 3:
+    p[0] = p[1] + p[2]
+  elif len(p) == 5:
+    p[0] = p[1] + space + p[2] + p[3] + p[4]
+  else:
+    raise Exception('Invalid expression for parser in p_sub_call')
 
 def p_sub_call_args(p):
   '''
@@ -129,7 +142,7 @@ def p_expression(p):
   elif len(p) == 2:
     p[0] = p[1]
   elif len(p) == 3:
-    p[0] = p[1] + space + p[2]
+    p[0] = p[1] + p[2]
   else:
     raise Exception('Invalid expression for parser in p_expression')
 
@@ -146,7 +159,7 @@ def p_exp(p):
   elif len(p) == 2:
     p[0] = p[1]
   elif len(p) == 3:
-    p[0] = p[1] + space + p[2]
+    p[0] = p[1] + p[2]
   else:
     raise Exception('Invalid expression for parser in p_exp')
 
@@ -194,7 +207,11 @@ def p_class_block(p):
   class_block_public : public
                      | empty
   '''
-  if len(p) == 4:
+  if p[0] == None:
+    p[0] = ""
+  elif len(p) == 2:
+    p[0] = p[1]
+  elif len(p) == 4:
     p[0] = p[1] + newline + p[2] + newline + p[3]
   else:
     raise Exception('Invalid expression for parser in p_class_block')
@@ -315,10 +332,14 @@ def p_assignment(p):
   assignment_access : access
                     | empty
   '''
-  if len(p) == 2:
+  if p[0] == None:
+    p[0] = ""
+  elif len(p) == 2:
     p[0] = p[1]
   elif len(p) == 3:
     p[0] = p[1] + p[2]
+  elif len(p) == 7:
+    p[0] = p[1] + space + p[2] + p[3] + space + p[4] + space + p[5] + p[6]
   else:
     raise Exception('Invalid expression for parser in p_assignment')
 
@@ -588,14 +609,13 @@ def p_read(p):
   read : READ COLON read_list END
   read_list : read_p read_list_p
   read_list_p : COMMA read_list
-              | empty
-  read_p : ID read_pp
-  read_pp : MONEY ID read_ppp
-          | access
-          | empty
-  read_ppp : access
+  read_p : ID read_obj read_access EQUAL expression DOT
+  read_obj : MONEY ID
            | empty
+  read_access : access
+              | empty
   '''
+
 
   if p[1] == None:
     p[0] = ""

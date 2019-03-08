@@ -1,4 +1,4 @@
-str file = 'THIS IS A TEST FILE FOR PARSER"
+str file = "THIS IS A TEST FILE FOR PARSER".
 
 int x = 0.
 int x.
@@ -18,9 +18,21 @@ class Persona :
     int x.
     flt x.
     bool x.
+    sub int erik(int a, bool b, str c, flt d):
+      a = b.
+      c = x < 8.
+    end
   end
 
   public:
+    int x.
+    flt x.
+    bool x.
+    sub flt funcion2(int a, bool b, str c, flt d):
+      a = b.
+      c = x < 8.
+      c[4] = id$id.
+    end
   end
 end
 
