@@ -207,7 +207,7 @@ def p_class_block(p):
   class_block_public : public
                      | empty
   '''
-  if p[0] == None:
+  if p[1] == None:
     p[0] = ""
   elif len(p) == 2:
     p[0] = p[1]
@@ -332,7 +332,7 @@ def p_assignment(p):
   assignment_access : access
                     | empty
   '''
-  if p[0] == None:
+  if p[1] == None:
     p[0] = ""
   elif len(p) == 2:
     p[0] = p[1]
@@ -427,13 +427,12 @@ def p_var_cte_2(p):
 
 def p_id_calls(p):
   '''
-  id_calls : ID id_calls_p
-  id_calls_p : sub_call_args
-             | MONEY ID id_calls_pp
+  id_calls : ID id_calls_obj id_calls_p
+  id_calls_obj : MONEY ID
+               | empty
+  id_calls_p : access
+             | sub_call_args
              | empty
-  id_calls_pp : access
-              | sub_call_args
-              | empty
   '''
   if p[1] == None:
     p[0] = ""
@@ -609,13 +608,13 @@ def p_read(p):
   read : READ COLON read_list END
   read_list : read_p read_list_p
   read_list_p : COMMA read_list
-  read_p : ID read_obj read_access EQUAL expression DOT
+              | empty
+  read_p : ID read_obj read_access
   read_obj : MONEY ID
            | empty
   read_access : access
               | empty
   '''
-
 
   if p[1] == None:
     p[0] = ""
@@ -623,10 +622,10 @@ def p_read(p):
     p[0] = p[1]
   elif len(p) == 3:
     p[0] = p[1] + space + p[2]
-  elif len(p) == 4:
-    p[0] = p[1] + space + p[2] + p[3]
   elif len(p) == 5:
     p[0] = p[1] + p[2] + space + p[3] + space + p[4]
+  elif len(p) == 4:
+    p[0] = p[1] + p[2] + space + p[3]
   else:
     raise Exception('Invalid expression for parser in p_read')
 
