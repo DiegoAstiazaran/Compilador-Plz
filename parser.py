@@ -131,20 +131,30 @@ def p_class(p):
 
 def p_expression(p):
   '''
-  expression : exp expression_p
-  expression_p : expression_pp exp
+  expression : mini_expression expression_p
+  expression_p : logical expression
                | empty
-  expression_pp : relational
-                | logical
   '''
   if p[1] == None:
     p[0] = ""
-  elif len(p) == 2:
-    p[0] = p[1]
   elif len(p) == 3:
-    p[0] = p[1] + p[2]
+    p[0] = p[1] + space + p[2]
   else:
     raise Exception('Invalid expression for parser in p_expression')
+
+
+def p_mini_expression(p):
+  '''
+  mini_expression : exp mini_expression_p
+  mini_expression_p : relational exp
+                    | empty
+  '''
+  if p[1] == None:
+    p[0] = ""
+  elif len(p) == 3:
+    p[0] = p[1] + space + p[2]
+  else:
+    raise Exception('Invalid expression for parser in p_mini_expression')
 
 def p_exp(p):
   '''
