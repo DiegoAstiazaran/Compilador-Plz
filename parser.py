@@ -196,6 +196,8 @@ def p_factor(p):
          | factor_p var_cte_2
   factor_p : PLUS
            | MINUS
+           | NOT
+           | NOT_OP
            | empty
   '''
   if p[1] == None:
@@ -402,10 +404,8 @@ def p_logical(p):
   '''
   logical : OR_OP
           | AND_OP
-          | NOT_OP
           | OR
           | AND
-          | NOT
   '''
   if len(p) == 2:
     p[0] = p[1]
