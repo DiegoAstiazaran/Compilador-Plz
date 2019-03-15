@@ -1,0 +1,113 @@
+str file = "THIS IS A TEST FILE FOR PARSER".
+
+int x = 0.
+int x.
+flt x.
+bool das.
+str x = "ddsad".
+
+class Persona :
+  sub Persona():
+    int x = 5 + 6 .
+    if (5 < 4 ):
+      print: 4324, fdsfsd, id$arr[4] end
+    end
+  end
+
+  private:
+    int x.
+    flt x.
+    bool x.
+    sub int erik(int a, bool b, str c, flt d):
+      a = b.
+      c = x < 8.
+    end
+  end
+
+  public:
+    int x.
+    flt x.
+    bool x.
+    sub flt funcion2(int a, bool b, str c, flt d):
+      a = b.
+      c = x < 8.
+      c[4] = id$id.
+    end
+  end
+end
+
+class Hombre under Persona :
+  sub Persona():
+    int x = 5 + 6 .
+    if (5 < 4):
+      print: 4324, fdsfsd, id$arr[4] end
+    end
+  end
+
+  private:
+    int x.
+    flt x.
+    bool x.
+  end
+
+  public:
+  end
+end
+
+sub void funcion(int x, bool y):
+  return 432.
+end
+
+sub void funcion(int x, bool y):
+  return 432.
+end
+
+sub void funcion(int x, bool y):
+  return 432.
+end
+
+return fsd.
+
+read: x,y,z, id$id, id$id[321] end
+
+read: dsa[fdfs] end
+
+x = 4.
+
+is = 5 < 4.
+
+if (5 < 4 ):
+  print: 4324, fdsfsd, id$arr[4] end
+elsif ( 6< 4) :
+
+else:
+
+end
+
+print: 4324, fdsfsd, id$arr[4] end
+
+when 7 repeat:
+  x = 7.
+end
+
+repeat:
+  if (5 < 4 ):
+    print: 4324, fdsfsd, id$arr[4] end
+  elsif ( 6< 4) :
+
+  else:
+  x = x[5].
+  x = x[5].
+
+  end
+while 7 > 8 end
+
+for a from x$x[432] by /3 while True:
+  print: x,y,z end
+end
+
+imprimir().
+
+id$ifsd(x,y,y, (8+9&5) < (4*7/fd+5.5) ).
+
+x = a + b - 7 > 8 + 7 * 6 and True or False > 8.
