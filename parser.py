@@ -17,10 +17,8 @@ start = 'program'
 def p_program(p):
   '''
   program : program_p program_class program_subroutine block
-  program_p : program_pp program_p
+  program_p : decl_init program_p
             | empty
-  program_pp : initialization
-             | declaration
   program_class : class program_class
                 | empty
   program_subroutine : subroutine program_subroutine
@@ -244,10 +242,8 @@ def p_constructor(p):
                      | empty
   constructor_params_p : COMMA constructor_params
                        | empty
-  constructor_p : constructor_pp constructor_p
+  constructor_p : decl_init constructor_p
                 | empty
-  constructor_pp : initialization
-                 | declaration
   '''
   constructor_debug(p, parse_debug)
 
@@ -328,11 +324,8 @@ def p_subroutine(p):
                     | empty
   subroutine_params_p : COMMA subroutine_params
                     | empty
-  subroutine_p : subroutine_pp subroutine_ppp
+  subroutine_p : decl_init subroutine_p
                | empty
-  subroutine_pp : initialization
-                | declaration
-  subroutine_ppp : subroutine_p
   '''
   subroutine_debug(p, parse_debug)
 
