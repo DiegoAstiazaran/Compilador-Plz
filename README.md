@@ -1,15 +1,15 @@
 # Compilador-Plz
 
 
-###Project Purpose
+### Project Purpose
 
 The purpose of this project is to learn the basic functionalities of a programming language compiler. To understand the processes that happen from lexical analysis to runtime. To understand and build a virtual machine that can execute the code.
 
-###Language main objective
+### Language main objective
 
 The category we chose for this language is number 3: A basic object oriented language, that provides mechanisms to define classes, attributes, methods, and single inheritance and the basic elements of a programming language such as loops, statements, expressions, input and output and basic data structures.
 
-###Reserved Words
+### Reserved Words
 
 |               |               |              |
 | ------------- | ------------- | ------------
@@ -26,7 +26,7 @@ The category we chose for this language is number 3: A basic object oriented lan
 | neq  | True | False
 | dict  | when |
 
-###Tokens
+### Tokens
 
 |               |               |              |
 | ------------- | ------------- | ------------
@@ -40,7 +40,7 @@ The category we chose for this language is number 3: A basic object oriented lan
 | CTE_F  | CTE_STR  | L_SQ_BRACKET
 | R_SQ_BRACKET  |   |
 
-###NON TERMINALS
+### NON TERMINALS
 
 |               |               |              |
 | ------------- | ------------- | ------------
@@ -59,7 +59,7 @@ The category we chose for this language is number 3: A basic object oriented lan
 | SUB_CALL_ARGS  | ID_CALLS  | TYPE
 | READ  |   |
 
-###DATA TYPES
+### DATA TYPES
 
 As of this moment, Plz will only have the types Integer, Float, String and Boolean, with the possibility of creating arrays, matrices and dictionaries that contain variables or elements of this types.
 The user will also be able to create their own classes and objects.
