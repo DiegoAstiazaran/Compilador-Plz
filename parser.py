@@ -9,7 +9,11 @@ from lexer import tokens # Import tokens defined in lexer
 space = " "
 newline = "\n"
 
+# Sets main grammar rule
 start = 'program'
+
+# Functions for all grammar rules
+# Function name indicates what each of them are used for
 
 def p_program(p):
   '''
@@ -662,6 +666,7 @@ def p_error(p):
 # Build the parser
 parser = yacc.yacc()
 
+# Execution of parser with a filename
 while True:
   try:
       file = input('Filename: ')

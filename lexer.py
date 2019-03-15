@@ -1,8 +1,9 @@
 # Erik Torres A01196362
 # Diego Astiazaran A01243969
 
-import ply.lex as lex
+import ply.lex as lex # Import lex module
 
+# Tokens for reserved words
 reserved = {
   'return' : 'RETURN',
   'class' : 'CLASS',
@@ -41,6 +42,7 @@ reserved = {
   'dict' : 'DICT',
 }
 
+# List of tokens that include reserved words tokens
 tokens = [
   'ID',
   'CLASS_NAME',
@@ -73,6 +75,7 @@ tokens = [
   'R_SQ_BRACKET'
 ] + list(reserved.values())
 
+# Regular expressions for one character long tokens
 t_COLON        = r':'
 t_MONEY        = r'\$'
 t_PLUS         = r'\+'
@@ -98,7 +101,7 @@ t_NOT_OP       = r'~'
 t_L_SQ_BRACKET = r'\['
 t_R_SQ_BRACKET = r'\]'
 
-
+# Functions with regex for complex tokens
 def t_ID(t):
   r'[a-z][a-zA-Z_0-9]*'
   t.type = reserved.get(t.value,'ID')
@@ -124,18 +127,23 @@ def t_CTE_STR(t):
   t.value = t.value[1:-1]
   return t
 
+# Define a rule so we can track line numbers
 def t_newline(t):
   r'\n+'
   t.lexer.lineno += len(t.value)
 
+# A string containing ignored characters (spaces and tabs)
 t_ignore  = ' \t'
 
+# Error handling rule
 def t_error(t):
   print("Illegal character '%s'" % t.value[0])
   t.lexer.skip(1)
 
+# Initializes lexer
 lexer = lex.lex()
 
+# Code needed to test lexer
 # while True:
 #   try:
 #     lexer = lex.lex()
