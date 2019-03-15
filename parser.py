@@ -4,10 +4,9 @@
 import ply.yacc as yacc # Import yacc module
 
 from lexer import tokens # Import tokens defined in lexer
+from parserDebug import * # Import functions to debug parser
 
-# Define space and newline
-space = " "
-newline = "\n"
+parse_debug = False # Boolean for debugging parser
 
 # Sets main grammar rule
 start = 'program'
@@ -27,28 +26,14 @@ def p_program(p):
   program_subroutine : subroutine program_subroutine
                      | empty
   '''
-  if p[1] == None:
-    p[0] = ""
-  elif len(p) == 2:
-    p[0] = p[1]
-  elif len(p) == 3:
-    p[0] = p[1] + newline + p[2]
-  elif len(p) == 5:
-    p[0] = p[1] + newline + p[2] + newline + p[3] + newline + p[4]
-  else:
-    raise Exception('Invalid expression for parser in p_program')
+  program_debug(p, parse_debug)
 
 def p_block(p):
   '''
   block : statement block
         | empty
   '''
-  if p[1] == None:
-    p[0] = ""
-  elif len(p) == 3:
-    p[0] = p[1] + newline + p[2]
-  else:
-    raise Exception('Invalid expression for parser in p_block')
+  block_debug(p, parse_debug)
 
 def p_statement(p):
   '''
@@ -60,16 +45,7 @@ def p_statement(p):
             | return
             | sub_call
   '''
-  if p[1] == None:
-    p[0] = ""
-  elif len(p) == 2:
-    p[0] = p[1]
-  elif len(p) == 3:
-    p[0] = p[1] + p[2]
-  elif len(p) == 5:
-    p[0] = p[1] + space + p[2] + p[3] + p[4]
-  else:
-    raise Exception('Invalid expression for parser in p_statement')
+  statement_debug(p, parse_debug)
 
 def p_sub_call(p):
   '''
@@ -77,14 +53,7 @@ def p_sub_call(p):
   sub_call_p : MONEY ID
              | empty
   '''
-  if p[1] == None:
-    p[0] = ""
-  elif len(p) == 3:
-    p[0] = p[1] + p[2]
-  elif len(p) == 5:
-    p[0] = p[1] + space + p[2] + p[3] + p[4]
-  else:
-    raise Exception('Invalid expression for parser in p_sub_call')
+  sub_call_debug(p, parse_debug)
 
 def p_sub_call_args(p):
   '''
@@ -94,14 +63,7 @@ def p_sub_call_args(p):
   sub_call_args_pp : COMMA sub_call_args_p
                   | empty
   '''
-  if p[1] == None:
-    p[0] = ""
-  elif len(p) == 3:
-    p[0] = p[1] + space + p[2]
-  elif len(p) == 4:
-    p[0] = p[1] + p[2] + p[3]
-  else:
-    raise Exception('Invalid expression for parser in p_sub_call_args')
+  sub_call_args_debug(p, parse_debug)
 
 def p_return(p):
   '''
@@ -109,14 +71,7 @@ def p_return(p):
   return_expression : expression
                     | empty
   '''
-  if p[1] == None:
-    p[0] = ""
-  elif len(p) == 2:
-    p[0] = p[1]
-  elif len(p) == 4:
-    p[0] = p[1] + space + p[2] + p[3]
-  else:
-    raise Exception('Invalid expression for parser in p_return')
+  return_debug(p, parse_debug)
 
 def p_class(p):
   '''
@@ -124,14 +79,7 @@ def p_class(p):
   class_p : UNDER CLASS_NAME
           | empty
   '''
-  if p[1] == None:
-    p[0] = ""
-  elif len(p) == 3:
-    p[0] = p[1] + space + p[2]
-  elif len(p) == 7:
-    p[0] = p[1] + space + p[2] + space + p[3] + p[4] + newline + p[5] + newline + p[6]
-  else:
-    raise Exception('Invalid expression for parser in p_class')
+  class_debug(p, parse_debug)
 
 def p_expression(p):
   '''
@@ -139,13 +87,7 @@ def p_expression(p):
   expression_p : logical expression
                | empty
   '''
-  if p[1] == None:
-    p[0] = ""
-  elif len(p) == 3:
-    p[0] = p[1] + space + p[2]
-  else:
-    raise Exception('Invalid expression for parser in p_expression')
-
+  expression_debug(p, parse_debug)
 
 def p_mini_expression(p):
   '''
@@ -153,12 +95,7 @@ def p_mini_expression(p):
   mini_expression_p : relational exp
                     | empty
   '''
-  if p[1] == None:
-    p[0] = ""
-  elif len(p) == 3:
-    p[0] = p[1] + space + p[2]
-  else:
-    raise Exception('Invalid expression for parser in p_mini_expression')
+  mini_expression_debug(p, parse_debug)
 
 def p_exp(p):
   '''
@@ -168,14 +105,7 @@ def p_exp(p):
   exp_pp : PLUS
          | MINUS
   '''
-  if p[1] == None:
-    p[0] = ""
-  elif len(p) == 2:
-    p[0] = p[1]
-  elif len(p) == 3:
-    p[0] = p[1] + p[2]
-  else:
-    raise Exception('Invalid expression for parser in p_exp')
+  exp_debug(p, parse_debug)
 
 def p_term(p):
   '''
@@ -185,14 +115,7 @@ def p_term(p):
   term_pp : MULTIPLY
           | DIVIDE
   '''
-  if p[1] == None:
-    p[0] = ""
-  elif len(p) == 2:
-    p[0] = p[1]
-  elif len(p) == 3:
-    p[0] = p[1] + space + p[2]
-  else:
-    raise Exception('Invalid expression for parser in p_term')
+  term_debug(p, parse_debug)
 
 def p_factor(p):
   '''
@@ -204,16 +127,7 @@ def p_factor(p):
            | NOT_OP
            | empty
   '''
-  if p[1] == None:
-    p[0] = ""
-  elif len(p) == 2:
-    p[0] = p[1]
-  elif len(p) == 3:
-    p[0] = p[1] + p[2]
-  elif len(p) == 4:
-    p[0] = p[1] + space + p[2] + space + p[3]
-  else:
-    raise Exception('Invalid expression for parser in p_factor')
+  factor_debug(p, parse_debug)
 
 def p_class_block(p):
   '''
@@ -223,14 +137,7 @@ def p_class_block(p):
   class_block_public : public
                      | empty
   '''
-  if p[1] == None:
-    p[0] = ""
-  elif len(p) == 2:
-    p[0] = p[1]
-  elif len(p) == 4:
-    p[0] = p[1] + newline + p[2] + newline + p[3]
-  else:
-    raise Exception('Invalid expression for parser in p_class_block')
+  class_block_debug(p, parse_debug)
 
 def p_private(p):
   '''
@@ -240,14 +147,7 @@ def p_private(p):
   private_sub : subroutine private_sub
               | empty
   '''
-  if p[1] == None:
-    p[0] = ""
-  elif len(p) == 3:
-    p[0] = p[1] + newline + p[2]
-  elif len(p) == 6:
-    p[0] = p[1] + p[2] + newline + p[3] + newline + p[4] + newline + p[5]
-  else:
-    raise Exception('Invalid expression for parser in p_private')
+  private_debug(p, parse_debug)
 
 def p_public(p):
   '''
@@ -257,14 +157,7 @@ def p_public(p):
   public_sub : subroutine public_sub
              | empty
   '''
-  if p[1] == None:
-    p[0] = ""
-  elif len(p) == 3:
-    p[0] = p[1] + newline + p[2]
-  elif len(p) == 6:
-    p[0] = p[1] + p[2] + newline + p[3] + newline + p[4] + newline + p[5]
-  else:
-    raise Exception('Invalid expression for parser in p_public')
+  public_debug(p, parse_debug)
 
 def p_declaration(p):
   '''
@@ -276,25 +169,13 @@ def p_declaration(p):
   declaration_ppp : array_size
                   | empty
   '''
-  if p[1] == None:
-    p[0] = ""
-  elif len(p) == 2:
-    p[0] = p[1]
-  elif len(p) == 3:
-    p[0] = p[1] + space + p[2]
-  elif len(p) == 4:
-    p[0] = p[1] + space + p[2] + p[3]
-  else:
-    raise Exception('Invalid expression for parser in p_declaration')
+  declaration_debug(p, parse_debug)
 
 def p_array_size(p):
   '''
   array_size : L_PAREN CTE_I R_PAREN
   '''
-  if len(p) == 4:
-    p[0] = p[1] + str(p[2]) + p[3]
-  else:
-    raise Exception('Invalid expression for parser in p_array_size')
+  array_size_debug(p, parse_debug)
 
 def p_decl_init(p):
   '''
@@ -303,6 +184,7 @@ def p_decl_init(p):
               | decl_init_dict
               | decl_init_obj
   '''
+  decl_init_debug(p, parse_debug)
 
 def p_decl_init_var(p):
   '''
@@ -325,24 +207,8 @@ def p_decl_init_var(p):
   matrix_content : L_BRACKET array_content R_BRACKET matrix_content_p
   matrix_content_p : COMMA matrix_content
                    | empty
-
   '''
-  if p[1] == None:
-    p[0] = ""
-  elif len(p) == 2:
-    p[0] = p[1]
-  elif len(p) == 3:
-    p[0] = p[1] + p[2]
-  elif len(p) == 4:
-    p[0] = p[1] + p[2] + p[3]
-  elif len(p) == 5:
-    p[0] = p[1] + p[2] + p[3] + p[4]
-  elif len(p) == 6:
-    p[0] = p[1] + p[2] + p[3] + p[4] + p[5]
-  elif len(p) == 7:
-    p[0] = p[1] + space + p[2] + p[3] + space + p[4] + space + p[5] + p[6]
-  else:
-    raise Exception('Invalid expression for parser in p_decl_init_var')
+  decl_init_var_debug(p, parse_debug)
     
 def p_decl_init_dict(p):
   '''
@@ -353,26 +219,13 @@ def p_decl_init_dict(p):
   initialization_dict_p : COMMA initialization_dict
                         | empty
   '''
-  if p[1] == None:
-    p[0] = ""
-  elif len(p) == 3:
-    p[0] = p[1] + p[2]
-  elif len(p) == 4:
-    p[0] = p[1] + p[2] + p[3]
-  elif len(p) == 5:
-    p[0] = p[1] + p[2] + p[3] + p[4]
-  else:
-    raise Exception('Invalid expression for parser in p_decl_init_dict')
+  decl_init_dict_debug(p, parse_debug)
 
 def p_decl_init_obj(arg):
   '''
   decl_init_obj : CLASS_NAME ID EQUAL CLASS_NAME sub_call_args
   '''
-  if len(p) == 6:
-    p[0] = p[1] + p[2] + p[3] + p[4] + p[5]
-  else:
-    raise Exception('Invalid expression for parser in p_decl_init_obj')
-
+  decl_init_obj_debug(p, parse_debug)
 
 def p_assignment(p):
   '''
@@ -382,16 +235,7 @@ def p_assignment(p):
   assignment_access : access
                     | empty
   '''
-  if p[1] == None:
-    p[0] = ""
-  elif len(p) == 2:
-    p[0] = p[1]
-  elif len(p) == 3:
-    p[0] = p[1] + p[2]
-  elif len(p) == 7:
-    p[0] = p[1] + space + p[2] + p[3] + space + p[4] + space + p[5] + p[6]
-  else:
-    raise Exception('Invalid expression for parser in p_assignment')
+  assignment_debug(p, parse_debug)
 
 def p_constructor(p):
   '''
@@ -405,18 +249,7 @@ def p_constructor(p):
   constructor_pp : initialization
                  | declaration
   '''
-  if p[1] == None:
-    p[0] = ""
-  elif len(p) == 2:
-    p[0] = p[1]
-  elif len(p) == 3:
-    p[0] = p[1] + p[2]
-  elif len(p) == 4:
-    p[0] = p[1] + space + p[2] + p[3]
-  elif len(p) == 10:
-    p[0] = p[1] + space + p[2] + p[3] + p[4] + p[5] + p[6] + p[7] + newline + p[8] + newline + p[9]
-  else:
-    raise Exception('Invalid expression for parser in p_constructor')
+  constructor_debug(p, parse_debug)
 
 def p_relational(p):
   '''
@@ -433,10 +266,7 @@ def p_relational(p):
              | EQ
              | NEQ
   '''
-  if len(p) == 2:
-    p[0] = p[1]
-  else:
-    raise Exception('Invalid expression for parser in p_relational')
+  relational_debug(p, parse_debug)
 
 def p_logical(p):
   '''
@@ -445,20 +275,14 @@ def p_logical(p):
           | OR
           | AND
   '''
-  if len(p) == 2:
-    p[0] = p[1]
-  else:
-    raise Exception('Invalid expression for parser in p_logical')
+  logical_debug(p, parse_debug)
 
 def p_var_cte_1(p):
   '''
   var_cte_1 : ID
             | CTE_I
   '''
-  if len(p) == 2:
-    p[0] = str(p[1])
-  else:
-    raise Exception('Invalid expression for parser in p_var_cte_1')
+  var_cte_1_debug(p, parse_debug)
 
 def p_var_cte_2(p):
   '''
@@ -468,10 +292,7 @@ def p_var_cte_2(p):
             | cte_b
             | id_calls
   '''
-  if len(p) == 2:
-    p[0] = str(p[1])
-  else:
-    raise Exception('Invalid expression for parser in p_var_cte_2')
+  var_cte_2_debug(p, parse_debug)
 
 def p_id_calls(p):
   '''
@@ -482,36 +303,21 @@ def p_id_calls(p):
              | sub_call_args
              | empty
   '''
-  if p[1] == None:
-    p[0] = ""
-  elif len(p) == 2:
-    p[0] = p[1]
-  elif len(p) == 3:
-    p[0] = p[1] + p[2]
-  elif len(p) == 4:
-    p[0] = p[1] + p[2] + space + p[3]
-  else:
-    raise Exception('Invalid expression for parser in p_id_calls')
+  id_calls_debug(p, parse_debug)
 
 def p_var_cte_3(p):
   '''
   var_cte_3 : var_cte_1
             | CTE_STR
   '''
-  if len(p) == 2:
-    p[0] = p[1]
-  else:
-    raise Exception('Invalid expression for parser in p_var_cte_3')
+  var_cte_3_debug(p, parse_debug)
 
 def p_cte_b(p):
   '''
   cte_b : TRUE
         | FALSE
   '''
-  if len(p) == 2:
-    p[0] = p[1]
-  else:
-    raise Exception('Invalid expression for parser in p_cte_b')
+  cte_b_debug(p, parse_debug)
 
 def p_subroutine(p):
   '''
@@ -528,18 +334,7 @@ def p_subroutine(p):
                 | declaration
   subroutine_ppp : subroutine_p
   '''
-  if p[1] == None:
-    p[0] = ""
-  elif len(p) == 2:
-    p[0] = p[1]
-  elif len(p) == 3:
-    p[0] = p[1] + p[2]
-  elif len(p) == 4:
-    p[0] = p[1] + space + p[2] + space + p[3]
-  elif len(p) == 11:
-    p[0] = p[1] + space + p[2] + space + p[3] + space + p[4] + p[5] + p[6] + p[7] + newline + p[8] + newline + p[9] + newline + p[10]
-  else:
-    raise Exception('Invalid expression for parser in p_subroutine')
+  subroutine_debug(p, parse_debug)
 
 def p_write(p):
   '''
@@ -548,14 +343,7 @@ def p_write(p):
   write_pp : COMMA write_p
            | empty
   '''
-  if p[1] == None:
-    p[0] = ""
-  elif len(p) == 3:
-    p[0] = p[1] + p[2]
-  elif len(p) == 5:
-    p[0] = p[1] + p[2] + space + p[3] + p[4]
-  else:
-    raise Exception('Invalid expression for parser in p_write')
+  write_debug(p, parse_debug)
 
 def p_condition(p):
   '''
@@ -566,16 +354,7 @@ def p_condition(p):
   condition_ppp : ELSE COLON block
                 | empty
   '''
-  if p[1] == None:
-    p[0] = ""
-  elif len(p) == 3:
-    p[0] = p[1] + space + p[2]
-  elif len(p) == 4:
-    p[0] = p[1] + p[2] + newline + p[3]
-  elif len(p) == 5:
-    p[0] = p[1] + space + p[2] + p[3] + space + p[4]
-  else:
-    raise Exception('Invalid expression for parser in p_condition')
+  condition_debug(p, parse_debug)
 
 def p_cycle(p):
   '''
@@ -583,10 +362,7 @@ def p_cycle(p):
         | repeat
         | for
   '''
-  if len(p) == 2:
-    p[0] = p[1]
-  else:
-    raise Exception('Invalid expression for parser in p_cycle')
+  cycle_debug(p, parse_debug)
 
 def p_operator(p):
   '''
@@ -595,10 +371,7 @@ def p_operator(p):
            | MULTIPLY
            | DIVIDE
   '''
-  if len(p) == 2:
-    p[0] = p[1]
-  else:
-    raise Exception('Invalid expression for parser in p_operator')
+  operator_debug(p, parse_debug)
 
 def p_access(p):
   '''
@@ -606,33 +379,19 @@ def p_access(p):
   access_p : L_SQ_BRACKET expression R_SQ_BRACKET
            | empty
   '''
-
-  if p[1] == None:
-    p[0] = ""
-  elif len(p) == 4:
-    p[0] = p[1] + p[2] + p[3]
-  elif len(p) == 5:
-    p[0] = p[1] + space + p[2] + space + p[3] + p[4]
-  else:
-    raise Exception('Invalid expression for parser in p_access')
+  access_debug(p, parse_debug)
 
 def p_when(p):
   '''
   when : WHEN expression REPEAT COLON block END
   '''
-  if len(p) == 7:
-    p[0] = p[1] + space + p[2] + space + p[3] + p[4] + newline + p[5] + newline + p[6]
-  else:
-    raise Exception('Invalid expression for parser in p_when')
+  when_debug(p, parse_debug)
 
 def p_repeat(p):
   '''
   repeat : REPEAT COLON block WHILE expression END
   '''
-  if len(p) == 7:
-    p[0] = p[1] + p[2] + newline + p[3] + newline + p[4] + space + p[5] + space + p[6]
-  else:
-    raise Exception('Invalid expression for parser in p_repeat')
+  repeat_debug(p, parse_debug)
 
 def p_for(p):
   '''
@@ -642,14 +401,7 @@ def p_for(p):
   for_operator : operator
                | empty
   '''
-  if p[1] == None:
-    p[0] = ""
-  elif len(p) == 2:
-    p[0] = p[1]
-  elif len(p) == 13:
-    p[0] = p[1] + space + p[2] + space + p[3] + space + p[4] + space + p[5] + space + p[6] + p[7] + space + p[8] + space + p[9] + space + p[10] + newline + p[11] + newline + p[12]
-  else:
-    raise Exception('Invalid expression for parser in p_for')
+  for_debug(p, parse_debug)
 
 def p_read(p):
   '''
@@ -663,19 +415,7 @@ def p_read(p):
   read_access : access
               | empty
   '''
-
-  if p[1] == None:
-    p[0] = ""
-  elif len(p) == 2:
-    p[0] = p[1]
-  elif len(p) == 3:
-    p[0] = p[1] + space + p[2]
-  elif len(p) == 5:
-    p[0] = p[1] + p[2] + space + p[3] + space + p[4]
-  elif len(p) == 4:
-    p[0] = p[1] + p[2] + space + p[3]
-  else:
-    raise Exception('Invalid expression for parser in p_read')
+  read_debug(p, parse_debug)
 
 def p_type(p):
   '''
@@ -684,10 +424,7 @@ def p_type(p):
        | BOOL
        | STR
   '''
-  if len(p) == 2:
-    p[0] = p[1]
-  else:
-    raise Exception('Invalid expression for parser in p_type')
+  type_debug(p, parse_debug)
 
 def p_empty(p):
   'empty :'
