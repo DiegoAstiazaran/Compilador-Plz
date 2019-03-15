@@ -40,7 +40,7 @@ The category we chose for this language is number 3: A basic object oriented lan
 | CTE_F  | CTE_STR  | L_SQ_BRACKET
 | R_SQ_BRACKET  |   |
 
-### NON TERMINALS
+### Non terminals
 
 |               |               |              |
 | ------------- | ------------- | ------------
@@ -59,7 +59,7 @@ The category we chose for this language is number 3: A basic object oriented lan
 | SUB_CALL_ARGS  | ID_CALLS  | TYPE
 | READ  |   |
 
-### DATA TYPES
+### Data types
 
 As of this moment, Plz will only have the types Integer, Float, String and Boolean, with the possibility of creating arrays, matrices and dictionaries that contain variables or elements of this types.
 The user will also be able to create their own classes and objects.
