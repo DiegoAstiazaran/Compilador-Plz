@@ -1,4 +1,4 @@
-from constants import GLOBAL_BLOCK, CLASS_BLOCK
+from constants import GLOBAL_BLOCK, CLASS_BLOCK, CONSTRUCTOR_BLOCK
 
 # Stores variables for a block
 # Includes name, type and if it is public in case of class
@@ -47,7 +47,10 @@ class FunctionDirectory:
       self._function_table[block_name] = [type, directory, is_public]
     # Adding block to function directory of class
     else:
-      self._function_table[class_name][1].add_block(block_name, type, is_public)   
+      # Check if construcor is named as class
+      if type == CONSTRUCTOR_BLOCK and block_name != class_name:
+        raise Exception('Constructor in ' + class_name + ' should be named as class.')
+      self._function_table[class_name][1].add_block(block_name, type, is_public)
 
   # Adds a variable to a VariableDirectory of a block
   def add_variable(self, var_name, block_name, type, is_public, class_name = None):
