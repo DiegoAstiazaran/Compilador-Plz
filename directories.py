@@ -1,4 +1,4 @@
-from constants import *
+from constants import GLOBAL_BLOCK, CLASS_BLOCK
 
 # Stores variables for a block
 # Includes name, type and if it is public in case of class
@@ -9,6 +9,8 @@ class VariableDirectory:
 
   # Adds a variable to dictionary
   def add_variable(self, var_name, type, is_public):
+    if var_name in self._variable_table:
+      raise Exception('Variable ' + var_name + ' already defined in scope.')
     self._variable_table[var_name] = [type, is_public]
   
   # Used for debugging and testing purposes
@@ -30,9 +32,13 @@ class FunctionDirectory:
     if class_name == None:
       # Class block has a function directory
       if type == CLASS_BLOCK:
+        if block_name in self._function_table:
+          raise Exception('Class ' + block_name + ' is already defined.')
         directory = FunctionDirectory()
       # Other blocks have a variable directory
       else:
+        if block_name in self._function_table:
+          raise Exception('Block ' + block_name + ' already defined in scope.')
         directory = VariableDirectory()
       # Adds block to main function directory
       self._function_table[block_name] = [type, directory, is_public]
@@ -60,6 +66,7 @@ class FunctionDirectory:
     self.print()
     print("|   END FUNCTION DIRECTORY   |")
     print("------------------------------")
+    self._function_table.clear()
   
   # Used for debugging and testing purposes
   def print(self):

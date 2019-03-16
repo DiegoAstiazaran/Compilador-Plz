@@ -494,6 +494,7 @@ def p_empty(p):
 # Error rule for syntax errors
 def p_error(p):
   print("Syntax error in input!")
+  raise Exception('Syntax error in input!"')
 
 # Build the parser
 parser = yacc.yacc()

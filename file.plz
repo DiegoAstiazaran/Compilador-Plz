@@ -1,10 +1,10 @@
 str file = "THIS IS A TEST FILE FOR PARSER".
 
 int x = 0.
-int x.
-flt x.
+int x2.
+flt x3.
 bool das.
-str x = "ddsad".
+str x4 = "ddsad".
 
 class Persona :
   sub Persona():
@@ -16,8 +16,8 @@ class Persona :
 
   private:
     int x.
-    flt x.
-    bool x.
+    flt x2.
+    bool x3.
     sub int erik(int a, bool b, str c, flt d):
       a = b.
       c = x < 8.
@@ -25,9 +25,9 @@ class Persona :
   end
 
   public:
-    int x.
-    flt x.
-    bool x.
+    int x4.
+    flt x5.
+    bool x6.
     sub flt funcion2(int a, bool b, str c, flt d):
       a = b.
       c = x < 8.
@@ -46,8 +46,8 @@ class Hombre under Persona :
 
   private:
     int x.
-    flt x.
-    bool x.
+    flt x2.
+    bool x3.
   end
 
   public:
@@ -62,7 +62,7 @@ sub void funcion2(int x, bool y):
   return 432.
 end
 
-sub void funcion(int x, bool y):
+sub void funcion3(int x, bool y):
   return 432.
 end
 
