@@ -83,7 +83,7 @@ def p_return(p):
 def p_class(p):
   '''
   class : CLASS CLASS_NAME neural_class_decl class_p COLON class_block END neural_class_decl_end
-  class_p : UNDER CLASS_NAME
+  class_p : UNDER CLASS_NAME neural_class_decl_inheritance
           | empty
   '''
   class_debug(p, parse_debug)
@@ -100,6 +100,12 @@ def p_neural_class_decl_end(p):
   '''neural_class_decl_end :'''
   global current_class_block
   current_class_block = None
+
+# Called after CLASS_NAME when inheriting a class
+def p_neural_class_decl_inheritance(p):
+  '''neural_class_decl_inheritance :'''
+  class_name = p[-1]
+  function_directory.check_class(class_name)
 
 def p_expression(p):
   '''

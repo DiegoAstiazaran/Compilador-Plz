@@ -55,6 +55,10 @@ class FunctionDirectory:
     else:
       self._function_table[class_name][1].add_variable(var_name, block_name, type, is_public)
 
+  def check_class(self, class_name):
+    if class_name not in self._function_table:
+      raise Exception('Class ' + class_name + ' is not defined.')
+
   # Used for debugging and testing purposes
   def output(self):
     print("------------------------------")
