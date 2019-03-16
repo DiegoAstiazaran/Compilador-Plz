@@ -217,9 +217,13 @@ def p_declaration(p):
 
 def p_array_size(p):
   '''
-  array_size : L_PAREN CTE_I R_PAREN
+  array_size : L_PAREN CTE_I R_PAREN neural_array_decl
   '''
   array_size_debug(p, parse_debug)
+
+def p_neural_array_decl(p):
+  '''neural_array_decl :'''
+  function_directory.add_dimension_to_variable(current_last_id, current_block, current_class_block)
 
 def p_decl_init(p):
   '''
@@ -253,7 +257,7 @@ def p_decl_init_var(p):
                    | empty
   '''
   decl_init_var_debug(p, parse_debug)
-    
+
 def p_decl_init_dict(p):
   '''
   decl_init_dict : DICT ID neural_var_decl_id dict_init_dict_p
@@ -275,12 +279,12 @@ def p_decl_init_obj(p):
 # It can be in decl_init, parameter declaration or attribute declaration
 def p_neural_var_decl_id(p):
   '''neural_var_decl_id :'''
-  global current_last_type
+  global current_last_type, current_last_id
   if current_last_type == None:
     # Second previous element in p will be stored; DICT or CLASS_NAME
     current_last_type = p[-2]
-  var_name = p[-1]
-  function_directory.add_variable(var_name, current_block, current_last_type, current_is_public, current_class_block)
+  current_last_id = p[-1]
+  function_directory.add_variable(current_last_id, current_block, current_last_type, current_is_public, current_class_block)
   current_last_type = None
 
 def p_assignment(p):

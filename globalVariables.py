@@ -10,3 +10,5 @@ current_class_block = None
 current_last_type = None
 # Defines if current class block is public
 current_is_public = None
+# Current last id declared
+current_last_id = None

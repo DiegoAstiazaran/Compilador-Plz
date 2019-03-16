@@ -11,13 +11,16 @@ class VariableDirectory:
   def add_variable(self, var_name, type, is_public):
     if var_name in self._variable_table:
       raise Exception('Variable ' + var_name + ' already defined in scope.')
-    self._variable_table[var_name] = [type, is_public]
-  
+    self._variable_table[var_name] = [type, is_public, None]
+
+  def add_dimension(self, var_name):
+    self._variable_table[var_name][2] = 1 if self._variable_table[var_name][2] == None else 2
+
   # Used for debugging and testing purposes
   def print(self):
     print("Vars:")
     for key, value in self._variable_table.items():
-      print(key, '\t', value[0], '\t', value[1])
+      print(key, '\t', value[0], '\t', value[1], '\t', value[2])
 
 class FunctionDirectory:
   # Initializes object with empty dictionary
@@ -55,6 +58,12 @@ class FunctionDirectory:
     else:
       self._function_table[class_name][1].add_variable(var_name, block_name, type, is_public)
 
+  def add_dimension_to_variable(self, var_name, block_name, class_name = None):
+    if class_name == None:
+      self._function_table[block_name][1].add_dimension(var_name)
+    else:
+      self._function_table[class_name][1].add_dimension_to_variable(var_name, block_name)
+
   def check_class(self, class_name):
     if class_name not in self._function_table:
       raise Exception('Class ' + class_name + ' is not defined.')
@@ -65,7 +74,7 @@ class FunctionDirectory:
     print("|     FUNCTION DIRECTORY     |")
     print("------------------------------")
     print("xyz_name : name | type is_public")
-    print("v_name\ttype\tis_public")
+    print("v_name\ttype\tis_public\tdims")
     print("------------------------------")
     self.print()
     print("|   END FUNCTION DIRECTORY   |")
