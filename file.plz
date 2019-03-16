@@ -8,7 +8,7 @@ str x = "ddsad".
 
 class Persona :
   sub Persona():
-    int x = 5 + 6 .
+    int x_var = 5 + 6 .
     if (5 < 4 ):
       print: 4324, fdsfsd, id$arr[4] end
     end
@@ -38,7 +38,7 @@ end
 
 class Hombre under Persona :
   sub Persona():
-    int x = 5 + 6 .
+    str x = 5 + 6 .
     if (5 < 4):
       print: 4324, fdsfsd, id$arr[4] end
     end
@@ -58,7 +58,7 @@ sub void funcion(int x, bool y):
   return 432.
 end
 
-sub void funcion(int x, bool y):
+sub void funcion2(int x, bool y):
   return 432.
 end
 

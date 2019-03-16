@@ -3,8 +3,10 @@
 
 import ply.yacc as yacc # Import yacc module
 
-from lexer import tokens # Import tokens defined in lexer
-from parserDebug import * # Import functions to debug parser
+from lexer import tokens      # Import tokens defined in lexer
+from parserDebug import *     # Import functions to debug parser
+from globalVariables import * # Import variables used for function directory
+from constants import *       # Import constants
 
 parse_debug = False # Boolean for debugging parser
 
@@ -16,7 +18,7 @@ start = 'program'
 
 def p_program(p):
   '''
-  program : program_p program_class program_subroutine block
+  program : neural_global_block program_p program_class program_subroutine block
   program_p : decl_init program_p
             | empty
   program_class : class program_class
@@ -25,6 +27,13 @@ def p_program(p):
                      | empty
   '''
   program_debug(p, parse_debug)
+
+# Called when parsing starts and when subroutine ends
+def p_neural_global_block(p):
+  '''neural_global_block :'''
+  global current_block
+  # Set current block as global
+  current_block = GLOBAL_BLOCK
 
 def p_block(p):
   '''
@@ -73,11 +82,24 @@ def p_return(p):
 
 def p_class(p):
   '''
-  class : CLASS CLASS_NAME class_p COLON class_block END
+  class : CLASS CLASS_NAME neural_class_decl class_p COLON class_block END neural_class_decl_end
   class_p : UNDER CLASS_NAME
           | empty
   '''
   class_debug(p, parse_debug)
+
+# Called after CLASS_NAME in class declaration
+def p_neural_class_decl(p):
+  '''neural_class_decl :'''
+  global current_class_block
+  current_class_block = p[-1]
+  function_directory.add_block(current_class_block, CLASS_BLOCK)
+
+# Called at the end of class declaration
+def p_neural_class_decl_end(p):
+  '''neural_class_decl_end :'''
+  global current_class_block
+  current_class_block = None
 
 def p_expression(p):
   '''
@@ -139,7 +161,7 @@ def p_class_block(p):
 
 def p_private(p):
   '''
-  private : PRIVATE COLON private_declaration private_sub END
+  private : PRIVATE neural_class_decl_private COLON private_declaration private_sub END neural_class_decl_section_end
   private_declaration : declaration private_declaration
                       | empty
   private_sub : subroutine private_sub
@@ -149,7 +171,7 @@ def p_private(p):
 
 def p_public(p):
   '''
-  public : PUBLIC COLON public_declaration public_sub END
+  public : PUBLIC neural_class_decl_public COLON public_declaration public_sub END neural_class_decl_section_end
   public_declaration : declaration public_declaration
                      | empty
   public_sub : subroutine public_sub
@@ -157,11 +179,29 @@ def p_public(p):
   '''
   public_debug(p, parse_debug)
 
+# Called after PRIVATE in public section of class declaration
+def p_neural_class_decl_private(p):
+  '''neural_class_decl_private :'''
+  global current_is_public
+  current_is_public = False
+
+# Called after PUBLIC in public section of class declaration
+def p_neural_class_decl_public(p):
+  '''neural_class_decl_public :'''
+  global current_is_public
+  current_is_public = True
+
+# Called at the end of private or public section of class declaration
+def p_neural_class_decl_section_end(p):
+  '''neural_class_decl_section_end : '''
+  global current_is_public
+  current_is_public = None
+
 def p_declaration(p):
   '''
   declaration : declaration_p DOT
-  declaration_p : type ID declaration_pp
-                | DICT ID
+  declaration_p : type ID neural_var_decl_id declaration_pp
+                | DICT ID neural_var_decl_id
   declaration_pp : array_size declaration_ppp
                  | empty
   declaration_ppp : array_size
@@ -186,7 +226,7 @@ def p_decl_init(p):
 
 def p_decl_init_var(p):
   '''
-  decl_init_var : type ID decl_init_var_p
+  decl_init_var : type ID neural_var_decl_id decl_init_var_p
   decl_init_var_p : decl_init_var_var
                   | decl_init_var_pp
   decl_init_var_var : EQUAL expression
@@ -210,7 +250,7 @@ def p_decl_init_var(p):
     
 def p_decl_init_dict(p):
   '''
-  decl_init_dict : DICT ID dict_init_dict_p
+  decl_init_dict : DICT ID neural_var_decl_id dict_init_dict_p
   dict_init_dict_p : EQUAL L_BRACKET initialization_dict R_BRACKET
                    | empty
   initialization_dict : var_cte_3 COLON expression initialization_dict_p
@@ -219,11 +259,23 @@ def p_decl_init_dict(p):
   '''
   decl_init_dict_debug(p, parse_debug)
 
-def p_decl_init_obj(arg):
+def p_decl_init_obj(p):
   '''
-  decl_init_obj : CLASS_NAME ID EQUAL CLASS_NAME sub_call_args
+  decl_init_obj : CLASS_NAME ID neural_var_decl_id EQUAL CLASS_NAME sub_call_args
   '''
   decl_init_obj_debug(p, parse_debug)
+
+# Called after ID in every declaration or initialization
+# It can be in decl_init, parameter declaration or attribute declaration
+def p_neural_var_decl_id(p):
+  '''neural_var_decl_id :'''
+  global current_last_type
+  if current_last_type == None:
+    # Second previous element in p will be stored; DICT or CLASS_NAME
+    current_last_type = p[-2]
+  var_name = p[-1]
+  function_directory.add_variable(var_name, current_block, current_last_type, current_is_public, current_class_block)
+  current_last_type = None
 
 def p_assignment(p):
   '''
@@ -237,8 +289,8 @@ def p_assignment(p):
 
 def p_constructor(p):
   '''
-  constructor : SUB CLASS_NAME L_PAREN constructor_params R_PAREN COLON constructor_p block END
-  constructor_params : type ID constructor_params_p
+  constructor : SUB CLASS_NAME neural_sub_decl_id L_PAREN constructor_params R_PAREN COLON constructor_p block END neural_global_block
+  constructor_params : type ID neural_var_decl_id constructor_params_p
                      | empty
   constructor_params_p : COMMA constructor_params
                        | empty
@@ -317,10 +369,10 @@ def p_cte_b(p):
 
 def p_subroutine(p):
   '''
-  subroutine : SUB subroutine_return_type ID L_PAREN subroutine_params R_PAREN COLON subroutine_p block END
+  subroutine : SUB subroutine_return_type ID neural_sub_decl_id L_PAREN subroutine_params R_PAREN COLON subroutine_p block END neural_global_block
   subroutine_return_type : type
-                         | VOID
-  subroutine_params : type ID subroutine_params_p
+                         | VOID neural_decl_type
+  subroutine_params : type ID neural_var_decl_id subroutine_params_p
                     | empty
   subroutine_params_p : COMMA subroutine_params
                     | empty
@@ -328,6 +380,16 @@ def p_subroutine(p):
                | empty
   '''
   subroutine_debug(p, parse_debug)
+
+# Called after ID in subroutine declaration
+def p_neural_sub_decl_id(p):
+  '''neural_sub_decl_id :'''
+  global current_block, current_last_type
+  current_block = p[-1]
+  if current_last_type == None:
+    current_last_type = CONSTRUCTOR_BLOCK
+  function_directory.add_block(current_block, current_last_type, current_is_public, current_class_block)
+  current_last_type = None
 
 def p_write(p):
   '''
@@ -412,12 +474,18 @@ def p_read(p):
 
 def p_type(p):
   '''
-  type : INT
-       | FLT
-       | BOOL
-       | STR
+  type : INT neural_decl_type
+       | FLT neural_decl_type
+       | BOOL neural_decl_type
+       | STR neural_decl_type
   '''
   type_debug(p, parse_debug)
+
+# Called after each primitive type
+def p_neural_decl_type(p):
+  '''neural_decl_type :'''
+  global current_last_type
+  current_last_type = p[-1]
 
 def p_empty(p):
   'empty :'
@@ -441,3 +509,4 @@ while True:
   if not file: continue
   result = parser.parse(s)
   print(result)
+  function_directory.output()

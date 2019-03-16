@@ -1,6 +1,6 @@
-# Define space and newline
-space = " "
-newline = "\n"
+# Define _space and _newline
+_space = " "
+_newline = "\n"
 
 def program_debug(p, debug):
   if not debug:
@@ -10,9 +10,9 @@ def program_debug(p, debug):
   elif len(p) == 2:
     p[0] = p[1]
   elif len(p) == 3:
-    p[0] = p[1] + newline + p[2]
+    p[0] = p[1] + _newline + p[2]
   elif len(p) == 5:
-    p[0] = p[1] + newline + p[2] + newline + p[3] + newline + p[4]
+    p[0] = p[1] + _newline + p[2] + _newline + p[3] + _newline + p[4]
   else:
     raise Exception('Invalid expression for parser in p_program')
 
@@ -22,7 +22,7 @@ def block_debug(p, debug):
   if p[1] == None:
     p[0] = ""
   elif len(p) == 3:
-    p[0] = p[1] + newline + p[2]
+    p[0] = p[1] + _newline + p[2]
   else:
     raise Exception('Invalid expression for parser in p_block')
 
@@ -36,7 +36,7 @@ def statement_debug(p, debug):
   elif len(p) == 3:
     p[0] = p[1] + p[2]
   elif len(p) == 5:
-    p[0] = p[1] + space + p[2] + p[3] + p[4]
+    p[0] = p[1] + _space + p[2] + p[3] + p[4]
   else:
     raise Exception('Invalid expression for parser in p_statement')
 
@@ -48,7 +48,7 @@ def sub_call_debug(p, debug):
   elif len(p) == 3:
     p[0] = p[1] + p[2]
   elif len(p) == 5:
-    p[0] = p[1] + space + p[2] + p[3] + p[4]
+    p[0] = p[1] + _space + p[2] + p[3] + p[4]
   else:
     raise Exception('Invalid expression for parser in p_sub_call')
 
@@ -58,7 +58,7 @@ def sub_call_args_debug(p, debug):
   if p[1] == None:
     p[0] = ""
   elif len(p) == 3:
-    p[0] = p[1] + space + p[2]
+    p[0] = p[1] + _space + p[2]
   elif len(p) == 4:
     p[0] = p[1] + p[2] + p[3]
   else:
@@ -72,7 +72,7 @@ def return_debug(p, debug):
   elif len(p) == 2:
     p[0] = p[1]
   elif len(p) == 4:
-    p[0] = p[1] + space + p[2] + p[3]
+    p[0] = p[1] + _space + p[2] + p[3]
   else:
     raise Exception('Invalid expression for parser in p_return')
 
@@ -82,9 +82,9 @@ def class_debug(p, debug):
   if p[1] == None:
     p[0] = ""
   elif len(p) == 3:
-    p[0] = p[1] + space + p[2]
+    p[0] = p[1] + _space + p[2]
   elif len(p) == 7:
-    p[0] = p[1] + space + p[2] + space + p[3] + p[4] + newline + p[5] + newline + p[6]
+    p[0] = p[1] + _space + p[2] + _space + p[3] + p[4] + _newline + p[5] + _newline + p[6]
   else:
     raise Exception('Invalid expression for parser in p_class')
 
@@ -94,7 +94,7 @@ def expression_debug(p, debug):
   if p[1] == None:
     p[0] = ""
   elif len(p) == 3:
-    p[0] = p[1] + space + p[2]
+    p[0] = p[1] + _space + p[2]
   else:
     raise Exception('Invalid expression for parser in p_expression')
 
@@ -104,7 +104,7 @@ def mini_expression_debug(p, debug):
   if p[1] == None:
     p[0] = ""
   elif len(p) == 3:
-    p[0] = p[1] + space + p[2]
+    p[0] = p[1] + _space + p[2]
   else:
     raise Exception('Invalid expression for parser in p_mini_expression')
 
@@ -128,7 +128,7 @@ def term_debug(p, debug):
   elif len(p) == 2:
     p[0] = p[1]
   elif len(p) == 3:
-    p[0] = p[1] + space + p[2]
+    p[0] = p[1] + _space + p[2]
   else:
     raise Exception('Invalid expression for parser in p_term')
 
@@ -142,7 +142,7 @@ def factor_debug(p, debug):
   elif len(p) == 3:
     p[0] = p[1] + p[2]
   elif len(p) == 4:
-    p[0] = p[1] + space + p[2] + space + p[3]
+    p[0] = p[1] + _space + p[2] + _space + p[3]
   else:
     raise Exception('Invalid expression for parser in p_factor')
 
@@ -154,7 +154,7 @@ def class_block_debug(p, debug):
   elif len(p) == 2:
     p[0] = p[1]
   elif len(p) == 4:
-    p[0] = p[1] + newline + p[2] + newline + p[3]
+    p[0] = p[1] + _newline + p[2] + _newline + p[3]
   else:
     raise Exception('Invalid expression for parser in p_class_block')
 
@@ -164,9 +164,9 @@ def private_debug(p, debug):
   if p[1] == None:
     p[0] = ""
   elif len(p) == 3:
-    p[0] = p[1] + newline + p[2]
+    p[0] = p[1] + _newline + p[2]
   elif len(p) == 6:
-    p[0] = p[1] + p[2] + newline + p[3] + newline + p[4] + newline + p[5]
+    p[0] = p[1] + p[2] + _newline + p[3] + _newline + p[4] + _newline + p[5]
   else:
     raise Exception('Invalid expression for parser in p_private')
 
@@ -176,9 +176,9 @@ def public_debug(p, debug):
   if p[1] == None:
     p[0] = ""
   elif len(p) == 3:
-    p[0] = p[1] + newline + p[2]
+    p[0] = p[1] + _newline + p[2]
   elif len(p) == 6:
-    p[0] = p[1] + p[2] + newline + p[3] + newline + p[4] + newline + p[5]
+    p[0] = p[1] + p[2] + _newline + p[3] + _newline + p[4] + _newline + p[5]
   else:
     raise Exception('Invalid expression for parser in p_public')
 
@@ -190,9 +190,9 @@ def declaration_debug(p, debug):
   elif len(p) == 2:
     p[0] = p[1]
   elif len(p) == 3:
-    p[0] = p[1] + space + p[2]
+    p[0] = p[1] + _space + p[2]
   elif len(p) == 4:
-    p[0] = p[1] + space + p[2] + p[3]
+    p[0] = p[1] + _space + p[2] + p[3]
   else:
     raise Exception('Invalid expression for parser in p_declaration')
 
@@ -230,7 +230,7 @@ def decl_init_var_debug(p, debug):
   elif len(p) == 6:
     p[0] = p[1] + p[2] + p[3] + p[4] + p[5]
   elif len(p) == 7:
-    p[0] = p[1] + space + p[2] + p[3] + space + p[4] + space + p[5] + p[6]
+    p[0] = p[1] + _space + p[2] + p[3] + _space + p[4] + _space + p[5] + p[6]
   else:
     raise Exception('Invalid expression for parser in p_decl_init_var')
 
@@ -266,7 +266,7 @@ def assignment_debug(p, debug):
   elif len(p) == 3:
     p[0] = p[1] + p[2]
   elif len(p) == 7:
-    p[0] = p[1] + space + p[2] + p[3] + space + p[4] + space + p[5] + p[6]
+    p[0] = p[1] + _space + p[2] + p[3] + _space + p[4] + _space + p[5] + p[6]
   else:
     raise Exception('Invalid expression for parser in p_assignment')
 
@@ -280,9 +280,9 @@ def constructor_debug(p, debug):
   elif len(p) == 3:
     p[0] = p[1] + p[2]
   elif len(p) == 4:
-    p[0] = p[1] + space + p[2] + p[3]
+    p[0] = p[1] + _space + p[2] + p[3]
   elif len(p) == 10:
-    p[0] = p[1] + space + p[2] + p[3] + p[4] + p[5] + p[6] + p[7] + newline + p[8] + newline + p[9]
+    p[0] = p[1] + _space + p[2] + p[3] + p[4] + p[5] + p[6] + p[7] + _newline + p[8] + _newline + p[9]
   else:
     raise Exception('Invalid expression for parser in p_constructor')
 
@@ -328,7 +328,7 @@ def id_calls_debug(p, debug):
   elif len(p) == 3:
     p[0] = p[1] + p[2]
   elif len(p) == 4:
-    p[0] = p[1] + p[2] + space + p[3]
+    p[0] = p[1] + p[2] + _space + p[3]
   else:
     raise Exception('Invalid expression for parser in p_id_calls')
 
@@ -358,9 +358,9 @@ def subroutine_debug(p, debug):
   elif len(p) == 3:
     p[0] = p[1] + p[2]
   elif len(p) == 4:
-    p[0] = p[1] + space + p[2] + space + p[3]
+    p[0] = p[1] + _space + p[2] + _space + p[3]
   elif len(p) == 11:
-    p[0] = p[1] + space + p[2] + space + p[3] + space + p[4] + p[5] + p[6] + p[7] + newline + p[8] + newline + p[9] + newline + p[10]
+    p[0] = p[1] + _space + p[2] + _space + p[3] + _space + p[4] + p[5] + p[6] + p[7] + _newline + p[8] + _newline + p[9] + _newline + p[10]
   else:
     raise Exception('Invalid expression for parser in p_subroutine')
 
@@ -372,7 +372,7 @@ def write_debug(p, debug):
   elif len(p) == 3:
     p[0] = p[1] + p[2]
   elif len(p) == 5:
-    p[0] = p[1] + p[2] + space + p[3] + p[4]
+    p[0] = p[1] + p[2] + _space + p[3] + p[4]
   else:
     raise Exception('Invalid expression for parser in p_write')
 
@@ -382,11 +382,11 @@ def condition_debug(p, debug):
   if p[1] == None:
     p[0] = ""
   elif len(p) == 3:
-    p[0] = p[1] + space + p[2]
+    p[0] = p[1] + _space + p[2]
   elif len(p) == 4:
-    p[0] = p[1] + p[2] + newline + p[3]
+    p[0] = p[1] + p[2] + _newline + p[3]
   elif len(p) == 5:
-    p[0] = p[1] + space + p[2] + p[3] + space + p[4]
+    p[0] = p[1] + _space + p[2] + p[3] + _space + p[4]
   else:
     raise Exception('Invalid expression for parser in p_condition')
 
@@ -414,7 +414,7 @@ def access_debug(p, debug):
   elif len(p) == 4:
     p[0] = p[1] + p[2] + p[3]
   elif len(p) == 5:
-    p[0] = p[1] + space + p[2] + space + p[3] + p[4]
+    p[0] = p[1] + _space + p[2] + _space + p[3] + p[4]
   else:
     raise Exception('Invalid expression for parser in p_access')
 
@@ -422,7 +422,7 @@ def when_debug(p, debug):
   if not debug:
     return
   if len(p) == 7:
-    p[0] = p[1] + space + p[2] + space + p[3] + p[4] + newline + p[5] + newline + p[6]
+    p[0] = p[1] + _space + p[2] + _space + p[3] + p[4] + _newline + p[5] + _newline + p[6]
   else:
     raise Exception('Invalid expression for parser in p_when')
 
@@ -430,7 +430,7 @@ def repeat_debug(p, debug):
   if not debug:
     return
   if len(p) == 7:
-    p[0] = p[1] + p[2] + newline + p[3] + newline + p[4] + space + p[5] + space + p[6]
+    p[0] = p[1] + p[2] + _newline + p[3] + _newline + p[4] + _space + p[5] + _space + p[6]
   else:
     raise Exception('Invalid expression for parser in p_repeat')
 
@@ -442,7 +442,7 @@ def for_debug(p, debug):
   elif len(p) == 2:
     p[0] = p[1]
   elif len(p) == 13:
-    p[0] = p[1] + space + p[2] + space + p[3] + space + p[4] + space + p[5] + space + p[6] + p[7] + space + p[8] + space + p[9] + space + p[10] + newline + p[11] + newline + p[12]
+    p[0] = p[1] + _space + p[2] + _space + p[3] + _space + p[4] + _space + p[5] + _space + p[6] + p[7] + _space + p[8] + _space + p[9] + _space + p[10] + _newline + p[11] + _newline + p[12]
   else:
     raise Exception('Invalid expression for parser in p_for')
 
@@ -454,11 +454,11 @@ def read_debug(p, debug):
   elif len(p) == 2:
     p[0] = p[1]
   elif len(p) == 3:
-    p[0] = p[1] + space + p[2]
+    p[0] = p[1] + _space + p[2]
   elif len(p) == 5:
-    p[0] = p[1] + p[2] + space + p[3] + space + p[4]
+    p[0] = p[1] + p[2] + _space + p[3] + _space + p[4]
   elif len(p) == 4:
-    p[0] = p[1] + p[2] + space + p[3]
+    p[0] = p[1] + p[2] + _space + p[3]
   else:
     raise Exception('Invalid expression for parser in p_read')
 

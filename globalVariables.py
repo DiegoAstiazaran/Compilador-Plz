@@ -6,3 +6,7 @@ function_directory = FunctionDirectory()
 current_block = None
 # Current block when current_block is a class.
 current_class_block = None
+# Current last type read in a declaration or initialization
+current_last_type = None
+# Defines if current class block is public
+current_is_public = None
