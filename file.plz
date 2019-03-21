@@ -1,14 +1,15 @@
 str file = "THIS IS A TEST FILE FOR PARSER".
 
 int x = 0.
-int x.
-flt x.
+int x2.
+flt x3.
 bool das.
-str x = "ddsad".
+str x4 = "ddsad".
+int x5(4)(5).
 
 class Persona :
   sub Persona():
-    int x = 5 + 6 .
+    int x_var = 5 + 6 .
     if (5 < 4 ):
       print: 4324, fdsfsd, id$arr[4] end
     end
@@ -16,8 +17,9 @@ class Persona :
 
   private:
     int x.
-    flt x.
-    bool x.
+    flt x2.
+    bool x3.
+    bool x7(1).
     sub int erik(int a, bool b, str c, flt d):
       a = b.
       c = x < 8.
@@ -25,9 +27,9 @@ class Persona :
   end
 
   public:
-    int x.
-    flt x.
-    bool x.
+    int x4.
+    flt x5.
+    bool x6.
     sub flt funcion2(int a, bool b, str c, flt d):
       a = b.
       c = x < 8.
@@ -37,8 +39,8 @@ class Persona :
 end
 
 class Hombre under Persona :
-  sub Persona():
-    int x = 5 + 6 .
+  sub Hombre():
+    str x = 5 + 6 .
     if (5 < 4):
       print: 4324, fdsfsd, id$arr[4] end
     end
@@ -46,8 +48,8 @@ class Hombre under Persona :
 
   private:
     int x.
-    flt x.
-    bool x.
+    flt x2.
+    bool x3.
   end
 
   public:
@@ -58,11 +60,11 @@ sub void funcion(int x, bool y):
   return 432.
 end
 
-sub void funcion(int x, bool y):
+sub void funcion2(int x, bool y):
   return 432.
 end
 
-sub void funcion(int x, bool y):
+sub void funcion3(int x, bool y):
   return 432.
 end
 
