@@ -83,7 +83,7 @@ def p_class(p):
 
 def p_expression(p):
   '''
-  expression : mini_expression expression_p
+  expression : mini_expression neural_check_operator_stack_logical expression_p
   expression_p : logical expression
                | empty
   '''
@@ -91,7 +91,7 @@ def p_expression(p):
 
 def p_mini_expression(p):
   '''
-  mini_expression : exp mini_expression_p
+  mini_expression : exp neural_check_operator_stack_relational mini_expression_p
   mini_expression_p : relational exp
                     | empty
   '''
@@ -99,7 +99,7 @@ def p_mini_expression(p):
 
 def p_exp(p):
   '''
-  exp : term exp_p
+  exp : term neural_check_operator_stack_plus_minus exp_p
   exp_p : exp_pp exp
         | empty
   exp_pp : PLUS   neural_add_to_operator_stack
@@ -109,7 +109,7 @@ def p_exp(p):
 
 def p_term(p):
   '''
-  term : factor term_p
+  term : factor neural_check_operator_stack_multiply_divide term_p
   term_p : term_pp term
          | empty
   term_pp : MULTIPLY  neural_add_to_operator_stack
@@ -120,7 +120,7 @@ def p_term(p):
 def p_factor(p):
   '''
   factor : L_PAREN neural_operator_stack_push_false expression R_PAREN neural_operator_stack_pop_false
-         | factor_p var_cte_2
+         | factor_p var_cte_2 neural_check_operator_stack_unary
   factor_p : PLUS   neural_read_unary_operator neural_add_to_operator_stack
            | MINUS  neural_read_unary_operator neural_add_to_operator_stack
            | NOT    neural_read_unary_operator neural_add_to_operator_stack
@@ -509,6 +509,55 @@ def p_neural_sub_decl_id(p):
 #################################################
 #######  Expression Quad Constructions  #########
 #################################################
+
+### Check operator stack
+
+def p_neural_check_operator_stack_relational(p):
+  '''neural_check_operator_stack_relational :'''
+  check_operator_stack(Operators.relational)
+
+def p_neural_check_operator_stack_logical(p):
+  '''neural_check_operator_stack_logical :'''
+  check_operator_stack(Operators.logical)
+
+def p_neural_check_operator_stack_plus_minus(p):
+  '''neural_check_operator_stack_plus_minus :'''
+  check_operator_stack(Operators.plus_minus)
+
+def p_neural_check_operator_stack_multiply_divide(p):
+  '''neural_check_operator_stack_multiply_divide :'''
+  check_operator_stack(Operators.multiply_divide)
+
+def p_neural_check_operator_stack_unary(p):
+  '''neural_check_operator_stack_unary :'''
+  check_operator_stack()
+
+def check_operator_stack(operators_list = None):
+  # first part of condition is for unary operators
+  # second part is for the rest of the operators
+  if gv.read_unary_operator or (operators_list and not gv.stack_operators.empty() and gv.stack_operators.top() in operators_list):
+    operator = gv.stack_operators.pop()
+    operand_right = gv.stack_operands.pop()
+    operand_left = gv.stack_operands.pop() if operators_list else None
+
+    if operand_left is None:
+      result_type = gv.semantic_cube.validate_type(operator, operand_left.get_type())
+    else:
+      result_type = gv.semantic_cube.validate_type(operator, operand_left.get_type(), operand_right.get_type())
+
+    if result_type == None:
+      helpers.throw_error('Type mismatch on operator ' + operator + " " + str(operand_left) + " " + str(operand_right))
+
+    result_value = gv.temporal_memory.get_available()
+    if operand_left is None:
+      quad = Quad(operator, operand_right.get_value(), result_value)
+    else:
+      quad = Quad(operator, operand_left.get_value(), operand_right.get_value(), result_value)
+
+    gv.quad_list.add(quad)
+    result = OperandPair(result_value, result_type)
+    gv.stack_operands.push(result)
+    gv.read_unary_operator = False
 
 ### Add to operand stack
 
