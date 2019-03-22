@@ -60,22 +60,22 @@ class FunctionDirectory:
       # Check if construcor is named as class
       if type == CONSTRUCTOR_BLOCK and block_name != class_name:
         helpers.throw_error('Constructor in ' + class_name + ' should be named as class.')
-      self._function_table[class_name][1].add_block(block_name, type, is_public)
+      self.get_entry_directory(class_name).add_block(block_name, type, is_public)
 
   # Adds a variable to a VariableDirectory of a block
   def add_variable(self, var_name, block_name, type, is_public, class_name = None):
     # Adding variable of a block of main function directory
     if class_name == None:
-      self._function_table[block_name][1].add_variable(var_name, type, is_public)
+      self.get_entry_directory(block_name).add_variable(var_name, type, is_public)
     # Adding variable of a block of a class's function directory
     else:
-      self._function_table[class_name][1].add_variable(var_name, block_name, type, is_public)
+      self.get_entry_directory(class_name).add_variable(var_name, block_name, type, is_public)
 
   def add_dimension_to_variable(self, var_name, block_name, class_name = None):
     if class_name == None:
-      self._function_table[block_name][1].add_dimension(var_name)
+      self.get_entry_directory(block_name).add_dimension(var_name)
     else:
-      self._function_table[class_name][1].add_dimension_to_variable(var_name, block_name)
+      self.get_entry_directory(class_name).add_dimension_to_variable(var_name, block_name)
 
   def check_class(self, class_name):
     if class_name not in self._function_table:
