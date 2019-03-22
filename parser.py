@@ -3,12 +3,12 @@
 
 import ply.yacc as yacc # Import yacc module
 
-from lexer import tokens      # Import tokens defined in lexer
-from parserDebug import *     # Import functions to debug parser
-from globalVariables import * # Import variables used for function directory
-from constants import *       # Import constants
-
-parse_debug = False # Boolean for debugging parser
+from lexer import tokens, lexer   # Import tokens and lexer defined in lexer
+from parserDebug import *         # Import functions to debug parser
+import globalVariables as gv      # Import global variables
+from constants import *           # Import all constants
+from structures import OperandPair, Quad, Operators  # Import OperandPair and Quad class
+import helpers                    # Import helpers
 
 # Sets main grammar rule
 start = 'program'
@@ -26,21 +26,14 @@ def p_program(p):
   program_subroutine : subroutine program_subroutine
                      | empty
   '''
-  program_debug(p, parse_debug)
-
-# Called when parsing starts and when subroutine ends
-def p_neural_global_block(p):
-  '''neural_global_block :'''
-  global current_block
-  # Set current block as global
-  current_block = GLOBAL_BLOCK
+  program_debug(p, gv.parse_debug)
 
 def p_block(p):
   '''
   block : statement block
         | empty
   '''
-  block_debug(p, parse_debug)
+  block_debug(p, gv.parse_debug)
 
 def p_statement(p):
   '''
@@ -52,7 +45,7 @@ def p_statement(p):
             | return
             | sub_call
   '''
-  statement_debug(p, parse_debug)
+  statement_debug(p, gv.parse_debug)
 
 def p_sub_call(p):
   '''
@@ -60,7 +53,7 @@ def p_sub_call(p):
   sub_call_p : MONEY ID
              | empty
   '''
-  sub_call_debug(p, parse_debug)
+  sub_call_debug(p, gv.parse_debug)
 
 def p_sub_call_args(p):
   '''
@@ -70,7 +63,7 @@ def p_sub_call_args(p):
   sub_call_args_pp : COMMA sub_call_args_p
                   | empty
   '''
-  sub_call_args_debug(p, parse_debug)
+  sub_call_args_debug(p, gv.parse_debug)
 
 def p_return(p):
   '''
@@ -78,7 +71,7 @@ def p_return(p):
   return_expression : expression
                     | empty
   '''
-  return_debug(p, parse_debug)
+  return_debug(p, gv.parse_debug)
 
 def p_class(p):
   '''
@@ -86,26 +79,7 @@ def p_class(p):
   class_p : UNDER CLASS_NAME neural_class_decl_inheritance
           | empty
   '''
-  class_debug(p, parse_debug)
-
-# Called after CLASS_NAME in class declaration
-def p_neural_class_decl(p):
-  '''neural_class_decl :'''
-  global current_class_block
-  current_class_block = p[-1]
-  function_directory.add_block(current_class_block, CLASS_BLOCK)
-
-# Called at the end of class declaration
-def p_neural_class_decl_end(p):
-  '''neural_class_decl_end :'''
-  global current_class_block
-  current_class_block = None
-
-# Called after CLASS_NAME when inheriting a class
-def p_neural_class_decl_inheritance(p):
-  '''neural_class_decl_inheritance :'''
-  class_name = p[-1]
-  function_directory.check_class(class_name)
+  class_debug(p, gv.parse_debug)
 
 def p_expression(p):
   '''
@@ -113,7 +87,7 @@ def p_expression(p):
   expression_p : logical expression
                | empty
   '''
-  expression_debug(p, parse_debug)
+  expression_debug(p, gv.parse_debug)
 
 def p_mini_expression(p):
   '''
@@ -121,39 +95,39 @@ def p_mini_expression(p):
   mini_expression_p : relational exp
                     | empty
   '''
-  mini_expression_debug(p, parse_debug)
+  mini_expression_debug(p, gv.parse_debug)
 
 def p_exp(p):
   '''
   exp : term exp_p
   exp_p : exp_pp exp
         | empty
-  exp_pp : PLUS
-         | MINUS
+  exp_pp : PLUS   neural_add_to_operator_stack
+         | MINUS  neural_add_to_operator_stack
   '''
-  exp_debug(p, parse_debug)
+  exp_debug(p, gv.parse_debug)
 
 def p_term(p):
   '''
   term : factor term_p
   term_p : term_pp term
          | empty
-  term_pp : MULTIPLY
-          | DIVIDE
+  term_pp : MULTIPLY  neural_add_to_operator_stack
+          | DIVIDE    neural_add_to_operator_stack
   '''
-  term_debug(p, parse_debug)
+  term_debug(p, gv.parse_debug)
 
 def p_factor(p):
   '''
-  factor : L_PAREN expression R_PAREN
+  factor : L_PAREN neural_operator_stack_push_false expression R_PAREN neural_operator_stack_pop_false
          | factor_p var_cte_2
-  factor_p : PLUS
-           | MINUS
-           | NOT
-           | NOT_OP
+  factor_p : PLUS   neural_read_unary_operator neural_add_to_operator_stack
+           | MINUS  neural_read_unary_operator neural_add_to_operator_stack
+           | NOT    neural_read_unary_operator neural_add_to_operator_stack
+           | NOT_OP neural_read_unary_operator neural_add_to_operator_stack
            | empty
   '''
-  factor_debug(p, parse_debug)
+  factor_debug(p, gv.parse_debug)
 
 def p_class_block(p):
   '''
@@ -163,7 +137,7 @@ def p_class_block(p):
   class_block_public : public
                      | empty
   '''
-  class_block_debug(p, parse_debug)
+  class_block_debug(p, gv.parse_debug)
 
 def p_private(p):
   '''
@@ -173,7 +147,7 @@ def p_private(p):
   private_sub : subroutine private_sub
               | empty
   '''
-  private_debug(p, parse_debug)
+  private_debug(p, gv.parse_debug)
 
 def p_public(p):
   '''
@@ -183,25 +157,7 @@ def p_public(p):
   public_sub : subroutine public_sub
              | empty
   '''
-  public_debug(p, parse_debug)
-
-# Called after PRIVATE in public section of class declaration
-def p_neural_class_decl_private(p):
-  '''neural_class_decl_private :'''
-  global current_is_public
-  current_is_public = False
-
-# Called after PUBLIC in public section of class declaration
-def p_neural_class_decl_public(p):
-  '''neural_class_decl_public :'''
-  global current_is_public
-  current_is_public = True
-
-# Called at the end of private or public section of class declaration
-def p_neural_class_decl_section_end(p):
-  '''neural_class_decl_section_end : '''
-  global current_is_public
-  current_is_public = None
+  public_debug(p, gv.parse_debug)
 
 def p_declaration(p):
   '''
@@ -213,17 +169,13 @@ def p_declaration(p):
   declaration_ppp : array_size
                   | empty
   '''
-  declaration_debug(p, parse_debug)
+  declaration_debug(p, gv.parse_debug)
 
 def p_array_size(p):
   '''
   array_size : L_PAREN CTE_I R_PAREN neural_array_decl
   '''
-  array_size_debug(p, parse_debug)
-
-def p_neural_array_decl(p):
-  '''neural_array_decl :'''
-  function_directory.add_dimension_to_variable(current_last_id, current_block, current_class_block)
+  array_size_debug(p, gv.parse_debug)
 
 def p_decl_init(p):
   '''
@@ -232,7 +184,7 @@ def p_decl_init(p):
               | decl_init_dict
               | decl_init_obj
   '''
-  decl_init_debug(p, parse_debug)
+  decl_init_debug(p, gv.parse_debug)
 
 def p_decl_init_var(p):
   '''
@@ -256,7 +208,7 @@ def p_decl_init_var(p):
   matrix_content_p : COMMA matrix_content
                    | empty
   '''
-  decl_init_var_debug(p, parse_debug)
+  decl_init_var_debug(p, gv.parse_debug)
 
 def p_decl_init_dict(p):
   '''
@@ -267,25 +219,13 @@ def p_decl_init_dict(p):
   initialization_dict_p : COMMA initialization_dict
                         | empty
   '''
-  decl_init_dict_debug(p, parse_debug)
+  decl_init_dict_debug(p, gv.parse_debug)
 
 def p_decl_init_obj(p):
   '''
   decl_init_obj : CLASS_NAME ID neural_var_decl_id EQUAL CLASS_NAME sub_call_args
   '''
-  decl_init_obj_debug(p, parse_debug)
-
-# Called after ID in every declaration or initialization
-# It can be in decl_init, parameter declaration or attribute declaration
-def p_neural_var_decl_id(p):
-  '''neural_var_decl_id :'''
-  global current_last_type, current_last_id
-  if current_last_type == None:
-    # Second previous element in p will be stored; DICT or CLASS_NAME
-    current_last_type = p[-2]
-  current_last_id = p[-1]
-  function_directory.add_variable(current_last_id, current_block, current_last_type, current_is_public, current_class_block)
-  current_last_type = None
+  decl_init_obj_debug(p, gv.parse_debug)
 
 def p_assignment(p):
   '''
@@ -295,7 +235,7 @@ def p_assignment(p):
   assignment_access : access
                     | empty
   '''
-  assignment_debug(p, parse_debug)
+  assignment_debug(p, gv.parse_debug)
 
 def p_constructor(p):
   '''
@@ -307,75 +247,76 @@ def p_constructor(p):
   constructor_p : decl_init constructor_p
                 | empty
   '''
-  constructor_debug(p, parse_debug)
+  constructor_debug(p, gv.parse_debug)
 
 def p_relational(p):
   '''
-  relational : L_THAN
-             | G_THAN
-             | NOT_EQ
-             | L_THAN_EQ
-             | G_THAN_EQ
-             | EQ_TO
-             | GT
-             | LT
-             | GTE
-             | LTE
-             | EQ
-             | NEQ
+  relational : L_THAN     neural_add_to_operator_stack
+             | G_THAN     neural_add_to_operator_stack
+             | NOT_EQ     neural_add_to_operator_stack
+             | L_THAN_EQ  neural_add_to_operator_stack
+             | G_THAN_EQ  neural_add_to_operator_stack
+             | EQ_TO      neural_add_to_operator_stack
+             | GT         neural_add_to_operator_stack
+             | LT         neural_add_to_operator_stack
+             | GTE        neural_add_to_operator_stack
+             | LTE        neural_add_to_operator_stack
+             | EQ         neural_add_to_operator_stack
+             | NEQ        neural_add_to_operator_stack
   '''
-  relational_debug(p, parse_debug)
+  relational_debug(p, gv.parse_debug)
 
 def p_logical(p):
   '''
-  logical : OR_OP
-          | AND_OP
-          | OR
-          | AND
+  logical : OR_OP   neural_add_to_operator_stack
+          | AND_OP  neural_add_to_operator_stack
+          | OR      neural_add_to_operator_stack
+          | AND     neural_add_to_operator_stack
   '''
-  logical_debug(p, parse_debug)
+  logical_debug(p, gv.parse_debug)
 
 def p_var_cte_1(p):
   '''
   var_cte_1 : ID
             | CTE_I
   '''
-  var_cte_1_debug(p, parse_debug)
+  var_cte_1_debug(p, gv.parse_debug)
 
 def p_var_cte_2(p):
   '''
-  var_cte_2 : CTE_I
-            | CTE_F
-            | CTE_STR
+  var_cte_2 : CTE_I   neural_add_to_operand_stack_int
+            | CTE_F   neural_add_to_operand_stack_flt
+            | CTE_STR neural_add_to_operand_stack_str
             | cte_b
             | id_calls
   '''
-  var_cte_2_debug(p, parse_debug)
+  var_cte_2_debug(p, gv.parse_debug)
 
 def p_id_calls(p):
   '''
-  id_calls : ID id_calls_obj id_calls_p
+  id_calls : ID neural_add_to_operand_stack_id id_calls_obj id_calls_p
   id_calls_obj : MONEY ID
                | empty
   id_calls_p : access
              | sub_call_args
              | empty
   '''
-  id_calls_debug(p, parse_debug)
+  # TODO: move neural_add_to_operand_stack_id 
+  id_calls_debug(p, gv.parse_debug)
 
 def p_var_cte_3(p):
   '''
   var_cte_3 : var_cte_1
             | CTE_STR
   '''
-  var_cte_3_debug(p, parse_debug)
+  var_cte_3_debug(p, gv.parse_debug)
 
 def p_cte_b(p):
   '''
-  cte_b : TRUE
-        | FALSE
+  cte_b : TRUE  neural_add_to_operand_stack_bool
+        | FALSE neural_add_to_operand_stack_bool
   '''
-  cte_b_debug(p, parse_debug)
+  cte_b_debug(p, gv.parse_debug)
 
 def p_subroutine(p):
   '''
@@ -389,17 +330,7 @@ def p_subroutine(p):
   subroutine_p : decl_init subroutine_p
                | empty
   '''
-  subroutine_debug(p, parse_debug)
-
-# Called after ID in subroutine declaration
-def p_neural_sub_decl_id(p):
-  '''neural_sub_decl_id :'''
-  global current_block, current_last_type
-  current_block = p[-1]
-  if current_last_type == None:
-    current_last_type = CONSTRUCTOR_BLOCK
-  function_directory.add_block(current_block, current_last_type, current_is_public, current_class_block)
-  current_last_type = None
+  subroutine_debug(p, gv.parse_debug)
 
 def p_write(p):
   '''
@@ -408,7 +339,7 @@ def p_write(p):
   write_pp : COMMA write_p
            | empty
   '''
-  write_debug(p, parse_debug)
+  write_debug(p, gv.parse_debug)
 
 def p_condition(p):
   '''
@@ -419,7 +350,7 @@ def p_condition(p):
   condition_ppp : ELSE COLON block
                 | empty
   '''
-  condition_debug(p, parse_debug)
+  condition_debug(p, gv.parse_debug)
 
 def p_cycle(p):
   '''
@@ -427,7 +358,7 @@ def p_cycle(p):
         | repeat
         | for
   '''
-  cycle_debug(p, parse_debug)
+  cycle_debug(p, gv.parse_debug)
 
 def p_operator(p):
   '''
@@ -436,7 +367,7 @@ def p_operator(p):
            | MULTIPLY
            | DIVIDE
   '''
-  operator_debug(p, parse_debug)
+  operator_debug(p, gv.parse_debug)
 
 def p_access(p):
   '''
@@ -444,19 +375,19 @@ def p_access(p):
   access_p : L_SQ_BRACKET expression R_SQ_BRACKET
            | empty
   '''
-  access_debug(p, parse_debug)
+  access_debug(p, gv.parse_debug)
 
 def p_when(p):
   '''
   when : WHEN expression REPEAT COLON block END
   '''
-  when_debug(p, parse_debug)
+  when_debug(p, gv.parse_debug)
 
 def p_repeat(p):
   '''
   repeat : REPEAT COLON block WHILE expression END
   '''
-  repeat_debug(p, parse_debug)
+  repeat_debug(p, gv.parse_debug)
 
 def p_for(p):
   '''
@@ -466,7 +397,7 @@ def p_for(p):
   for_operator : operator
                | empty
   '''
-  for_debug(p, parse_debug)
+  for_debug(p, gv.parse_debug)
 
 def p_read(p):
   '''
@@ -480,7 +411,7 @@ def p_read(p):
   read_access : access
               | empty
   '''
-  read_debug(p, parse_debug)
+  read_debug(p, gv.parse_debug)
 
 def p_type(p):
   '''
@@ -489,13 +420,7 @@ def p_type(p):
        | BOOL neural_decl_type
        | STR neural_decl_type
   '''
-  type_debug(p, parse_debug)
-
-# Called after each primitive type
-def p_neural_decl_type(p):
-  '''neural_decl_type :'''
-  global current_last_type
-  current_last_type = p[-1]
+  type_debug(p, gv.parse_debug)
 
 def p_empty(p):
   'empty :'
@@ -504,7 +429,140 @@ def p_empty(p):
 # Error rule for syntax errors
 def p_error(p):
   print("Syntax error in input!")
-  raise Exception('Syntax error in input!"')
+  helpers.throw_error('Syntax error in input!"')
+
+################################################################################
+################                NEURALGIC POINTS                ################
+################################################################################
+
+#################################################
+####### Function Directory Construction #########
+#################################################
+
+# Called when parsing starts and when subroutine ends
+def p_neural_global_block(p):
+  '''neural_global_block :'''
+  # Set current block as global
+  gv.current_block = GLOBAL_BLOCK
+
+# Called after CLASS_NAME in class declaration
+def p_neural_class_decl(p):
+  '''neural_class_decl :'''
+  gv.current_class_block = p[-1]
+  gv.function_directory.add_block(gv.current_class_block, CLASS_BLOCK)
+
+# Called at the end of class declaration
+def p_neural_class_decl_end(p):
+  '''neural_class_decl_end :'''
+  gv.current_class_block = None
+
+# Called after CLASS_NAME when inheriting a class
+def p_neural_class_decl_inheritance(p):
+  '''neural_class_decl_inheritance :'''
+  class_name = p[-1]
+  gv.function_directory.check_class(class_name)
+
+# Called after PRIVATE in public section of class declaration
+def p_neural_class_decl_private(p):
+  '''neural_class_decl_private :'''
+  gv.current_is_public = False
+
+# Called after PUBLIC in public section of class declaration
+def p_neural_class_decl_public(p):
+  '''neural_class_decl_public :'''
+  gv.current_is_public = True
+
+# Called at the end of private or public section of class declaration
+def p_neural_class_decl_section_end(p):
+  '''neural_class_decl_section_end : '''
+  gv.current_is_public = None
+
+# Called after ID in every declaration or initialization
+# It can be in decl_init, parameter declaration or attribute declaration
+def p_neural_var_decl_id(p):
+  '''neural_var_decl_id :'''
+  if gv.current_last_type == None:
+    # Second previous element in p will be stored; DICT or CLASS_NAME
+    gv.current_last_type = p[-2]
+  gv.current_last_id = p[-1]
+  gv.function_directory.add_variable(gv.current_last_id, gv.current_block, gv.current_last_type, gv.current_is_public, gv.current_class_block)
+  gv.current_last_type = None
+
+# Called after each primitive type
+def p_neural_decl_type(p):
+  '''neural_decl_type :'''
+  gv.current_last_type = p[-1]
+
+def p_neural_array_decl(p):
+  '''neural_array_decl :'''
+  gv.function_directory.add_dimension_to_variable(gv.current_last_id, gv.current_block, gv.current_class_block)
+
+# Called after ID in subroutine declaration
+def p_neural_sub_decl_id(p):
+  '''neural_sub_decl_id :'''
+  gv.current_block = p[-1]
+  if gv.current_last_type == None:
+    gv.current_last_type = CONSTRUCTOR_BLOCK
+  gv.function_directory.add_block(gv.current_block, gv.current_last_type, gv.current_is_public, gv.current_class_block)
+  gv.current_last_type = None
+
+#################################################
+#######  Expression Quad Constructions  #########
+#################################################
+
+### Add to operand stack
+
+def p_neural_add_to_operand_stack_int(p):
+  '''neural_add_to_operand_stack_int :'''
+  operand_value = p[-1]
+  operand_type = "int"
+  add_to_operand_stack(operand_value, operand_type)
+
+def p_neural_add_to_operand_stack_flt(p):
+  '''neural_add_to_operand_stack_flt :'''
+  operand_value = p[-1]
+  operand_type = "flt"
+  add_to_operand_stack(operand_value, operand_type)
+
+def p_neural_add_to_operand_stack_str(p):
+  '''neural_add_to_operand_stack_str :'''
+  operand_value = p[-1]
+  operand_type = "str"
+  add_to_operand_stack(operand_value, operand_type)
+
+def p_neural_add_to_operand_stack_bool(p):
+  '''neural_add_to_operand_stack_bool :'''
+  operand_value = p[-1]
+  operand_type = "bool"
+  add_to_operand_stack(operand_value, operand_type)
+
+def p_neural_add_to_operand_stack_id(p):
+  '''neural_add_to_operand_stack_id :'''
+  operand_value = p[-1]
+  operand_type = gv.function_directory.get_variable_type(operand_value, gv.current_block, gv.current_class_block)
+  add_to_operand_stack(operand_value, operand_type)
+
+def add_to_operand_stack(operand_value, operand_type):
+  gv.stack_operands.push(OperandPair(operand_value, operand_type))
+
+### Modify operator stack
+
+def p_neural_add_to_operator_stack(p):
+  '''neural_add_to_operator_stack :'''
+  operator = p[-1]
+  gv.stack_operators.push(operator)
+
+def p_neural_read_unary_operator(p):
+  '''neural_read_unary_operator :'''
+  gv.read_unary_operator = True
+
+def p_neural_operator_stack_push_false(p):
+  '''neural_operator_stack_push_false :'''
+  gv.stack_operators.push("(")
+
+def p_neural_operator_stack_pop_false(p):
+  '''neural_operator_stack_pop_false :'''
+  gv.stack_operators.pop()
 
 # Build the parser
 parser = yacc.yacc()
@@ -520,4 +578,4 @@ while True:
   if not file: continue
   result = parser.parse(s)
   print(result)
-  function_directory.output()
+  # gv.function_directory.output()
