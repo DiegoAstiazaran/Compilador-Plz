@@ -6,7 +6,7 @@ import ply.yacc as yacc # Import yacc module
 from lexer import tokens, lexer   # Import tokens and lexer defined in lexer
 from parserDebug import *         # Import functions to debug parser
 import globalVariables as gv      # Import global variables
-from constants import GLOBAL_BLOCK, CLASS_BLOCK, CONSTRUCTOR_BLOCK, Operators # Import all constants
+from constants import GLOBAL_BLOCK, CLASS_BLOCK, CONSTRUCTOR_BLOCK, Operators, QuadOperations # Import all constants
 from structures import OperandPair, Quad  # Import OperandPair and Quad class
 import helpers                    # Import helpers
 import sys                        # TODO: delete
@@ -162,7 +162,7 @@ def p_public(p):
 
 def p_declaration(p):
   '''
-  declaration : declaration_p DOT
+  declaration : declaration_p neural_check_operator_stack_equal DOT
   declaration_p : type ID neural_var_decl_id declaration_pp
                 | DICT ID neural_var_decl_id
   declaration_pp : array_size declaration_ppp
@@ -343,9 +343,9 @@ def p_subroutine(p):
 
 def p_write(p):
   '''
-  write : PRINT COLON write_p END
-  write_p : expression write_pp
-  write_pp : COMMA write_p
+  write : PRINT COLON write_p neural_write_new_line END
+  write_p : expression neural_write_expression write_pp
+  write_pp : neural_write_space COMMA write_p
            | empty
   '''
   write_debug(p, gv.parse_debug)
@@ -414,7 +414,7 @@ def p_read(p):
   read_list : read_p read_list_p
   read_list_p : COMMA read_list
               | empty
-  read_p : ID read_obj read_access
+  read_p : ID neural_read read_obj read_access
   read_obj : AT ID
            | empty
   read_access : access
@@ -554,6 +554,8 @@ def p_neural_check_operator_stack_equal(p):
       helpers.throw_error('Type mismatch')
     quad = Quad(operator, first.get_value(), operand_id.get_value())
     gv.quad_list.add(quad)
+  ## SEGUN YO PARA QUE JALE LO DE METER ESTE NEURAL A DECLARATION, DEBERIA HABER
+  ## UN ELSE EN EL QUE HAGA POP SI NO ENCUENTRA AL EQUAL
 
 def check_operator_stack(operators_list = None):
   # first part of condition is for unary operators
@@ -635,6 +637,30 @@ def p_neural_operator_stack_push_false(p):
 def p_neural_operator_stack_pop_false(p):
   '''neural_operator_stack_pop_false :'''
   gv.stack_operators.pop()
+
+### Other quadruples (write, read)
+
+def p_neural_write_expression(p):
+  '''neural_write_expression :'''
+  expression = gv.stack_operands.pop()
+  quad = Quad(QuadOperations.WRITE, expression.get_value())
+  gv.quad_list.add(quad)
+
+def p_neural_write_new_line(p):
+  '''neural_write_new_line :'''
+  quad = Quad(QuadOperations.WRITE_NEW_LINE)
+  gv.quad_list.add(quad)
+
+def p_neural_write_space(p):
+  '''neural_write_space :'''
+  quad = Quad(QuadOperations.WRITE_SPACE)
+  gv.quad_list.add(quad)
+
+def p_neural_read(p):
+  '''neural_read :'''
+  result = gv.stack_operands.pop()
+  quad = Quad(QuadOperations.READ, result.get_value())
+  gv.quad_list.add(quad)
 
 ### Other
 

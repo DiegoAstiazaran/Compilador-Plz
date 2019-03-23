@@ -55,9 +55,9 @@ class QuadList:
 
 # Quad for intermediate code
 class Quad:
-  def __init__(self, instruction, first, second = None, third = None):
-    if first is None and second is None and third is None:
-      raise Exception("Quad must have at least two params different from None")
+  def __init__(self, instruction, first = None, second = None, third = None):
+    if instruction is None:
+      raise Exception("Quad operator must be different from None")
     self._quad = [instruction]
     if first is not None:
       self._quad.append(first)

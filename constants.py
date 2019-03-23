@@ -49,3 +49,10 @@ class Operators:
   multiply_divide = [MULTIPLY, DIVIDE]
   unary = [PLUS, MINUS, NOT, NOT_OP]
   unary_arithmetic = [PLUS, MINUS]
+
+# Enum for quad operations
+class QuadOperations:
+  WRITE = 'write'
+  READ = 'read'
+  WRITE_NEW_LINE = 'write_new_line'
+  WRITE_SPACE = 'write_space'
