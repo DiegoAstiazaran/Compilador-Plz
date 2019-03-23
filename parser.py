@@ -639,6 +639,7 @@ while True:
   if not file: continue
   result = parser.parse(s)
   print(result)
+  print(gv.quad_list)
   del sys.modules['globalVariables']
   import globalVariables as gv
   # gv.function_directory.output()

@@ -81,6 +81,9 @@ class Stack:
 class QuadList:
   def __init__(self):
     self._quad_list = []
+
+  def __str__(self):
+    return '[\n' + ',\n'.join('{}'.format(item) for item in self._quad_list) + '\n]'
   
   def next(self):
     return len(self._quad_list)
@@ -98,11 +101,14 @@ class Quad:
       raise Exception("Quad must have at least two params different from None")
     self._quad = [instruction]
     if first is not None:
-      self._quad.append(second)
+      self._quad.append(first)
     if second is not None:
       self._quad.append(second)
     if third is not None:
       self._quad.append(third)
+  
+  def __repr__(self):
+    return ' '.join(str(i) for i in filter(None, self._quad))
 
 # Temporal memory manager
 class TemporalMemory:
@@ -111,7 +117,7 @@ class TemporalMemory:
   
   def get_available(self):
     self._next_available += 1
-    return 'temporal #%d' % (self._next_available - 1)
+    return 'temp_%d' % (self._next_available - 1)
 
 # Semantic cuve for resulting types of operations
 class SemanticCube:
