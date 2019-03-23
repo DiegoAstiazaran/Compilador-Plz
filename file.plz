@@ -7,12 +7,15 @@ flt x3.
 bool das.
 str x4 = "ddsad".
 int x5(4)(5).
+int arreglo(5) = {4,5,6,7}.
 
 class Persona :
   sub Persona():
     str fdsfsd.
     int id(10).
     int x_var = 5 + 6 .
+    int hola.
+    hola = 666.
     if (5 < 4 ):
       print: 4324, fdsfsd, id$arr[4] end
     end

@@ -180,7 +180,7 @@ def p_array_size(p):
 
 def p_decl_init(p):
   '''
-  decl_init : decl_init_p DOT
+  decl_init : decl_init_p neural_check_operator_stack_equal DOT
   decl_init_p : decl_init_var
               | decl_init_dict
               | decl_init_obj
@@ -192,7 +192,7 @@ def p_decl_init_var(p):
   decl_init_var : type ID neural_var_decl_id decl_init_var_p
   decl_init_var_p : decl_init_var_var
                   | decl_init_var_pp
-  decl_init_var_var : EQUAL expression
+  decl_init_var_var : EQUAL neural_add_to_operator_stack expression
                     | empty
   decl_init_var_pp : array_size decl_init_var_ppp
   decl_init_var_ppp : decl_init_var_array
@@ -209,6 +209,8 @@ def p_decl_init_var(p):
   matrix_content_p : COMMA matrix_content
                    | empty
   '''
+  # TODO: Put neural_add_to_operator_stack back after EQUAL in array and matrix initialization
+
   decl_init_var_debug(p, gv.parse_debug)
 
 def p_decl_init_dict(p):
@@ -220,17 +222,19 @@ def p_decl_init_dict(p):
   initialization_dict_p : COMMA initialization_dict
                         | empty
   '''
+  # TODO: Put neural_add_to_operator_stack back after EQUAL
   decl_init_dict_debug(p, gv.parse_debug)
 
 def p_decl_init_obj(p):
   '''
   decl_init_obj : CLASS_NAME ID neural_var_decl_id EQUAL CLASS_NAME sub_call_args
   '''
+  # TODO: Put neural_add_to_operator_stack back after EQUAL
   decl_init_obj_debug(p, gv.parse_debug)
 
 def p_assignment(p):
   '''
-  assignment : ID assignment_obj assignment_access EQUAL expression DOT
+  assignment : ID neural_add_to_operand_stack_id assignment_obj assignment_access EQUAL neural_add_to_operator_stack expression neural_check_operator_stack_equal DOT
   assignment_obj : MONEY ID
                  | empty
   assignment_access : access
@@ -302,7 +306,7 @@ def p_id_calls(p):
              | sub_call_args
              | empty
   '''
-  # TODO: move neural_add_to_operand_stack_id 
+  # TODO: move neural_add_to_operand_stack_id
   id_calls_debug(p, gv.parse_debug)
 
 def p_var_cte_3(p):
@@ -487,6 +491,9 @@ def p_neural_var_decl_id(p):
     gv.current_last_type = p[-2]
   gv.current_last_id = p[-1]
   gv.function_directory.add_variable(gv.current_last_id, gv.current_block, gv.current_last_type, gv.current_is_public, gv.current_class_block)
+  # Add operand to operand stack in case it is a initialization
+  add_to_operand_stack(gv.current_last_id, gv.current_last_type)
+
   gv.current_last_type = None
 
 # Called after each primitive type
@@ -533,6 +540,15 @@ def p_neural_check_operator_stack_unary(p):
   '''neural_check_operator_stack_unary :'''
   check_operator_stack()
 
+def p_neural_check_operator_stack_equal(p):
+  '''neural_check_operator_stack_equal :'''
+  first = gv.stack_operands.pop()
+  if not gv.stack_operators.empty() and gv.stack_operators.top() == Operators.EQUAL:
+    operand_id = gv.stack_operands.pop()
+    operator = gv.stack_operators.pop()
+    quad = Quad(operator, first.get_value(), operand_id.get_value())
+    gv.quad_list.add(quad)
+
 def check_operator_stack(operators_list = None):
   # first part of condition is for unary operators
   # second part is for the rest of the operators
@@ -547,7 +563,7 @@ def check_operator_stack(operators_list = None):
       result_type = gv.semantic_cube.validate_type(operator, operand_left.get_type(), operand_right.get_type())
 
     if result_type == None:
-      helpers.throw_error('Type mismatch on operator ' + operator + " " + str(operand_left) + " " + str(operand_right))
+      helpers.throw_error('Type mismatch on operator ')
 
     result_value = gv.temporal_memory.get_available()
     if operand_left is None:

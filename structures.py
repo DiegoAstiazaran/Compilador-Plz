@@ -9,6 +9,7 @@ class Types:
 class Operators:
   NOT_OP       = '~'
   NOT          = 'not'
+  EQUAL        = '='
   PLUS         = '+'
   MINUS        = '-'
   MULTIPLY     = '*'
@@ -40,17 +41,17 @@ class Operators:
   unary = [PLUS, MINUS, NOT, NOT_OP]
   unary_arithmetic = [PLUS, MINUS]
 
-# Pair of operand value and type 
+# Pair of operand value and type
 class OperandPair:
   def __init__(self, operand_value, operand_type):
     self._pair = (operand_value, operand_type)
-  
+
   def __str__(self):
     return str(self._pair)
 
   def get_value(self):
     return self._pair[0]
-  
+
   def get_type(self):
     return self._pair[1]
 
@@ -58,39 +59,39 @@ class OperandPair:
 class Stack:
   def __init__(self):
     self._stack = []
-  
+
   def __str__(self):
     return str(self._stack)
-  
+
   def push(self, value):
     self._stack.append(value)
-  
+
   # Pops and returns element
   def pop(self):
     top = self.top()
     self._stack.pop()
     return top
-  
+
   def top(self):
     return self._stack[-1]
-  
+
   def empty(self):
     return not self._stack
 
-# List for quads 
+# List for quads
 class QuadList:
   def __init__(self):
     self._quad_list = []
 
   def __str__(self):
     return '[\n' + ',\n'.join('{}'.format(item) for item in self._quad_list) + '\n]'
-  
+
   def next(self):
     return len(self._quad_list)
-  
+
   def size(self):
     return len(self._quad_list)
-  
+
   def add(self, quad):
     self._quad_list.append(quad)
 
@@ -106,7 +107,7 @@ class Quad:
       self._quad.append(second)
     if third is not None:
       self._quad.append(third)
-  
+
   def __repr__(self):
     return ' '.join(str(i) for i in filter(None.__ne__, self._quad))
 
@@ -114,7 +115,7 @@ class Quad:
 class TemporalMemory:
   def __init__(self):
     self._next_available = 0
-  
+
   def get_available(self):
     self._next_available += 1
     return 'temp_%d' % (self._next_available - 1)
@@ -137,7 +138,7 @@ class SemanticCube:
       [ None,       None,      None,      None,         None ]
     ]
     # relational: >, <, >=, <=, gt, lt, gte,lte
-    relational_operations_one = [ 
+    relational_operations_one = [
       [ Types.BOOL, Types.BOOL, None,      None,        None ],
       [ None,       Types.BOOL, None,      None,        None ],
       [ None,       None,       None,      None,        None ],
@@ -145,14 +146,14 @@ class SemanticCube:
       [ None,       None,       None,      None,        None ]
     ]
     # relational: ==, ~=, eq, neq
-    relational_operations_two = [ 
+    relational_operations_two = [
       [ Types.BOOL, Types.BOOL, None,       None,       None ],
       [ None,       Types.BOOL, None,       None,       None ],
       [ None,       None,       Types.BOOL, None,       None ],
       [ None,       None,       None,       Types.BOOL, None ],
       [ None,       None,       None,       None,       None ]
     ]
-    logical_operations = [ 
+    logical_operations = [
       [ None,       None,       None,       None,       None ],
       [ None,       None,       None,       None,       None ],
       [ None,       None,       None,       None,       None ],
@@ -164,7 +165,7 @@ class SemanticCube:
     # +, - (as positive and negative)
     unary_arithmetic_operations = [ Types.INT, Types.FLT, None, None, None ]
 
-    self._semantic_cube = [sum_operations, 
+    self._semantic_cube = [sum_operations,
                            minus_multiply_divide_operations,
                            relational_operations_one,
                            relational_operations_two,
