@@ -39,3 +39,7 @@ quad_list = QuadList()
 
 # Temporal memory manager
 temporal_memory = TemporalMemory()
+
+# For debugging purposes
+# TODO: delete
+lines_read = []

@@ -59,6 +59,9 @@ class Stack:
   def __init__(self):
     self._stack = []
   
+  def __str__(self):
+    return str(self._stack)
+  
   def push(self, value):
     self._stack.append(value)
   
@@ -108,7 +111,7 @@ class TemporalMemory:
   
   def get_available(self):
     self._next_available += 1
-    return self._next_available - 1
+    return 'temporal #%d' % (self._next_available - 1)
 
 # Semantic cuve for resulting types of operations
 class SemanticCube:

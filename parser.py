@@ -613,6 +613,17 @@ def p_neural_operator_stack_pop_false(p):
   '''neural_operator_stack_pop_false :'''
   gv.stack_operators.pop()
 
+### Other
+
+# Use for debugging
+# TODO: delete
+def p_neural_new_line(p):
+  '''neural_new_line :'''
+  line = lexer.lineno
+  if line not in gv.lines_read:
+    print('Line #%d\n' % (line) )
+  gv.lines_read.append(line)
+
 # Build the parser
 parser = yacc.yacc()
 
