@@ -48,6 +48,7 @@ tokens = [
   'CLASS_NAME',
 	'COLON',
 	'MONEY',
+  'AT',
 	'PLUS',
 	'MINUS',
 	'MULTIPLY',
@@ -78,6 +79,7 @@ tokens = [
 # Regular expressions for one character long tokens
 t_COLON        = r':'
 t_MONEY        = r'\$'
+t_AT           = r'\@'
 t_PLUS         = r'\+'
 t_MINUS        = r'-'
 t_MULTIPLY     = r'\*'
@@ -147,8 +149,11 @@ lexer = lex.lex()
 # while True:
 #   try:
 #     lexer = lex.lex()
-#     data = input('data > ')
-#     lexer.input(data)
+#     # data = input('data > ')
+#     file = input('Filename: ')
+#     with open(file, 'r') as myfile:
+#         s = myfile.read()
+#     lexer.input(s)
 #     while True:
 #       tok = lexer.token()
 #       if not tok:

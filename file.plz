@@ -1,10 +1,14 @@
 str file = "THIS IS A TEST FILE FOR PARSER".
 
+int diego.
+int erik.
+int id.
+int a = erik@diego.
 int x = -0.
 bool b = ~True.
 int x2.
 flt x3.
-bool das.
+bool is.
 str x4 = "ddsad".
 int x5(4)(5).
 int arreglo(5) = {4,5,6,7}.
@@ -17,7 +21,7 @@ class Persona :
     int hola.
     hola = 666.
     if (5 < 4 ):
-      print: 4324, fdsfsd, id$arr[4] end
+      print: 4324, fdsfsd, id@arr[4] end
     end
   end
 
@@ -26,7 +30,7 @@ class Persona :
     flt x2.
     bool x3.
     bool x7(1).
-    sub int erik(int a, bool b, str c, flt d, int x):
+    sub int erik(int a, int b, bool c, flt d, int x):
       a = b.
       c = x < 8.
     end
@@ -36,22 +40,22 @@ class Persona :
     int x4.
     flt x5.
     bool x6.
-    sub flt funcion2(int a, int b, str c, flt d):
+    sub flt funcion2(int a, int b, bool c, flt d):
     int x = 9.
     int id(10).
       a = b.
       c = x < 8.
-      c[4] = id$id.
+      c[4] = id@id.
     end
   end
 end
 
 class Hombre under Persona :
   sub Hombre():
-    str x = 5 + 6 .
+    str x = "5 + 6" .
     int id(10).
     if (5 < 4):
-      print: 4324, x, id$arr[4] end
+      print: 4324, x, id@arr[4] end
     end
   end
 
@@ -79,7 +83,7 @@ end
 
 return x.
 
-read: x,y,z, id$id, id$id[321] end
+read: x,y,z, erikkkkkkkk@diegooooo end
 
 read: x[x2] end
 
@@ -88,14 +92,14 @@ x = 4.
 is = 5 < 4.
 
 if (5 < 4 ):
-  print: 4324, 'string', x5$arr[4] end
+  print: 4324, 'string', x5@arr[4] end
 elsif ( 6< 4) :
 
 else:
 
 end
 
-print: 4324, x2, x3$arr[4] end
+print: 4324, x2, x3@arr[4] end
 
 when 7 repeat:
   x = 7.
@@ -109,11 +113,12 @@ repeat:
   else:
   x = x[5].
   x = x[5].
+  x = 10.
 
   end
 while 7 > 8 end
 
-for a from x$x[432] by /3 while True:
+for a from x@x[432] by /3 while True:
   print: x,x2,x3 end
 end
 
@@ -121,4 +126,4 @@ imprimir().
 
 id$ifsd(x, (8+9*5) < (4*7/x2+5.5) ).
 
-x = True and True or 2 > 1.
+x = 1.

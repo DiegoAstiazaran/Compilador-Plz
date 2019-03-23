@@ -235,7 +235,7 @@ def p_decl_init_obj(p):
 def p_assignment(p):
   '''
   assignment : ID neural_add_to_operand_stack_id assignment_obj assignment_access EQUAL neural_add_to_operator_stack expression neural_check_operator_stack_equal DOT
-  assignment_obj : MONEY ID
+  assignment_obj : AT ID
                  | empty
   assignment_access : access
                     | empty
@@ -299,12 +299,16 @@ def p_var_cte_2(p):
 
 def p_id_calls(p):
   '''
-  id_calls : ID neural_add_to_operand_stack_id id_calls_obj id_calls_p
-  id_calls_obj : MONEY ID
-               | empty
+  id_calls : ID neural_add_to_operand_stack_id id_calls_p
   id_calls_p : access
              | sub_call_args
+             | id_calls_method
+             | id_calls_attribute
              | empty
+  id_calls_method : MONEY ID sub_call_args
+  id_calls_attribute : AT ID id_calls_attribute_p
+  id_calls_attribute_p : access
+                       | empty
   '''
   # TODO: move neural_add_to_operand_stack_id
   id_calls_debug(p, gv.parse_debug)
@@ -411,7 +415,7 @@ def p_read(p):
   read_list_p : COMMA read_list
               | empty
   read_p : ID read_obj read_access
-  read_obj : MONEY ID
+  read_obj : AT ID
            | empty
   read_access : access
               | empty
@@ -546,6 +550,8 @@ def p_neural_check_operator_stack_equal(p):
   if not gv.stack_operators.empty() and gv.stack_operators.top() == Operators.EQUAL:
     operand_id = gv.stack_operands.pop()
     operator = gv.stack_operators.pop()
+    if first.get_type() != operand_id.get_type():
+      helpers.throw_error('Type mismatch')
     quad = Quad(operator, first.get_value(), operand_id.get_value())
     gv.quad_list.add(quad)
 
@@ -647,7 +653,8 @@ parser = yacc.yacc()
 # Execution of parser with a filename
 while True:
   try:
-      file = input('Filename: ')
+      # file = input('Filename: ')
+      file = 'file.plz'
       with open(file, 'r') as myfile:
           s = myfile.read()
   except EOFError:
@@ -658,4 +665,5 @@ while True:
   print(gv.quad_list)
   del sys.modules['globalVariables']
   import globalVariables as gv
+  break # remove this break to loop the tests
   # gv.function_directory.output()
