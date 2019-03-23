@@ -108,7 +108,7 @@ class Quad:
       self._quad.append(third)
   
   def __repr__(self):
-    return ' '.join(str(i) for i in filter(None, self._quad))
+    return ' '.join(str(i) for i in filter(None.__ne__, self._quad))
 
 # Temporal memory manager
 class TemporalMemory:
@@ -210,14 +210,12 @@ class SemanticCube:
   # Returns resulting type for operator and operands
   def validate_type(self, operator, operand_left_type, operand_right_type = None):
     operator_index = self._operators_index[operator]
+    operand_left_index = self._types_index.get(operand_left_type, 4)
 
     if operand_right_type == None:
       if operator in Operators.unary_arithmetic:
-        operand_left_index = self._operators_index["unary_arithmetic"]
-      else: 
-        operand_left_index = self._operators_index[operator]
+          operator_index = self._operators_index["unary_arithmetic"]
       return self._semantic_cube[operator_index][operand_left_index]
 
-    operand_left_index = self._types_index.get(operand_left_type, 4)
     operand_right_index = self._types_index.get(operand_right_type, 4)
     return self._semantic_cube[operator_index][operand_left_index][operand_right_index]

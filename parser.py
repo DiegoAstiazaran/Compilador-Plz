@@ -122,10 +122,10 @@ def p_factor(p):
   '''
   factor : L_PAREN neural_operator_stack_push_false expression R_PAREN neural_operator_stack_pop_false
          | factor_p var_cte_2 neural_check_operator_stack_unary
-  factor_p : PLUS   neural_read_unary_operator neural_add_to_operator_stack
-           | MINUS  neural_read_unary_operator neural_add_to_operator_stack
-           | NOT    neural_read_unary_operator neural_add_to_operator_stack
-           | NOT_OP neural_read_unary_operator neural_add_to_operator_stack
+  factor_p : PLUS   neural_add_to_operator_stack neural_read_unary_operator
+           | MINUS  neural_add_to_operator_stack neural_read_unary_operator
+           | NOT    neural_add_to_operator_stack neural_read_unary_operator
+           | NOT_OP neural_add_to_operator_stack neural_read_unary_operator
            | empty
   '''
   factor_debug(p, gv.parse_debug)
@@ -542,7 +542,7 @@ def check_operator_stack(operators_list = None):
     operand_left = gv.stack_operands.pop() if operators_list else None
 
     if operand_left is None:
-      result_type = gv.semantic_cube.validate_type(operator, operand_left.get_type())
+      result_type = gv.semantic_cube.validate_type(operator, operand_right.get_type())
     else:
       result_type = gv.semantic_cube.validate_type(operator, operand_left.get_type(), operand_right.get_type())
 

@@ -1,6 +1,7 @@
 str file = "THIS IS A TEST FILE FOR PARSER".
 
-int x = 0.
+int x = -0.
+bool b = ~True.
 int x2.
 flt x3.
 bool das.
