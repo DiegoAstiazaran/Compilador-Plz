@@ -6,8 +6,8 @@ import ply.yacc as yacc # Import yacc module
 from lexer import tokens, lexer   # Import tokens and lexer defined in lexer
 from parserDebug import *         # Import functions to debug parser
 import globalVariables as gv      # Import global variables
-from constants import *           # Import all constants
-from structures import OperandPair, Quad, Operators  # Import OperandPair and Quad class
+from constants import GLOBAL_BLOCK, CLASS_BLOCK, CONSTRUCTOR_BLOCK, Operators # Import all constants
+from structures import OperandPair, Quad  # Import OperandPair and Quad class
 import helpers                    # Import helpers
 import sys                        # TODO: delete
 
