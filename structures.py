@@ -7,6 +7,9 @@ class OperandPair:
   def __str__(self):
     return str(self._pair)
 
+  def __repr__(self):
+    return str(self._pair)
+
   def get_value(self):
     return self._pair[0]
 

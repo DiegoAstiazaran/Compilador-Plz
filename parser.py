@@ -554,8 +554,6 @@ def p_neural_check_operator_stack_equal(p):
       helpers.throw_error('Type mismatch')
     quad = Quad(operator, first.get_value(), operand_id.get_value())
     gv.quad_list.add(quad)
-  ## SEGUN YO PARA QUE JALE LO DE METER ESTE NEURAL A DECLARATION, DEBERIA HABER
-  ## UN ELSE EN EL QUE HAGA POP SI NO ENCUENTRA AL EQUAL
 
 def check_operator_stack(operators_list = None):
   # first part of condition is for unary operators
@@ -658,8 +656,8 @@ def p_neural_write_space(p):
 
 def p_neural_read(p):
   '''neural_read :'''
-  result = gv.stack_operands.pop()
-  quad = Quad(QuadOperations.READ, result.get_value())
+  result = p[-1]
+  quad = Quad(QuadOperations.READ, result)
   gv.quad_list.add(quad)
 
 ### Other
