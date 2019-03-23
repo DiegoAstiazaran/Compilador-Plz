@@ -9,6 +9,7 @@ import globalVariables as gv      # Import global variables
 from constants import *           # Import all constants
 from structures import OperandPair, Quad, Operators  # Import OperandPair and Quad class
 import helpers                    # Import helpers
+import sys                        # TODO: delete
 
 # Sets main grammar rule
 start = 'program'
@@ -638,4 +639,6 @@ while True:
   if not file: continue
   result = parser.parse(s)
   print(result)
+  del sys.modules['globalVariables']
+  import globalVariables as gv
   # gv.function_directory.output()
