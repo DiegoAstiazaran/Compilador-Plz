@@ -91,7 +91,7 @@ def p_expression(p):
 
 def p_mini_expression(p):
   '''
-  mini_expression : exp neural_check_operator_stack_relational mini_expression_p
+  mini_expression : exp mini_expression_p neural_check_operator_stack_relational
   mini_expression_p : relational exp
                     | empty
   '''
