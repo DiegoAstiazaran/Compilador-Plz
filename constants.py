@@ -13,6 +13,7 @@ class Types:
   FLT   = 'flt'
   STR   = 'str'
   BOOL  = 'bool'
+  VOID  = 'void'
 
 # Enum for operators
 class Operators:
@@ -52,7 +53,8 @@ class Operators:
 
 # Enum for quad operations
 class QuadOperations:
-  WRITE = 'write'
-  READ = 'read'
-  WRITE_NEW_LINE = 'write_new_line'
-  WRITE_SPACE = 'write_space'
+  WRITE           = 'write'
+  READ            = 'read'
+  WRITE_NEW_LINE  = 'write_new_line'
+  WRITE_SPACE     = 'write_space'
+  RETURN          = 'return'

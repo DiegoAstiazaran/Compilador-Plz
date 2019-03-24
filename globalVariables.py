@@ -25,6 +25,12 @@ current_last_id = None
 # Boolean to know if unary operator was parsed
 read_unary_operator = False
 
+# Boolean to know if current return statement returns a value
+current_return_has_value = False
+
+# Boolean to know if current subroutine has a return statement
+current_sub_has_return_stmt = False
+
 # Semantic cube object
 semantic_cube = SemanticCube()
 

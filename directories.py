@@ -36,8 +36,13 @@ class FunctionDirectory:
     self._function_table = {}
     self.add_block(GLOBAL_BLOCK)
   
+  # Return directory stored in dictionary entry
   def get_entry_directory(self, block_name):
     return self._function_table[block_name][1]
+
+  # Return type stored in dictionary entry
+  def get_entry_type(self, block_name):
+    return self._function_table[block_name][0]
 
   # Adds a block to dictionary
   def add_block(self, block_name, type = None, is_public = None, class_name = None):
@@ -86,6 +91,12 @@ class FunctionDirectory:
       return self.get_entry_directory(block_name).get_variable_type(var_name)
     else:
       return self.get_entry_directory(class_name).get_variable_type(var_name, block_name)
+
+  def get_sub_type(self, block_name, class_name = None):
+    if class_name == None:
+      return self.get_entry_type(block_name)
+    else:
+      return self.get_entry_directory(class_name).get_sub_type(block_name)
 
   # Used for debugging and testing purposes
   def output(self):

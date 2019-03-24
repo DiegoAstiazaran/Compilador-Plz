@@ -72,6 +72,9 @@ class Quad:
   def __repr__(self):
     return ' '.join(str(i) for i in filter(None.__ne__, self._quad))
 
+  def add_element(self, element):
+    self._quad.append(element)
+
 # Temporal memory manager
 class TemporalMemory:
   def __init__(self):

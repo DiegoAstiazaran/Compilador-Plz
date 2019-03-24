@@ -33,6 +33,7 @@ class Persona :
     sub int erik(int a, int b, bool c, flt d, int x):
       a = b.
       c = x < 8.
+      return a.
     end
   end
 
@@ -41,11 +42,12 @@ class Persona :
     flt x5.
     bool x6.
     sub flt funcion2(int a, int b, bool c, flt d):
-    int x = 9.
-    int id(10).
+      int x = 9.
+      int id(10).
       a = b.
       c = x < 8.
       c[4] = id@id.
+      return 5.0.
     end
   end
 end
@@ -69,19 +71,22 @@ class Hombre under Persona :
   end
 end
 
-sub void funcion(int x, bool y):
+sub void writes(str string):
+  print: string end
+end
+
+sub int funcion(int x, bool y):
   return 432.
 end
 
 sub void funcion2(int x, bool y):
-  return 432.
+  return.
 end
 
-sub void funcion3(int x, bool y):
-  return 432.
+sub bool funcion3(int x, bool y):
+  return 4 * 5 * x < 10.
+  return True.
 end
-
-return x.
 
 read: x,y,z, erikkkkkkkk@diegooooo end
 

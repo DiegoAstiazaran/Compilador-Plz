@@ -6,7 +6,7 @@ import ply.yacc as yacc # Import yacc module
 from lexer import tokens, lexer   # Import tokens and lexer defined in lexer
 from parserDebug import *         # Import functions to debug parser
 import globalVariables as gv      # Import global variables
-from constants import GLOBAL_BLOCK, CLASS_BLOCK, CONSTRUCTOR_BLOCK, Operators, QuadOperations # Import all constants
+from constants import GLOBAL_BLOCK, CLASS_BLOCK, CONSTRUCTOR_BLOCK, Types, Operators, QuadOperations # Imports some constants
 from structures import OperandPair, Quad  # Import OperandPair and Quad class
 import helpers                    # Import helpers
 import sys                        # TODO: delete
@@ -68,8 +68,8 @@ def p_sub_call_args(p):
 
 def p_return(p):
   '''
-  return : RETURN return_expression DOT
-  return_expression : expression
+  return : RETURN return_expression neural_return_expression DOT
+  return_expression : expression neural_return_value
                     | empty
   '''
   return_debug(p, gv.parse_debug)
@@ -329,7 +329,7 @@ def p_cte_b(p):
 
 def p_subroutine(p):
   '''
-  subroutine : SUB subroutine_return_type ID neural_sub_decl_id L_PAREN subroutine_params R_PAREN COLON subroutine_p block END neural_global_block
+  subroutine : SUB subroutine_return_type ID neural_sub_decl_id L_PAREN subroutine_params R_PAREN COLON subroutine_p block neural_sub_end END neural_global_block
   subroutine_return_type : type
                          | VOID neural_decl_type
   subroutine_params : type ID neural_var_decl_id subroutine_params_p
@@ -636,7 +636,7 @@ def p_neural_operator_stack_pop_false(p):
   '''neural_operator_stack_pop_false :'''
   gv.stack_operators.pop()
 
-### Other quadruples (write, read)
+### Write
 
 def p_neural_write_expression(p):
   '''neural_write_expression :'''
@@ -654,11 +654,57 @@ def p_neural_write_space(p):
   quad = Quad(QuadOperations.WRITE_SPACE)
   gv.quad_list.add(quad)
 
+### Read
+
 def p_neural_read(p):
   '''neural_read :'''
   result = p[-1]
   quad = Quad(QuadOperations.READ, result)
   gv.quad_list.add(quad)
+
+### Return
+
+def p_neural_return_value(p):
+  '''neural_return_value :'''
+  gv.current_return_has_value = True
+
+def p_neural_return_expression(p):
+  '''neural_return_expression :'''
+  if gv.current_block == GLOBAL_BLOCK:
+    helpers.throw_error("Syntax error, return statement must be in subroutine")
+
+  current_sub_type = gv.function_directory.get_sub_type(gv.current_block, gv.current_class_block)
+  if current_sub_type == CONSTRUCTOR_BLOCK:
+    helpers.throw_error("Invalid return statement in constructor")
+
+  quad = Quad(QuadOperations.RETURN)
+
+  if gv.current_return_has_value:
+    expression = gv.stack_operands.pop()
+    return_value_type = expression.get_type()
+    quad.add_element(expression.get_value())
+  else:
+    return_value_type = Types.VOID
+  
+  if return_value_type != current_sub_type:
+    if current_sub_type == Types.VOID:
+      helpers.throw_error("Invalid return statement in void subroutine")
+    else:
+      if return_value_type == Types.VOID:
+        helpers.throw_error("Return statement must have an expression")
+      else:
+        helpers.throw_error("Type mismatch in return value")
+    
+  gv.quad_list.add(quad)
+  gv.current_return_has_value = False
+  gv.current_sub_has_return_stmt = True
+
+def p_neural_sub_end(p):
+  '''neural_sub_end : '''
+  current_sub_type = gv.function_directory.get_sub_type(gv.current_block, gv.current_class_block)
+  if current_sub_type != Types.VOID and current_sub_type != CONSTRUCTOR_BLOCK and not gv.current_sub_has_return_stmt:
+    helpers.throw_error("Subroutine must have return statement")
+  gv.current_sub_has_return_stmt = False
 
 ### Other
 
