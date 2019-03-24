@@ -414,7 +414,7 @@ def p_read(p):
   read_list : read_p read_list_p
   read_list_p : COMMA read_list
               | empty
-  read_p : ID neural_read read_obj read_access
+  read_p : ID neural_read_stmt read_obj read_access
   read_obj : AT ID
            | empty
   read_access : access
@@ -657,8 +657,11 @@ def p_neural_write_space(p):
 ### Read
 
 def p_neural_read(p):
-  '''neural_read :'''
+  '''neural_read_stmt :'''
   result = p[-1]
+  result_type = gv.function_directory.get_variable_type(result, gv.current_block, gv.current_class_block)
+  if result_type not in Types.primitives:
+    helpers.throw_error("Cannot assign input to " + result)
   quad = Quad(QuadOperations.READ, result)
   gv.quad_list.add(quad)
 

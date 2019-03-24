@@ -5,6 +5,9 @@ int erik.
 int id.
 int a = erik@diego.
 int x = -0.
+int y.
+int z.
+Persona obj = Persona().
 bool b = ~True.
 int x2.
 flt x3.
@@ -88,7 +91,7 @@ sub bool funcion3(int x, bool y):
   return True.
 end
 
-read: x,y,z, erikkkkkkkk@diegooooo end
+read: x,y,z, x@diegooooo end
 
 read: x[x2] end
 

@@ -15,6 +15,8 @@ class Types:
   BOOL  = 'bool'
   VOID  = 'void'
 
+  primitives = [INT, FLT, STR, BOOL]
+
 # Enum for operators
 class Operators:
   NOT_OP       = '~'
