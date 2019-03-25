@@ -1,0 +1,20 @@
+Marzo 6
+- Lexer
+
+Marzo 11
+- Ultima version de propuesta aceptada
+- Parser; unicamente revisión de sintaxis
+
+Marzo 16
+- Se terminó directorio de procedimientos y tablas de variables
+
+Marzo 22
+- Cuadruplos de expresiones
+
+Marzo 23:
+- Cuadruplos para operador =
+- Cuadruplos para read
+
+Marzo 24:
+- Cuadruplos para write
+- Cuadruplos para return
