@@ -1,0 +1,11 @@
+Marzo 12:
+- Mover operador ~/not a donde estan el +/- (positivo/negativo)
+
+Marzo 15:
+- Crear nonterminal decl_init (union de declaration y initialization)
+
+Marzo 23:
+- Cambiar $ a @ para acceder a atributos de objetos; se reacomodaron algunas gramaticas donde se factorizaba para que tenga sentido con la nueva regla
+
+Marzo 24:
+- Cambio en gramatica de program; decl_init, class y subroutine pueden estar en cualquier orden

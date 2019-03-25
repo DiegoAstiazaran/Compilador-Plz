@@ -1,17 +1,23 @@
 str file = "THIS IS A TEST FILE FOR PARSER".
 
-int x = 0.
-int x2.
-flt x3.
-bool das.
-str x4 = "ddsad".
+int diego.
+int erik.
+int id.
+int a = erik@diego.
+int x = -0.
+int y.
 int x5(4)(5).
+int arreglo(5) = {4,5,6,7}.
 
 class Persona :
   sub Persona():
+    str fdsfsd.
+    int id(10).
     int x_var = 5 + 6 .
+    int hola.
+    hola = 666.
     if (5 < 4 ):
-      print: 4324, fdsfsd, id$arr[4] end
+      print: 4324, fdsfsd, id@arr[4] end
     end
   end
 
@@ -20,9 +26,10 @@ class Persona :
     flt x2.
     bool x3.
     bool x7(1).
-    sub int erik(int a, bool b, str c, flt d):
+    sub int erik(int a, int b, bool c, flt d, int x):
       a = b.
       c = x < 8.
+      return a.
     end
   end
 
@@ -30,19 +37,23 @@ class Persona :
     int x4.
     flt x5.
     bool x6.
-    sub flt funcion2(int a, bool b, str c, flt d):
+    sub flt funcion2(int a, int b, bool c, flt d):
+      int x = 9.
+      int id(10).
       a = b.
       c = x < 8.
-      c[4] = id$id.
+      c[4] = id@id.
+      return 5.0.
     end
   end
 end
 
 class Hombre under Persona :
   sub Hombre():
-    str x = 5 + 6 .
+    str x = "5 + 6" .
+    int id(10).
     if (5 < 4):
-      print: 4324, fdsfsd, id$arr[4] end
+      print: 4324, x, id@arr[4] end
     end
   end
 
@@ -56,37 +67,48 @@ class Hombre under Persona :
   end
 end
 
-sub void funcion(int x, bool y):
+int z.
+Persona obj = Persona().
+bool b = ~True.
+int x2.
+flt x3.
+bool is.
+str x4 = "ddsad".
+
+sub void writes(str string):
+  print: string end
+end
+
+sub int funcion(int x, bool y):
   return 432.
 end
 
 sub void funcion2(int x, bool y):
-  return 432.
+  return.
 end
 
-sub void funcion3(int x, bool y):
-  return 432.
+sub bool funcion3(int x, bool y):
+  return 4 * 5 * x < 10.
+  return True.
 end
 
-return fsd.
+read: x,y,z, x@diegooooo end
 
-read: x,y,z, id$id, id$id[321] end
-
-read: dsa[fdfs] end
+read: x[x2] end
 
 x = 4.
 
 is = 5 < 4.
 
 if (5 < 4 ):
-  print: 4324, fdsfsd, id$arr[4] end
+  print: 4324, 'string', x5@arr[4] end
 elsif ( 6< 4) :
 
 else:
 
 end
 
-print: 4324, fdsfsd, id$arr[4] end
+print: 4324, x2, x3@arr[4] end
 
 when 7 repeat:
   x = 7.
@@ -94,22 +116,23 @@ end
 
 repeat:
   if (5 < 4 ):
-    print: 4324, fdsfsd, id$arr[4] end
+    print: 4324 end
   elsif ( 6< 4) :
 
   else:
   x = x[5].
   x = x[5].
+  x = 10.
 
   end
 while 7 > 8 end
 
-for a from x$x[432] by /3 while True:
-  print: x,y,z end
+for a from x@x[432] by /3 while True:
+  print: x,x2,x3 end
 end
 
 imprimir().
 
-id$ifsd(x,y,y, (8+9&5) < (4*7/fd+5.5) ).
+id$ifsd(x, (8+9*5) < (4*7/x2+5.5) ).
 
-x = a + b - 7 > 8 + 7 * 6 and True or False > 8.
+x = 1.
