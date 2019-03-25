@@ -1,12 +1,15 @@
-# Name for global scope
-GLOBAL_BLOCK = 'global'
+class Constants:
+  # Name for global scope
+  GLOBAL_BLOCK = 'global'
 
-# Name for class scope
-CLASS_BLOCK = 'class'
+  # Name for class scope
+  CLASS_BLOCK = 'class'
 
-# Name for constructor scope
-CONSTRUCTOR_BLOCK = 'constructor'
+  # Name for constructor scope
+  CONSTRUCTOR_BLOCK = 'constructor'
 
+  FALSE_BOTTOM_IF_CONDITION = 'false_bottom_if_condition'
+  
 # Enum for types
 class Types:
   INT   = 'int'
@@ -60,3 +63,6 @@ class QuadOperations:
   WRITE_NEW_LINE  = 'write_new_line'
   WRITE_SPACE     = 'write_space'
   RETURN          = 'return'
+  GOTO            = 'goto'
+  GOTO_F          = 'goto_f'
+  GOTO_T          = 'goto_t'

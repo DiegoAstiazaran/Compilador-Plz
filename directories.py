@@ -1,4 +1,4 @@
-from constants import GLOBAL_BLOCK, CLASS_BLOCK, CONSTRUCTOR_BLOCK
+from constants import Constants
 import helpers
 
 # Stores variables for a block
@@ -34,8 +34,8 @@ class FunctionDirectory:
   # Adds global block when created
   def __init__(self):
     self._function_table = {}
-    self.add_block(GLOBAL_BLOCK)
-  
+    self.add_block(Constants.GLOBAL_BLOCK)
+
   # Return directory stored in dictionary entry
   def get_entry_directory(self, block_name):
     return self._function_table[block_name][1]
@@ -49,7 +49,7 @@ class FunctionDirectory:
     # Adding block to main function directory
     if class_name == None:
       # Class block has a function directory
-      if type == CLASS_BLOCK:
+      if type == Constants.CLASS_BLOCK:
         if block_name in self._function_table:
           helpers.throw_error('Class ' + block_name + ' is already defined.')
         directory = FunctionDirectory()
@@ -63,7 +63,7 @@ class FunctionDirectory:
     # Adding block to function directory of class
     else:
       # Check if construcor is named as class
-      if type == CONSTRUCTOR_BLOCK and block_name != class_name:
+      if type == Constants.CONSTRUCTOR_BLOCK and block_name != class_name:
         helpers.throw_error('Constructor in ' + class_name + ' should be named as class.')
       self.get_entry_directory(class_name).add_block(block_name, type, is_public)
 
@@ -110,18 +110,18 @@ class FunctionDirectory:
     print("|   END FUNCTION DIRECTORY   |")
     print("------------------------------")
     self._function_table.clear()
-  
+
   # Used for debugging and testing purposes
   def print(self):
     for key, value in self._function_table.items():
-      if value[0] == CLASS_BLOCK:
+      if value[0] == Constants.CLASS_BLOCK:
         print("|    CLASS_BLOCK    |")
         print("--------------------")
       print("block_name", ":" , key, "|", value[0], value[2])
-      if value[0] == CLASS_BLOCK:
+      if value[0] == Constants.CLASS_BLOCK:
         print("------------------------------")
       value[1].print()
-      if value[0] != CLASS_BLOCK:
+      if value[0] != Constants.CLASS_BLOCK:
         print("------------------------------")
       else:
         print("|  END CLASS_BLOCK  |")

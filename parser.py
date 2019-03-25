@@ -6,7 +6,7 @@ import ply.yacc as yacc # Import yacc module
 from lexer import tokens, lexer   # Import tokens and lexer defined in lexer
 from parserDebug import *         # Import functions to debug parser
 import globalVariables as gv      # Import global variables
-from constants import GLOBAL_BLOCK, CLASS_BLOCK, CONSTRUCTOR_BLOCK, Types, Operators, QuadOperations # Imports some constants
+from constants import Constants, Types, Operators, QuadOperations # Imports some constants
 from structures import OperandPair, Quad  # Import OperandPair and Quad class
 import helpers                    # Import helpers
 import sys                        # TODO: delete
@@ -351,11 +351,11 @@ def p_write(p):
 
 def p_condition(p):
   '''
-  condition : IF condition_p condition_ppp END
-  condition_p : expression COLON block condition_pp
-  condition_pp : ELSIF condition_p
+  condition : IF neural_condition_if condition_p condition_else END neural_condition_end
+  condition_p : expression neural_condition_new_quad COLON block neural_condition_end_block condition_elsif
+  condition_elsif : ELSIF neural_condition_fill_quad condition_p
                | empty
-  condition_ppp : ELSE COLON block
+  condition_else : ELSE neural_condition_else neural_condition_fill_quad COLON block
                 | empty
   '''
   condition_debug(p, gv.parse_debug)
@@ -451,13 +451,13 @@ def p_error(p):
 def p_neural_global_block(p):
   '''neural_global_block :'''
   # Set current block as global
-  gv.current_block = GLOBAL_BLOCK
+  gv.current_block = Constants.GLOBAL_BLOCK
 
 # Called after CLASS_NAME in class declaration
 def p_neural_class_decl(p):
   '''neural_class_decl :'''
   gv.current_class_block = p[-1]
-  gv.function_directory.add_block(gv.current_class_block, CLASS_BLOCK)
+  gv.function_directory.add_block(gv.current_class_block, Constants.CLASS_BLOCK)
 
 # Called at the end of class declaration
 def p_neural_class_decl_end(p):
@@ -513,7 +513,7 @@ def p_neural_sub_decl_id(p):
   '''neural_sub_decl_id :'''
   gv.current_block = p[-1]
   if gv.current_last_type == None:
-    gv.current_last_type = CONSTRUCTOR_BLOCK
+    gv.current_last_type = Constants.CONSTRUCTOR_BLOCK
   gv.function_directory.add_block(gv.current_block, gv.current_last_type, gv.current_is_public, gv.current_class_block)
   gv.current_last_type = None
 
@@ -672,11 +672,11 @@ def p_neural_return_value(p):
 
 def p_neural_return_expression(p):
   '''neural_return_expression :'''
-  if gv.current_block == GLOBAL_BLOCK:
+  if gv.current_block == Constants.GLOBAL_BLOCK:
     helpers.throw_error("Syntax error, return statement must be in subroutine")
 
   current_sub_type = gv.function_directory.get_sub_type(gv.current_block, gv.current_class_block)
-  if current_sub_type == CONSTRUCTOR_BLOCK:
+  if current_sub_type == Constants.CONSTRUCTOR_BLOCK:
     helpers.throw_error("Invalid return statement in constructor")
 
   quad = Quad(QuadOperations.RETURN)
@@ -687,7 +687,7 @@ def p_neural_return_expression(p):
     quad.add_element(expression.get_value())
   else:
     return_value_type = Types.VOID
-  
+
   if return_value_type != current_sub_type:
     if current_sub_type == Types.VOID:
       helpers.throw_error("Invalid return statement in void subroutine")
@@ -696,7 +696,7 @@ def p_neural_return_expression(p):
         helpers.throw_error("Return statement must have an expression")
       else:
         helpers.throw_error("Type mismatch in return value")
-    
+
   gv.quad_list.add(quad)
   gv.current_return_has_value = False
   gv.current_sub_has_return_stmt = True
@@ -704,9 +704,58 @@ def p_neural_return_expression(p):
 def p_neural_sub_end(p):
   '''neural_sub_end : '''
   current_sub_type = gv.function_directory.get_sub_type(gv.current_block, gv.current_class_block)
-  if current_sub_type != Types.VOID and current_sub_type != CONSTRUCTOR_BLOCK and not gv.current_sub_has_return_stmt:
+  if current_sub_type != Types.VOID and current_sub_type != Constants.CONSTRUCTOR_BLOCK and not gv.current_sub_has_return_stmt:
     helpers.throw_error("Subroutine must have return statement")
   gv.current_sub_has_return_stmt = False
+
+### Condition
+
+def p_neural_condition_if(p):
+  '''neural_condition_if :'''
+  gv.stack_jumps.push(Constants.FALSE_BOTTOM_IF_CONDITION)
+
+def p_neural_condition_new_quad(p):
+  '''neural_condition_new_quad :'''
+  condition = gv.stack_operands.pop()
+  if condition.get_type() != Types.BOOL:
+    helpers.throw_error("Condition must be boolean")
+  quad = Quad(QuadOperations.GOTO_F, condition.get_value())
+  gv.stack_jumps.push(gv.quad_list.next())
+  gv.quad_list.add(quad)
+
+def p_neural_condition_fill_quad(p):
+  '''neural_condition_fill_quad :'''
+  end_block_index = gv.stack_jumps.pop()
+  quad_index = gv.stack_jumps.pop()
+  next_quad_index = gv.quad_list.next()
+  if not gv.current_condition_has_else and gv.condition_end:
+    next_quad_index -= 1
+  gv.quad_list.add_element_to_quad(quad_index, next_quad_index)
+  gv.stack_jumps.push(end_block_index)
+
+def p_neural_condition_else(p):
+  '''neural_condition_else :'''
+  gv.current_condition_has_else = True
+
+def p_neural_condition_end(p):
+  '''neural_condition_end :'''
+  gv.condition_end = True
+  if not gv.current_condition_has_else:
+    p_neural_condition_fill_quad(p)
+  while gv.stack_jumps.top() != Constants.FALSE_BOTTOM_IF_CONDITION:
+     quad_index = gv.stack_jumps.pop()
+     gv.quad_list.add_element_to_quad(quad_index, gv.quad_list.next())
+  gv.stack_jumps.pop()
+  if not gv.current_condition_has_else:
+    gv.quad_list.erase(quad_index)
+  gv.condition_end = False
+
+def p_neural_condition_end_block(p):
+  '''neural_condition_end_block :'''
+  quad = Quad(QuadOperations.GOTO)
+  next_quad = gv.quad_list.next()
+  gv.stack_jumps.push(next_quad)
+  gv.quad_list.add(quad)
 
 ### Other
 
@@ -726,7 +775,7 @@ parser = yacc.yacc()
 while True:
   try:
       # file = input('Filename: ')
-      file = 'file.plz'
+      file = 'test.plz'
       with open(file, 'r') as myfile:
           s = myfile.read()
   except EOFError:

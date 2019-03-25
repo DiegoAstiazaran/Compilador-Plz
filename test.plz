@@ -1,0 +1,9 @@
+int a.
+int b.
+int c.
+if a < b:
+  c = 5.
+elsif 5 < 9 +5 -7:
+  c = 4.
+end
+print: a end

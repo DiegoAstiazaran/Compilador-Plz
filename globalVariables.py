@@ -31,14 +31,23 @@ current_return_has_value = False
 # Boolean to know if current subroutine has a return statement
 current_sub_has_return_stmt = False
 
+# Boolean to know if there is an else in current condition_p
+current_condition_has_else = False
+
+# Boolean to know if the condition has reached the end
+condition_end = False
+
 # Semantic cube object
 semantic_cube = SemanticCube()
 
 # Stack for operators
 stack_operators = Stack()
 
-# Stack for operands, includes type and value 
+# Stack for operands, includes type and value
 stack_operands = Stack()
+
+# Stack for jumps for GoTo
+stack_jumps = Stack()
 
 # List of quads
 quad_list = QuadList()
