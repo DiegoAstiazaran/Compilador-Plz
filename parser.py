@@ -19,13 +19,12 @@ start = 'program'
 
 def p_program(p):
   '''
-  program : neural_global_block program_p program_class program_subroutine block
-  program_p : decl_init program_p
+  program : neural_global_block program_p block
+  program_p : program_pp program_p
             | empty
-  program_class : class program_class
-                | empty
-  program_subroutine : subroutine program_subroutine
-                     | empty
+  program_pp : decl_init
+             | class
+             | subroutine
   '''
   program_debug(p, gv.parse_debug)
 
