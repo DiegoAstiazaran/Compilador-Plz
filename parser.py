@@ -393,7 +393,7 @@ def p_when(p):
 
 def p_repeat(p):
   '''
-  repeat : REPEAT COLON block WHILE expression END
+  repeat : REPEAT COLON neural_repeat_start block WHILE expression END neural_repeat_end
   '''
   repeat_debug(p, gv.parse_debug)
 
@@ -783,6 +783,22 @@ def p_neural_when_end(p):
   gv.quad_list.add(quad)
   next_index = gv.quad_list.next()
   gv.quad_list.add_element_to_quad(goto_f_index, next_index)
+
+### Repeat
+
+def p_neural_repeat_start(p):
+  '''neural_repeat_start :'''
+  next_quad = gv.quad_list.next()
+  gv.stack_jumps.push(next_quad)
+
+def p_neural_repeat_end(p):
+  '''neural_repeat_end :'''
+  condition = gv.stack_operands.pop()
+  if condition.get_type() != Types.BOOL:
+      helpers.throw_error("Condition must be boolean")
+  goto_t_index = gv.stack_jumps.pop()
+  quad = Quad(QuadOperations.GOTO_T, condition.get_value(), goto_t_index)
+  gv.quad_list.add(quad)
 
 ### Other
 
