@@ -750,8 +750,6 @@ def p_neural_condition_end(p):
      quad_index = gv.stack_jumps.pop()
      gv.quad_list.add_element_to_quad(quad_index, gv.quad_list.next())
   gv.stack_jumps.pop()
-  if not gv.current_condition_has_else:
-    gv.quad_list.erase(quad_index)
   gv.condition_end = False
 
 def p_neural_condition_end_block(p):
@@ -787,7 +785,8 @@ while True:
   if not file: continue
   result = parser.parse(s)
   print(result)
-  print(gv.quad_list)
+  # print(gv.quad_list)
+  gv.quad_list.print_with_number()
   del sys.modules['globalVariables']
   import globalVariables as gv
   break # remove this break to loop the tests

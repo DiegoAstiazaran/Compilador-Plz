@@ -5,5 +5,9 @@ if a < b:
   c = 5.
 elsif 5 < 9 +5 -7:
   c = 4.
+elsif a < b + 6:
+  
+else:
+  a = 9.
 end
 print: a end
