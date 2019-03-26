@@ -742,6 +742,10 @@ def p_neural_condition_end(p):
   gv.condition_end = True
   if not gv.current_condition_has_else:
     p_neural_condition_fill_quad(p)
+  last_goto_index = gv.stack_jumps.top()
+  if not gv.current_condition_has_else:
+    gv.quad_list.erase(last_goto_index)
+    gv.stack_jumps.pop()
   while gv.stack_jumps.top() != Constants.FALSE_BOTTOM_IF_CONDITION:
      quad_index = gv.stack_jumps.pop()
      gv.quad_list.add_element_to_quad(quad_index, gv.quad_list.next())
