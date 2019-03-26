@@ -1,7 +1,11 @@
 int a.
 int b.
 int c = 1 +2.
-repeat:
-  print: a end
-while 7 < 8 end
-print: a end
+int x.
+
+for a from x by -b while 7 < 8 + a:
+  c = x.
+end
+
+print: 8 end
+

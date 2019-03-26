@@ -37,6 +37,9 @@ current_condition_has_else = False
 # Boolean to know if the condition has reached the end
 condition_end = False
 
+# Operator value for current for cycle
+current_for_operator = None
+
 # Semantic cube object
 semantic_cube = SemanticCube()
 

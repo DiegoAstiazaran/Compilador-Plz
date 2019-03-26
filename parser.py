@@ -281,8 +281,8 @@ def p_logical(p):
 
 def p_var_cte_1(p):
   '''
-  var_cte_1 : ID
-            | CTE_I
+  var_cte_1 : ID    neural_add_to_operand_stack_id
+            | CTE_I neural_add_to_operand_stack_int
   '''
   var_cte_1_debug(p, gv.parse_debug)
 
@@ -314,7 +314,8 @@ def p_id_calls(p):
 
 def p_var_cte_3(p):
   '''
-  var_cte_3 : var_cte_1
+  var_cte_3 : ID
+            | CTE_I
             | CTE_STR
   '''
   var_cte_3_debug(p, gv.parse_debug)
@@ -370,10 +371,10 @@ def p_cycle(p):
 
 def p_operator(p):
   '''
-  operator : PLUS
-           | MINUS
-           | MULTIPLY
-           | DIVIDE
+  operator : PLUS     neural_add_to_operator_stack
+           | MINUS    neural_add_to_operator_stack
+           | MULTIPLY neural_add_to_operator_stack
+           | DIVIDE   neural_add_to_operator_stack
   '''
   operator_debug(p, gv.parse_debug)
 
@@ -399,9 +400,10 @@ def p_repeat(p):
 
 def p_for(p):
   '''
-  for : FOR ID FROM for_p BY for_operator var_cte_1 WHILE expression COLON block END
+  for : FOR ID neural_for_id FROM for_p neural_for_assignment BY for_operator var_cte_1 WHILE neural_for_before_expression expression neural_for_after_expression COLON block END neural_for_end
   for_p : id_calls
-        | CTE_I
+        | CTE_I neural_add_to_operand_stack_int
+        | CTE_F neural_add_to_operand_stack_flt
   for_operator : operator
                | empty
   '''
@@ -799,6 +801,51 @@ def p_neural_repeat_end(p):
   goto_t_index = gv.stack_jumps.pop()
   quad = Quad(QuadOperations.GOTO_T, condition.get_value(), goto_t_index)
   gv.quad_list.add(quad)
+
+### For
+
+def p_neural_for_id(p):
+  '''neural_for_id :'''
+  id_value = p[-1]
+  id_type = gv.function_directory.get_variable_type(id_value, gv.current_block, gv.current_class_block)
+  if id_type != Types.INT and id_type != Types.FLT:
+    helpers.throw_error("Variable must be integer or float")
+  add_to_operand_stack(id_value, id_type)
+
+def p_neural_for_assignment(p):
+  '''neural_for_assignment :'''
+  value_to_assign = gv.stack_operands.pop()
+  id = gv.stack_operands.top()
+  quad = Quad(Operators.EQUAL, value_to_assign.get_value(), id.get_value())
+  gv.quad_list.add(quad)
+
+def p_neural_for_before_expression(p):
+  '''neural_for_before_expression :'''
+  gv.current_for_operator = Operators.PLUS if gv.stack_operators.empty() else gv.stack_operators.pop()
+  gv.stack_jumps.push(gv.quad_list.next())
+
+def p_neural_for_after_expression(p):
+  '''neural_for_after_expression :'''
+  condition = gv.stack_operands.pop()
+  if condition.get_type() != Types.BOOL:
+    helpers.throw_error("Condition must be boolean")
+  quad = Quad(QuadOperations.GOTO_F, condition.get_value())
+  gv.stack_jumps.push(gv.quad_list.next())
+  gv.quad_list.add(quad)
+
+def p_neural_for_end(p):
+  '''neural_for_end :'''
+  change_value = gv.stack_operands.pop()
+  id = gv.stack_operands.pop()
+  quad = Quad(gv.current_for_operator, id.get_value(), change_value.get_value(), id.get_value())
+  gv.quad_list.add(quad)
+
+  goto_f_index = gv.stack_jumps.pop()
+  goto_index = gv.stack_jumps.pop()
+  quad = Quad(QuadOperations.GOTO, goto_index)
+  gv.quad_list.add(quad)
+  next_index = gv.quad_list.next()
+  gv.quad_list.add_element_to_quad(goto_f_index, next_index)
 
 ### Other
 

@@ -9,3 +9,7 @@ Marzo 23:
 
 Marzo 24:
 - Cambio en gramatica de program; decl_init, class y subroutine pueden estar en cualquier orden
+
+Marzo 26:
+- Agregar constante flotante a asignacion de ciclo For
+- Modificar var_cte_3, ya no se reusa var_cte_1, se ponen los valores directamente

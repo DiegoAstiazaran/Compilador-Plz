@@ -18,3 +18,9 @@ Marzo 23:
 Marzo 24:
 - Cuadruplos para write
 - Cuadruplos para return
+
+Marzo 26:
+- Cuadruplos para when
+- Cuadruplos para repeat
+- Cuadruplos para for
+
