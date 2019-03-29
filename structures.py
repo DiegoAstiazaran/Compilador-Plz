@@ -56,6 +56,18 @@ class QuadList:
   def add(self, quad):
     self._quad_list.append(quad)
 
+  def erase(self, index):
+    self._quad_list.pop(index)
+
+  def add_element_to_quad(self, index, element):
+    self._quad_list[index].add_element(element)
+
+  def print_with_number(self):
+    index = 0
+    for item in self._quad_list:
+      print('#{}\t{}'.format(index, item))
+      index += 1
+
 # Quad for intermediate code
 class Quad:
   def __init__(self, instruction, first = None, second = None, third = None):
