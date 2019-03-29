@@ -332,7 +332,7 @@ def p_subroutine(p):
   subroutine : SUB subroutine_return_type ID neural_sub_decl_id L_PAREN subroutine_params R_PAREN COLON subroutine_p block neural_sub_end END neural_global_block
   subroutine_return_type : type
                          | VOID neural_decl_type
-  subroutine_params : type ID neural_var_decl_id subroutine_params_p
+  subroutine_params : type ID neural_var_decl_id neural_param_decl subroutine_params_p
                     | empty
   subroutine_params_p : COMMA subroutine_params
                     | empty
@@ -499,7 +499,12 @@ def p_neural_var_decl_id(p):
   # Add operand to operand stack in case it is a initialization
   add_to_operand_stack(gv.current_last_id, gv.current_last_type)
 
+  gv.current_param_type = gv.current_last_type
   gv.current_last_type = None
+
+def p_neural_param_decl(p):
+  '''neural_param_decl :'''
+  gv.subroutine_directory.add_param(gv.current_block, gv.current_param_type, gv.current_class_block)
 
 # Called after each primitive type
 def p_neural_decl_type(p):
@@ -517,6 +522,7 @@ def p_neural_sub_decl_id(p):
   if gv.current_last_type == None:
     gv.current_last_type = Constants.CONSTRUCTOR_BLOCK
   gv.function_directory.add_block(gv.current_block, gv.current_last_type, gv.current_is_public, gv.current_class_block)
+  gv.subroutine_directory.add(gv.current_block, gv.quad_list.next(), gv.current_class_block)
   gv.current_last_type = None
 
 #################################################
@@ -865,7 +871,7 @@ parser = yacc.yacc()
 while True:
   try:
       # file = input('Filename: ')
-      file = 'test.plz'
+      file = 'file.plz'
       with open(file, 'r') as myfile:
           s = myfile.read()
   except EOFError:

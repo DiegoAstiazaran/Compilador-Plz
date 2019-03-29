@@ -110,7 +110,7 @@ end
 
 print: 4324, x2, x3@arr[4] end
 
-when 7 repeat:
+when 7 > 7 repeat:
   x = 7.
 end
 

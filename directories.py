@@ -126,3 +126,21 @@ class FunctionDirectory:
       else:
         print("|  END CLASS_BLOCK  |")
         print("------------------------------")
+
+class SubroutineDirectory:
+  def __init__(self):
+    self._subs = {}
+  
+  def fix_sub_name(self, sub_name, class_name = None):
+    if class_name != None:
+      sub_name = "{}.{}".format(class_name, sub_name)
+    return sub_name
+  
+  def add(self, sub_name, start_goto, class_name = None):
+    # Params, start, local counters, temp counters 
+    sub_name = self.fix_sub_name(sub_name, class_name)
+    self._subs[sub_name] = [[], start_goto, [None, None, None, None], [None, None, None, None]]
+
+  def add_param(self, sub_name, type, class_name = None):
+    sub_name = self.fix_sub_name(sub_name, class_name)
+    self._subs[sub_name][0].append(type)
