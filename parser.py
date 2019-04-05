@@ -138,11 +138,12 @@ def p_class_block(p):
                       | empty
   class_block_attributes_p : class_block_p declaration class_block_attributes_p
                            | empty  
-  class_block_methods_p : constructor class_block_methods_pp
+  class_block_methods_p : class_block_methods_constructor class_block_methods_pp
+  class_block_methods_constructor : neural_class_decl_public constructor
   class_block_methods_pp : class_block_p subroutine class_block_methods_pp
                          | empty
-  class_block_p : PUBLIC
-                | PRIVATE
+  class_block_p : PUBLIC neural_class_decl_public
+                | PRIVATE neural_class_decl_private
   '''
   class_block_debug(p, gv.parse_debug)
 
@@ -460,14 +461,14 @@ def p_neural_class_decl_inheritance(p):
   gv.function_directory.check_class(class_name)
 
 # Called after PRIVATE in public section of class declaration
-# def p_neural_class_decl_private(p):
-#   '''neural_class_decl_private :'''
-#   gv.current_is_public = False
+def p_neural_class_decl_private(p):
+  '''neural_class_decl_private :'''
+  gv.current_is_public = False
 
 # Called after PUBLIC in public section of class declaration
-# def p_neural_class_decl_public(p):
-#   '''neural_class_decl_public :'''
-#   gv.current_is_public = True
+def p_neural_class_decl_public(p):
+  '''neural_class_decl_public :'''
+  gv.current_is_public = True
 
 # Called at the end of private or public section of class declaration
 # def p_neural_class_decl_section_end(p):
