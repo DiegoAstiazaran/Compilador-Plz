@@ -116,7 +116,7 @@ class SemanticCube:
     # relational: >, <, >=, <=, gt, lt, gte,lte
     relational_operations_one = [
       [ Types.BOOL, Types.BOOL, None,      None,        None ],
-      [ None,       Types.BOOL, None,      None,        None ],
+      [ Types.BOOL, Types.BOOL, None,      None,        None ],
       [ None,       None,       None,      None,        None ],
       [ None,       None,       None,      None,        None ],
       [ None,       None,       None,      None,        None ]
@@ -124,7 +124,7 @@ class SemanticCube:
     # relational: ==, ~=, eq, neq
     relational_operations_two = [
       [ Types.BOOL, Types.BOOL, None,       None,       None ],
-      [ None,       Types.BOOL, None,       None,       None ],
+      [ Types.BOOL, Types.BOOL, None,       None,       None ],
       [ None,       None,       Types.BOOL, None,       None ],
       [ None,       None,       None,       Types.BOOL, None ],
       [ None,       None,       None,       None,       None ]
