@@ -11,6 +11,8 @@ reserved = {
   'end' : 'END',
   'private' : 'PRIVATE',
   'public' : 'PUBLIC',
+  'attributes' : 'ATTRIBUTES',
+  'methods' : 'METHODS',
   'sub' : 'SUB',
   'void' : 'VOID',
   'if' : 'IF',

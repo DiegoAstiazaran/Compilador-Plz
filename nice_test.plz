@@ -1,0 +1,140 @@
+int i_a.
+flt f_a.
+str s_a.
+bool b_a.
+
+int i_b = 10.
+flt f_b = 1.0.
+str s_b = "THIS IS A TEST FILE".
+bool b_b = True.
+
+int i_array(10).
+int i_matrix(10)(10).
+int i_array2(10) = {1,2,3,4,5}.
+int i_matrix2(10)(10) = { {1,2,3,4,5}, {1,2,3,4,5} }.
+
+class Persona :
+  attributes:
+    private int age.
+    private bool alive.
+    private str children(5).
+    public int public_attr.
+  
+  methods:
+    sub Persona():
+      int i_a.
+      flt f_a = 5.0.
+    end
+
+    private sub void new_age(int age):
+      age = age.
+    end
+    
+    public sub int get_age(int age):
+      return age.
+    end
+
+    public sub void set_age(int age):
+      age = age.
+    end
+
+end
+
+class Hombre under Persona :
+  attributes:
+    private bool happy.
+    public str esposa.
+
+  methods:
+
+    sub Hombre(str work):
+      work = work.
+    end
+
+    public sub void set_esposa(str esposa):
+      esposa = esposa.
+    end
+
+end
+
+int i_c = 1 + 2 * 3 / 4.
+flt f_c = -1.0 * 2 * 3.0.
+str s_c = "decl after classes" + 'sum'.
+bool b_c = ~True and not b_c | False.
+Persona persona1 = Persona().
+
+sub void writes(int a):
+  print: a end
+end
+
+sub int funcion(int x, bool y):
+  return 1.
+end
+
+sub flt funcion2(int x, flt y):
+  return y.
+end
+
+sub str funcion3():
+  str s = 'return value'.
+  return s.
+end
+
+sub bool funcion4(str s):
+  return False.
+  return True.
+end
+
+i_array[i_c] = 1 + 2.
+i_matrix[i_c][i_c] = 1 + 2.
+
+read: i_a, f_a, s_a, b_a end
+
+print: i_a, f_a, s_a, b_a end
+
+i_a = 4.
+f_a = 4.0.
+s_a = '4.0'.
+b_a = False.
+
+if True :
+  i_a = 1.
+  if 1 > 0:
+    i_a = 2.
+  end
+elsif ( 5 < 4 ):
+  i_a = 2.
+else:
+  i_a = 2.
+  if 1 > 0:
+    i_a = 2.
+  else:
+    i_a = 3.
+  end
+end
+
+when 0.0 < 0 repeat:
+  print: f_a end
+end
+
+repeat:
+  if 1 > 0:
+    i_a = 2.
+  end
+  i_a = 3.
+while True end
+
+for i_a from 100 by /3 while i_a > 0:
+  print: i_a end
+end
+
+if True:
+  print: persona1@age end
+end
+
+funcion().
+funcion2().
+
+persona1$set_age(21, i_a, True).
+
+print: 'prueba final' end

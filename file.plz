@@ -10,34 +10,34 @@ int x5(4)(5).
 int arreglo(5) = {4,5,6,7}.
 
 class Persona :
-  sub Persona():
-    str fdsfsd.
-    int id(10).
-    int x_var = 5 + 6 .
-    int hola.
-    hola = 666.
-    if (5 < 4 ):
-      print: 4324, fdsfsd, id@arr[4] end
-    end
-  end
+  attributes:
+      private int x.
+      private flt x2.
+      private bool x3.
+      private bool x7(1).
+      public int x4.
+      public flt x5.
+      public bool x6.
 
-  private:
-    int x.
-    flt x2.
-    bool x3.
-    bool x7(1).
-    sub int erik(int a, int b, bool c, flt d, int x):
+  methods:
+    sub Persona():
+      str fdsfsd.
+      int id(10).
+      int x_var = 5 + 6 .
+      int hola.
+      hola = 666.
+      if (5 < 4 ):
+        print: 4324, fdsfsd, id@arr[4] end
+      end
+    end
+
+    private sub int erik(int a, int b, bool c, flt d, int x):
       a = b.
       c = x < 8.
       return a.
     end
-  end
 
-  public:
-    int x4.
-    flt x5.
-    bool x6.
-    sub flt funcion2(int a, int b, bool c, flt d):
+    public sub flt funcion2(int a, int b, bool c, flt d):
       int x = 9.
       int id(10).
       a = b.
@@ -45,26 +45,22 @@ class Persona :
       c[4] = id@id.
       return 5.0.
     end
-  end
 end
 
 class Hombre under Persona :
-  sub Hombre():
-    str x = "5 + 6" .
-    int id(10).
-    if (5 < 4):
-      print: 4324, x, id@arr[4] end
+  attributes:
+      private int x.
+      private flt x2.
+      private bool x3.
+  
+  methods:
+    sub Hombre():
+      str x = "5 + 6" .
+      int id(10).
+      if (5 < 4):
+        print: 4324, x, id@arr[4] end
+      end
     end
-  end
-
-  private:
-    int x.
-    flt x2.
-    bool x3.
-  end
-
-  public:
-  end
 end
 
 int z.
