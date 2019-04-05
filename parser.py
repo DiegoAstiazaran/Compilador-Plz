@@ -853,7 +853,7 @@ parser = yacc.yacc()
 while True:
   try:
       # file = input('Filename: ')
-      file = 'file.plz'
+      file = 'nice_test.plz'
       with open(file, 'r') as myfile:
           s = myfile.read()
   except EOFError:
