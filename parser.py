@@ -75,8 +75,8 @@ def p_return(p):
 
 def p_class(p):
   '''
-  class : CLASS CLASS_NAME neural_class_decl class_p COLON class_block END neural_class_decl_end
-  class_p : UNDER CLASS_NAME neural_class_decl_inheritance
+  class : CLASS CLASS_NAME neural_class_decl class_inheritance COLON class_block END neural_class_decl_end
+  class_inheritance : UNDER CLASS_NAME neural_class_decl_inheritance
           | empty
   '''
   class_debug(p, gv.parse_debug)
@@ -131,33 +131,21 @@ def p_factor(p):
 
 def p_class_block(p):
   '''
-  class_block : constructor class_block_private class_block_public
-  class_block_private : private
+  class_block : class_block_attributes class_block_methods
+  class_block_attributes : ATTRIBUTES COLON class_block_attributes_p
+                         | empty
+  class_block_methods : METHODS COLON class_block_methods_p
                       | empty
-  class_block_public : public
-                     | empty
+  class_block_attributes_p : class_block_p declaration class_block_attributes_p
+                           | empty  
+  class_block_methods_p : class_block_methods_constructor class_block_methods_pp
+  class_block_methods_constructor : neural_class_decl_public constructor
+  class_block_methods_pp : class_block_p subroutine class_block_methods_pp
+                         | empty
+  class_block_p : PUBLIC neural_class_decl_public
+                | PRIVATE neural_class_decl_private
   '''
   class_block_debug(p, gv.parse_debug)
-
-def p_private(p):
-  '''
-  private : PRIVATE neural_class_decl_private COLON private_declaration private_sub END neural_class_decl_section_end
-  private_declaration : declaration private_declaration
-                      | empty
-  private_sub : subroutine private_sub
-              | empty
-  '''
-  private_debug(p, gv.parse_debug)
-
-def p_public(p):
-  '''
-  public : PUBLIC neural_class_decl_public COLON public_declaration public_sub END neural_class_decl_section_end
-  public_declaration : declaration public_declaration
-                     | empty
-  public_sub : subroutine public_sub
-             | empty
-  '''
-  public_debug(p, gv.parse_debug)
 
 def p_declaration(p):
   '''
@@ -483,9 +471,9 @@ def p_neural_class_decl_public(p):
   gv.current_is_public = True
 
 # Called at the end of private or public section of class declaration
-def p_neural_class_decl_section_end(p):
-  '''neural_class_decl_section_end : '''
-  gv.current_is_public = None
+# def p_neural_class_decl_section_end(p):
+#   '''neural_class_decl_section_end : '''
+#   gv.current_is_public = None
 
 # Called after ID in every declaration or initialization
 # It can be in decl_init, parameter declaration or attribute declaration
