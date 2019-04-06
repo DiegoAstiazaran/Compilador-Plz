@@ -61,7 +61,7 @@ int i_c = 1 + 2 * 3 / 4.
 flt f_c = -1.0 * 2 * 3.0.
 str s_c = "decl after classes" + 'sum'.
 bool b_c = ~True and not b_c | False.
-Persona persona1 = Persona().
+Persona persona1 = Persona(True).
 
 sub void writes(int a):
   print: a end
@@ -132,9 +132,9 @@ if True:
   print: persona1@age end
 end
 
-funcion().
-funcion2().
+funcion(1, False).
+funcion2(1, 1.0).
 
-persona1$set_age(21, i_a, True).
+persona1$set_age(1 + 2).
 
 print: 'prueba final' end

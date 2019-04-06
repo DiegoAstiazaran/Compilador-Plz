@@ -45,6 +45,21 @@ condition_end = False
 # Operator value for current for cycle
 current_for_operator = None
 
+#
+sub_call_first_id = None
+
+#
+sub_call_second_id = None
+
+#
+current_sub_call_name = None
+
+#
+current_sub_call_class_name = None
+
+#
+sub_call_param_count = None
+
 # Semantic cube object
 semantic_cube = SemanticCube()
 

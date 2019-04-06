@@ -146,6 +146,20 @@ class ParamDirectory:
   def add_param(self, subroutine_name, type):
     self.get_params(subroutine_name).append(type)
 
+  def check_sub_exists(self, subroutine_name):
+    return subroutine_name in self._param_table
+  
+  def check_arg(self, type, index, subroutine_name):
+    if index >= self.get_param_count(subroutine_name):
+      helpers.throw_error("Call not valid, more arguments than expected")
+    return self.get_params(subroutine_name)[index] == type
+  
+  def get_param_count(self, subroutine_name):
+    return len(self.get_params(subroutine_name))
+  
+  def is_method_public(self, subroutine_name):
+    return self._param_table[subroutine_name][2]
+
 class SubroutineDirectory:
   def __init__(self):
     self._subroutine_directory = {}
@@ -168,3 +182,24 @@ class SubroutineDirectory:
     if block_name is None:
       block_name = Constants.GLOBAL_BLOCK
     self._subroutine_directory[block_name].add_param(subroutine_name, type)
+
+  def check_sub_exists(self, subroutine_name, block_name):
+    if block_name is None:
+      block_name = Constants.GLOBAL_BLOCK
+    return self._subroutine_directory[block_name].check_sub_exists(subroutine_name)
+  
+  def check_block_exists(self, block_name):
+    return block_name in self._subroutine_directory
+  
+  def check_arg(self, type, index, subroutine_name, block_name):
+    if block_name is None:
+      block_name = Constants.GLOBAL_BLOCK
+    return self._subroutine_directory[block_name].check_arg(type, index, subroutine_name)
+  
+  def get_param_count(self, subroutine_name, block_name):
+    if block_name is None:
+      block_name = Constants.GLOBAL_BLOCK
+    return self._subroutine_directory[block_name].get_param_count(subroutine_name)
+  
+  def is_method_public(self, subroutine_name, block_name):
+    return self._subroutine_directory[block_name].is_method_public(subroutine_name)

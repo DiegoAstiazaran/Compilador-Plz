@@ -49,16 +49,16 @@ def p_statement(p):
 
 def p_sub_call(p):
   '''
-  sub_call : ID sub_call_p sub_call_args DOT
-  sub_call_p : MONEY ID
+  sub_call : ID neural_sub_call_first_id sub_call_p neural_sub_call sub_call_args DOT
+  sub_call_p : MONEY ID neural_sub_call_second_id
              | empty
   '''
   sub_call_debug(p, gv.parse_debug)
 
 def p_sub_call_args(p):
   '''
-  sub_call_args : L_PAREN sub_call_args_p R_PAREN
-  sub_call_args_p : expression sub_call_args_pp
+  sub_call_args : L_PAREN sub_call_args_p R_PAREN neural_sub_call_args_end
+  sub_call_args_p : expression neural_sub_call_arg sub_call_args_pp
                   | empty
   sub_call_args_pp : COMMA sub_call_args_p
                   | empty
@@ -214,7 +214,7 @@ def p_decl_init_dict(p):
 
 def p_decl_init_obj(p):
   '''
-  decl_init_obj : CLASS_NAME ID neural_var_decl_id EQUAL CLASS_NAME sub_call_args
+  decl_init_obj : CLASS_NAME ID neural_var_decl_id EQUAL CLASS_NAME neural_constructor_call sub_call_args
   '''
   # TODO: Put neural_add_to_operator_stack back after EQUAL
   decl_init_obj_debug(p, gv.parse_debug)
@@ -845,6 +845,71 @@ def p_neural_for_end(p):
   gv.quad_list.add(quad)
   next_index = gv.quad_list.next()
   gv.quad_list.add_element_to_quad(goto_f_index, next_index)
+
+### Subroutine calls
+
+def p_neural_sub_call_first_id(p):
+  '''neural_sub_call_first_id :'''
+  gv.sub_call_first_id = p[-1]
+
+def p_neural_sub_call_second_id(p):
+  '''neural_sub_call_second_id :'''
+  gv.sub_call_second_id = p[-1]
+
+def p_neural_sub_call(p):
+  '''neural_sub_call :'''
+  if gv.sub_call_second_id == None:
+    gv.current_sub_call_name = gv.sub_call_first_id
+    gv.current_sub_call_class_name = None
+  else:
+    gv.current_sub_call_name = gv.sub_call_second_id
+    object_name = gv.sub_call_first_id
+    gv.current_sub_call_class_name = gv.function_directory.get_variable_type(object_name, gv.current_block, gv.current_class_block)
+
+  if not gv.subroutine_directory.check_sub_exists(gv.current_sub_call_name, gv.current_sub_call_class_name):
+    helpers.throw_error("Method " + gv.current_sub_call_name + " doesn't exist.")
+  
+  if gv.current_sub_call_class_name != None and gv.current_class_block != gv.current_sub_call_class_name and not gv.subroutine_directory.is_method_public(gv.current_sub_call_name, gv.current_sub_call_class_name):
+    helpers.throw_error("Method " + gv.current_sub_call_name + " is not public and cannot be called in current location.")
+  
+  quad = Quad(QuadOperations.ERA, gv.current_sub_call_class_name, gv.current_sub_call_name)
+  gv.quad_list.add(quad)
+
+  gv.sub_call_first_id = None
+  gv.sub_call_second_id = None
+  gv.sub_call_param_count = 0
+
+def p_neural_sub_call_arg(p):
+  '''neural_sub_call_arg :'''
+  arg = gv.stack_operands.pop()
+  if not gv.subroutine_directory.check_arg(arg.get_type(), gv.sub_call_param_count, gv.current_sub_call_name, gv.current_sub_call_class_name):
+    helpers.throw_error("Type mismatch in argument #{}".format(gv.sub_call_param_count + 1) )
+  
+  quad = Quad(QuadOperations.PARAM, arg.get_value(), gv.sub_call_param_count)
+  gv.quad_list.add(quad)
+
+  gv.sub_call_param_count += 1
+
+def p_neural_sub_call_args_end(p):
+  '''neural_sub_call_args_end :'''
+  if gv.sub_call_param_count != gv.subroutine_directory.get_param_count(gv.current_sub_call_name, gv.current_sub_call_class_name):
+    helpers.throw_error("Call not valid, less arguments than expected")
+  
+  quad = Quad(QuadOperations.GOSUB, gv.current_sub_call_class_name, gv.current_sub_call_name)
+  gv.quad_list.add(quad)
+
+def p_neural_constructor_call(p):
+  '''neural_constructor_call :'''
+  gv.current_sub_call_name = p[-1]
+  gv.current_sub_call_class_name = p[-1]
+
+  if not gv.subroutine_directory.check_block_exists(gv.current_sub_call_class_name):
+    helpers.throw_error("Class " + gv.current_sub_call_class_name + " doesn't exist.")
+  
+  quad = Quad(QuadOperations.ERA, gv.current_sub_call_class_name, gv.current_sub_call_name)
+  gv.quad_list.add(quad)
+
+  gv.sub_call_param_count = 0
 
 ### Other
 
