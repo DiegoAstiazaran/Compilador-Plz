@@ -286,13 +286,13 @@ def p_var_cte_2(p):
 
 def p_id_calls(p):
   '''
-  id_calls : ID neural_add_to_operand_stack_id id_calls_p
+  id_calls : ID neural_sub_call_first_id id_calls_p
   id_calls_p : access
-             | sub_call_args
+             | neural_sub_call sub_call_args
              | id_calls_method
              | id_calls_attribute
-             | empty
-  id_calls_method : MONEY ID sub_call_args
+             | empty neural_id_calls_p_empty
+  id_calls_method : MONEY ID neural_sub_call_second_id neural_sub_call sub_call_args
   id_calls_attribute : AT ID id_calls_attribute_p
   id_calls_attribute_p : access
                        | empty
@@ -493,6 +493,7 @@ def p_neural_var_decl_id(p):
 
 def p_neural_param_decl(p):
   '''neural_param_decl :'''
+  gv.stack_operands.pop()
   gv.subroutine_directory.add_param(gv.current_block, gv.current_param_type, gv.current_class_block)
 
 # Called after each primitive type
@@ -609,6 +610,13 @@ def p_neural_add_to_operand_stack_id(p):
   operand_value = p[-1]
   operand_type = gv.function_directory.get_variable_type(operand_value, gv.current_block, gv.current_class_block)
   add_to_operand_stack(operand_value, operand_type)
+
+def p_neural_id_calls_p_empty(p):
+  '''neural_id_calls_p_empty :'''
+  operand_value = gv.sub_call_first_id
+  operand_type = gv.function_directory.get_variable_type(operand_value, gv.current_block, gv.current_class_block)
+  add_to_operand_stack(operand_value, operand_type)
+  gv.sub_call_first_id = None
 
 def add_to_operand_stack(operand_value, operand_type):
   gv.stack_operands.push(OperandPair(operand_value, operand_type))

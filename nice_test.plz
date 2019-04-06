@@ -26,7 +26,7 @@ class Persona :
       flt f_a = 5.0.
     end
 
-    private sub void new_age(int age):
+    private sub void new_age(int age, bool b):
       age = age.
     end
     
@@ -136,5 +136,6 @@ funcion(1, False).
 funcion2(1, 1.0).
 
 persona1$set_age(1 + 2).
+i_a = funcion(1, True).
 
 print: 'prueba final' end
