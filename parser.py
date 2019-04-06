@@ -711,6 +711,10 @@ def p_neural_sub_end(p):
   current_sub_type = gv.function_directory.get_sub_type(gv.current_block, gv.current_class_block)
   if current_sub_type != Types.VOID and current_sub_type != Constants.CONSTRUCTOR_BLOCK and not gv.current_sub_has_return_stmt:
     helpers.throw_error("Subroutine must have return statement")
+  # TODO: generate RETURN for constructor
+  if not gv.current_sub_has_return_stmt:
+    quad = Quad(QuadOperations.RETURN)
+    gv.quad_list.add(quad)
   gv.current_sub_has_return_stmt = False
 
 def p_neural_sub_constructor_end(p):
