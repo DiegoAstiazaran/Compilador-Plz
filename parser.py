@@ -136,11 +136,11 @@ def p_class_block(p):
                          | empty
   class_block_methods : METHODS COLON class_block_methods_p
                       | empty
-  class_block_attributes_p : class_block_p declaration class_block_attributes_p
+  class_block_attributes_p : class_block_p declaration neural_is_public_none class_block_attributes_p
                            | empty  
   class_block_methods_p : class_block_methods_constructor class_block_methods_pp
-  class_block_methods_constructor : neural_class_decl_public constructor
-  class_block_methods_pp : class_block_p subroutine class_block_methods_pp
+  class_block_methods_constructor : neural_class_decl_public constructor neural_is_public_none
+  class_block_methods_pp : class_block_p subroutine neural_is_public_none class_block_methods_pp
                          | empty
   class_block_p : PUBLIC neural_class_decl_public
                 | PRIVATE neural_class_decl_private
@@ -231,8 +231,8 @@ def p_assignment(p):
 
 def p_constructor(p):
   '''
-  constructor : SUB CLASS_NAME neural_sub_decl_id L_PAREN constructor_params R_PAREN COLON constructor_p block END neural_global_block
-  constructor_params : type ID neural_var_decl_id constructor_params_p
+  constructor : SUB CLASS_NAME neural_sub_decl_id L_PAREN constructor_params R_PAREN COLON constructor_p block neural_sub_constructor_end END neural_global_block
+  constructor_params : type ID neural_var_decl_id neural_param_decl constructor_params_p
                      | empty
   constructor_params_p : COMMA constructor_params
                        | empty
@@ -317,7 +317,7 @@ def p_cte_b(p):
 
 def p_subroutine(p):
   '''
-  subroutine : SUB subroutine_return_type ID neural_sub_decl_id L_PAREN subroutine_params R_PAREN COLON subroutine_p block neural_sub_end END neural_global_block
+  subroutine : SUB subroutine_return_type ID neural_sub_decl_id L_PAREN subroutine_params R_PAREN COLON subroutine_p block neural_sub_end neural_sub_constructor_end END neural_global_block
   subroutine_return_type : type
                          | VOID neural_decl_type
   subroutine_params : type ID neural_var_decl_id neural_param_decl subroutine_params_p
@@ -448,6 +448,7 @@ def p_neural_class_decl(p):
   '''neural_class_decl :'''
   gv.current_class_block = p[-1]
   gv.function_directory.add_block(gv.current_class_block, Constants.CLASS_BLOCK)
+  gv.subroutine_directory.add_block(gv.current_class_block)
 
 # Called at the end of class declaration
 def p_neural_class_decl_end(p):
@@ -470,10 +471,10 @@ def p_neural_class_decl_public(p):
   '''neural_class_decl_public :'''
   gv.current_is_public = True
 
-# Called at the end of private or public section of class declaration
-# def p_neural_class_decl_section_end(p):
-#   '''neural_class_decl_section_end : '''
-#   gv.current_is_public = None
+#
+def p_neural_is_public_none(p):
+  '''neural_is_public_none :'''
+  gv.current_is_public = None
 
 # Called after ID in every declaration or initialization
 # It can be in decl_init, parameter declaration or attribute declaration
@@ -510,7 +511,7 @@ def p_neural_sub_decl_id(p):
   if gv.current_last_type == None:
     gv.current_last_type = Constants.CONSTRUCTOR_BLOCK
   gv.function_directory.add_block(gv.current_block, gv.current_last_type, gv.current_is_public, gv.current_class_block)
-  gv.subroutine_directory.add(gv.current_block, gv.quad_list.next(), gv.current_class_block)
+  gv.subroutine_directory.add_subroutine(gv.current_class_block, gv.current_block, gv.quad_list.next(), gv.current_is_public)
   gv.current_last_type = None
 
 #################################################
@@ -703,6 +704,10 @@ def p_neural_sub_end(p):
   if current_sub_type != Types.VOID and current_sub_type != Constants.CONSTRUCTOR_BLOCK and not gv.current_sub_has_return_stmt:
     helpers.throw_error("Subroutine must have return statement")
   gv.current_sub_has_return_stmt = False
+
+def p_neural_sub_constructor_end(p):
+  '''neural_sub_constructor_end :'''
+  gv.function_directory.free_memory(gv.current_block, gv.current_class_block)
 
 ### Condition
 

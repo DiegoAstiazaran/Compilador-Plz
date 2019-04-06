@@ -21,7 +21,7 @@ class Persona :
     public int public_attr.
   
   methods:
-    sub Persona():
+    sub Persona(bool b):
       int i_a.
       flt f_a = 5.0.
     end
@@ -51,7 +51,7 @@ class Hombre under Persona :
       work = work.
     end
 
-    public sub void set_esposa(str esposa):
+    private sub void set_esposa(str esposa, int erik):
       esposa = esposa.
     end
 
