@@ -104,6 +104,9 @@ class FunctionDirectory:
     else:
       self.get_entry_directory(class_name).free_memory(block_name)
 
+  def check_id_is_class(self, class_name):
+    return class_name in self._function_table and self.get_entry_type(class_name) == Constants.CLASS_BLOCK
+
   # Used for debugging and testing purposes
   def output(self):
     print("------------------------------")
@@ -137,8 +140,8 @@ class ParamDirectory:
   def __init__(self):
     self._param_table = {}
   
-  def add(self, subroutine_name, start, is_public):
-    self._param_table[subroutine_name] = [start, [], is_public]
+  def add(self, subroutine_name, start, is_public, type):
+    self._param_table[subroutine_name] = [start, [], is_public, type]
   
   def get_params(self, subroutine_name):
     return self._param_table[subroutine_name][1]
@@ -159,6 +162,12 @@ class ParamDirectory:
   
   def is_method_public(self, subroutine_name):
     return self._param_table[subroutine_name][2]
+  
+  def get_sub_type(self, subroutine_name):
+    return self._param_table[subroutine_name][3]
+  
+  def get_param_type(self, param_count, subroutine_name):
+    return self.get_params(subroutine_name)[param_count]
 
 class SubroutineDirectory:
   def __init__(self):
@@ -173,10 +182,10 @@ class SubroutineDirectory:
   def add_block(self, block_name):
     self._subroutine_directory[block_name] = ParamDirectory()
   
-  def add_subroutine(self, block_name, subroutine_name, start, is_public):
+  def add_subroutine(self, block_name, subroutine_name, start, is_public, type):
     if block_name is None:
       block_name = Constants.GLOBAL_BLOCK
-    self._subroutine_directory[block_name].add(subroutine_name, start, is_public)
+    self._subroutine_directory[block_name].add(subroutine_name, start, is_public, type)
 
   def add_param(self, subroutine_name, type, block_name):
     if block_name is None:
@@ -203,3 +212,9 @@ class SubroutineDirectory:
   
   def is_method_public(self, subroutine_name, block_name):
     return self._subroutine_directory[block_name].is_method_public(subroutine_name)
+  
+  def get_sub_type(self, subroutine_name, block_name):
+    return self._subroutine_directory[block_name].get_sub_type(subroutine_name)
+  
+  def get_param_type(self, param_count, subroutine_name, block_name):
+    return self._subroutine_directory[block_name].get_param_type(param_count, subroutine_name)

@@ -62,6 +62,8 @@ flt f_c = -1.0 * 2 * 3.0.
 str s_c = "decl after classes" + 'sum'.
 bool b_c = ~True and not b_c | False.
 Persona persona1 = Persona(True).
+int i_d = persona1$get_age(1 + 2).
+Persona persona2 = Persona(True).
 
 sub void writes(int a):
   print: a end
@@ -136,6 +138,7 @@ funcion(1, False).
 funcion2(1, 1.0).
 
 persona1$set_age(1 + 2).
-i_a = funcion(1, True).
+i_a = funcion(funcion(1, True), funcion4(s_a)).
+i_a = funcion(persona1$get_age(1 + 2), True).
 
 print: 'prueba final' end

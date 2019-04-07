@@ -3,7 +3,6 @@ str file = "THIS IS A TEST FILE FOR PARSER".
 int diego.
 int erik.
 int id.
-int a = erik@diego.
 int x = -0.
 int y.
 int x5(4)(5).
@@ -27,7 +26,7 @@ class Persona :
       int hola.
       hola = 666.
       if (5 < 4 ):
-        print: 4324, fdsfsd, id@arr[4] end
+        print: 4324, fdsfsd end
       end
     end
 
@@ -42,7 +41,7 @@ class Persona :
       int id(10).
       a = b.
       c = x < 8.
-      c[4] = id@id.
+      c[4] = id.
       return 5.0.
     end
 end
@@ -58,7 +57,7 @@ class Hombre under Persona :
       str x = "5 + 6" .
       int id(10).
       if (5 < 4):
-        print: 4324, x, id@arr[4] end
+        print: 4324, x, id end
       end
     end
 end
@@ -97,14 +96,14 @@ x = 4.
 is = 5 < 4.
 
 if (5 < 4 ):
-  print: 4324, 'string', x5@arr[4] end
+  print: 4324, 'string', x5 end
 elsif ( 6< 4) :
 
 else:
 
 end
 
-print: 4324, x2, x3@arr[4] end
+print: 4324, x2, x3 end
 
 when 7 > 7 repeat:
   x = 7.
@@ -123,12 +122,12 @@ repeat:
   end
 while 7 > 8 end
 
-for a from x@x[432] by /3 while True:
+for diego from x by /3 while True:
   print: x,x2,x3 end
 end
 
-imprimir().
+funcion2(1, True).
 
-id$ifsd(x, (8+9*5) < (4*7/x2+5.5) ).
+obj$funcion2(x, (8+9*5) , False, 5.0).
 
 x = 1.
