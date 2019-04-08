@@ -66,3 +66,6 @@ class QuadOperations:
   GOTO            = 'goto'
   GOTO_F          = 'goto_f'
   GOTO_T          = 'goto_t'
+  ERA             = 'era'
+  PARAM           = 'param'
+  GOSUB           = 'gosub'

@@ -1,4 +1,5 @@
-from constants import Types, Operators
+from constants import Types, Operators, Constants
+
 # Pair of operand value and type
 class OperandPair:
   def __init__(self, operand_value, operand_type):
@@ -196,3 +197,26 @@ class SemanticCube:
 
     operand_right_index = self._types_index.get(operand_right_type, 4)
     return self._semantic_cube[operator_index][operand_left_index][operand_right_index]
+
+class SubCall:
+  def __init__(self, sub_name, block_name):
+    if block_name == None:
+      block_name = Constants.GLOBAL_BLOCK
+    self._sub_name = sub_name
+    self._block_name = block_name
+    self._param_count = 0
+  
+  def get_sub_name_block_name(self):
+    return self._sub_name, self._block_name
+  
+  def get_param_count(self):
+    return self._param_count
+  
+  def add_param_count(self):
+    self._param_count += 1
+  
+  def get_sub_name(self):
+    return self._sub_name
+
+  def get_block_name(self):
+    return self._block_name

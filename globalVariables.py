@@ -1,4 +1,4 @@
-from directories import FunctionDirectory
+from directories import FunctionDirectory, SubroutineDirectory
 from structures import Stack, QuadList, TemporalMemory, SemanticCube
 
 # Boolean for debugging parser
@@ -6,6 +6,9 @@ parse_debug = False
 
 # Main directory with global scope, functions and classes.
 function_directory = FunctionDirectory()
+
+#
+subroutine_directory = SubroutineDirectory()
 
 # Current block of function_directory.
 current_block = None
@@ -15,6 +18,8 @@ current_class_block = None
 
 # Current last type read in a declaration or initialization
 current_last_type = None
+
+current_param_type = None
 
 # Defines if current class block is public
 current_is_public = None
@@ -40,6 +45,12 @@ condition_end = False
 # Operator value for current for cycle
 current_for_operator = None
 
+#
+sub_call_first_id = None
+
+#
+sub_call_second_id = None
+
 # Semantic cube object
 semantic_cube = SemanticCube()
 
@@ -51,6 +62,9 @@ stack_operands = Stack()
 
 # Stack for jumps for GoTo
 stack_jumps = Stack()
+
+# Stack for suboroutine calls
+stack_sub_calls = Stack()
 
 # List of quads
 quad_list = QuadList()

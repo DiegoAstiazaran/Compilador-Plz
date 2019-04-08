@@ -21,12 +21,12 @@ class Persona :
     public int public_attr.
   
   methods:
-    sub Persona():
+    sub Persona(bool b):
       int i_a.
       flt f_a = 5.0.
     end
 
-    private sub void new_age(int age):
+    private sub void new_age(int age, bool b):
       age = age.
     end
     
@@ -51,7 +51,7 @@ class Hombre under Persona :
       work = work.
     end
 
-    public sub void set_esposa(str esposa):
+    private sub void set_esposa(str esposa, int erik):
       esposa = esposa.
     end
 
@@ -61,7 +61,9 @@ int i_c = 1 + 2 * 3 / 4.
 flt f_c = -1.0 * 2 * 3.0.
 str s_c = "decl after classes" + 'sum'.
 bool b_c = ~True and not b_c | False.
-Persona persona1 = Persona().
+Persona persona1 = Persona(True).
+int i_d = persona1$get_age(1 + 2).
+Persona persona2 = Persona(True).
 
 sub void writes(int a):
   print: a end
@@ -132,9 +134,11 @@ if True:
   print: persona1@age end
 end
 
-funcion().
-funcion2().
+funcion(1, False).
+funcion2(1, 1.0).
 
-persona1$set_age(21, i_a, True).
+persona1$set_age(1 + 2).
+i_a = funcion(funcion(1, True), funcion4(s_a)).
+i_a = funcion(persona1$get_age(1 + 2), True).
 
 print: 'prueba final' end
