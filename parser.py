@@ -4,7 +4,6 @@
 import ply.yacc as yacc # Import yacc module
 
 from lexer import tokens, lexer   # Import tokens and lexer defined in lexer
-from parserDebug import *         # Import functions to debug parser
 import globalVariables as gv      # Import global variables
 from constants import Constants, Types, Operators, QuadOperations # Imports some constants
 from structures import OperandPair, Quad, SubCall                 # Import OperandPair and Quad class
@@ -26,14 +25,12 @@ def p_program(p):
              | class
              | subroutine
   '''
-  program_debug(p, gv.parse_debug)
 
 def p_block(p):
   '''
   block : statement block
         | empty
   '''
-  block_debug(p, gv.parse_debug)
 
 def p_statement(p):
   '''
@@ -45,7 +42,6 @@ def p_statement(p):
             | return
             | sub_call
   '''
-  statement_debug(p, gv.parse_debug)
 
 def p_sub_call(p):
   '''
@@ -53,7 +49,6 @@ def p_sub_call(p):
   sub_call_p : MONEY neural_check_id_is_object ID neural_sub_call_second_id
              | empty
   '''
-  sub_call_debug(p, gv.parse_debug)
 
 def p_sub_call_args(p):
   '''
@@ -63,7 +58,6 @@ def p_sub_call_args(p):
   sub_call_args_pp : COMMA sub_call_args_p
                   | empty
   '''
-  sub_call_args_debug(p, gv.parse_debug)
 
 def p_return(p):
   '''
@@ -71,7 +65,6 @@ def p_return(p):
   return_expression : expression neural_return_value
                     | empty
   '''
-  return_debug(p, gv.parse_debug)
 
 def p_class(p):
   '''
@@ -79,7 +72,6 @@ def p_class(p):
   class_inheritance : UNDER CLASS_NAME neural_class_decl_inheritance
           | empty
   '''
-  class_debug(p, gv.parse_debug)
 
 def p_expression(p):
   '''
@@ -87,7 +79,6 @@ def p_expression(p):
   expression_p : logical expression
                | empty
   '''
-  expression_debug(p, gv.parse_debug)
 
 def p_mini_expression(p):
   '''
@@ -95,7 +86,6 @@ def p_mini_expression(p):
   mini_expression_p : relational exp
                     | empty
   '''
-  mini_expression_debug(p, gv.parse_debug)
 
 def p_exp(p):
   '''
@@ -105,7 +95,6 @@ def p_exp(p):
   exp_pp : PLUS   neural_add_to_operator_stack
          | MINUS  neural_add_to_operator_stack
   '''
-  exp_debug(p, gv.parse_debug)
 
 def p_term(p):
   '''
@@ -115,7 +104,6 @@ def p_term(p):
   term_pp : MULTIPLY  neural_add_to_operator_stack
           | DIVIDE    neural_add_to_operator_stack
   '''
-  term_debug(p, gv.parse_debug)
 
 def p_factor(p):
   '''
@@ -127,7 +115,6 @@ def p_factor(p):
            | NOT_OP neural_add_to_operator_stack neural_read_unary_operator
            | empty
   '''
-  factor_debug(p, gv.parse_debug)
 
 def p_class_block(p):
   '''
@@ -145,7 +132,6 @@ def p_class_block(p):
   class_block_p : PUBLIC neural_class_decl_public
                 | PRIVATE neural_class_decl_private
   '''
-  class_block_debug(p, gv.parse_debug)
 
 def p_declaration(p):
   '''
@@ -157,13 +143,11 @@ def p_declaration(p):
   declaration_ppp : array_size
                   | empty
   '''
-  declaration_debug(p, gv.parse_debug)
 
 def p_array_size(p):
   '''
   array_size : L_PAREN CTE_I R_PAREN neural_array_decl
   '''
-  array_size_debug(p, gv.parse_debug)
 
 def p_decl_init(p):
   '''
@@ -172,7 +156,6 @@ def p_decl_init(p):
               | decl_init_dict
               | decl_init_obj
   '''
-  decl_init_debug(p, gv.parse_debug)
 
 def p_decl_init_var(p):
   '''
@@ -198,7 +181,6 @@ def p_decl_init_var(p):
   '''
   # TODO: Put neural_add_to_operator_stack back after EQUAL in array and matrix initialization
 
-  decl_init_var_debug(p, gv.parse_debug)
 
 def p_decl_init_dict(p):
   '''
@@ -210,14 +192,12 @@ def p_decl_init_dict(p):
                         | empty
   '''
   # TODO: Put neural_add_to_operator_stack back after EQUAL
-  decl_init_dict_debug(p, gv.parse_debug)
 
 def p_decl_init_obj(p):
   '''
   decl_init_obj : CLASS_NAME ID neural_var_decl_id EQUAL CLASS_NAME neural_constructor_call sub_call_args neural_sub_call_end_return_value
   '''
   # TODO: Put neural_add_to_operator_stack back after EQUAL
-  decl_init_obj_debug(p, gv.parse_debug)
 
 def p_assignment(p):
   '''
@@ -227,7 +207,6 @@ def p_assignment(p):
   assignment_access : access
                     | empty
   '''
-  assignment_debug(p, gv.parse_debug)
 
 def p_constructor(p):
   '''
@@ -239,7 +218,6 @@ def p_constructor(p):
   constructor_p : decl_init constructor_p
                 | empty
   '''
-  constructor_debug(p, gv.parse_debug)
 
 def p_relational(p):
   '''
@@ -256,7 +234,6 @@ def p_relational(p):
              | EQ         neural_add_to_operator_stack
              | NEQ        neural_add_to_operator_stack
   '''
-  relational_debug(p, gv.parse_debug)
 
 def p_logical(p):
   '''
@@ -265,14 +242,12 @@ def p_logical(p):
           | OR      neural_add_to_operator_stack
           | AND     neural_add_to_operator_stack
   '''
-  logical_debug(p, gv.parse_debug)
 
 def p_var_cte_1(p):
   '''
   var_cte_1 : ID    neural_add_to_operand_stack_id
             | CTE_I neural_add_to_operand_stack_int
   '''
-  var_cte_1_debug(p, gv.parse_debug)
 
 def p_var_cte_2(p):
   '''
@@ -282,7 +257,6 @@ def p_var_cte_2(p):
             | cte_b
             | id_calls
   '''
-  var_cte_2_debug(p, gv.parse_debug)
 
 def p_id_calls(p):
   '''
@@ -297,7 +271,6 @@ def p_id_calls(p):
   id_calls_attribute_p : access
                        | empty
   '''
-  id_calls_debug(p, gv.parse_debug)
 
 def p_var_cte_3(p):
   '''
@@ -305,14 +278,12 @@ def p_var_cte_3(p):
             | CTE_I
             | CTE_STR
   '''
-  var_cte_3_debug(p, gv.parse_debug)
 
 def p_cte_b(p):
   '''
   cte_b : TRUE  neural_add_to_operand_stack_bool
         | FALSE neural_add_to_operand_stack_bool
   '''
-  cte_b_debug(p, gv.parse_debug)
 
 def p_subroutine(p):
   '''
@@ -326,7 +297,6 @@ def p_subroutine(p):
   subroutine_p : decl_init subroutine_p
                | empty
   '''
-  subroutine_debug(p, gv.parse_debug)
 
 def p_write(p):
   '''
@@ -335,7 +305,6 @@ def p_write(p):
   write_pp : neural_write_space COMMA write_p
            | empty
   '''
-  write_debug(p, gv.parse_debug)
 
 def p_condition(p):
   '''
@@ -346,7 +315,6 @@ def p_condition(p):
   condition_else : ELSE neural_condition_else neural_condition_fill_quad COLON block
                 | empty
   '''
-  condition_debug(p, gv.parse_debug)
 
 def p_cycle(p):
   '''
@@ -354,7 +322,6 @@ def p_cycle(p):
         | repeat
         | for
   '''
-  cycle_debug(p, gv.parse_debug)
 
 def p_operator(p):
   '''
@@ -363,7 +330,6 @@ def p_operator(p):
            | MULTIPLY neural_add_to_operator_stack
            | DIVIDE   neural_add_to_operator_stack
   '''
-  operator_debug(p, gv.parse_debug)
 
 def p_access(p):
   '''
@@ -371,19 +337,16 @@ def p_access(p):
   access_p : L_SQ_BRACKET expression R_SQ_BRACKET
            | empty
   '''
-  access_debug(p, gv.parse_debug)
 
 def p_when(p):
   '''
   when : WHEN neural_when_before_expression expression REPEAT neural_when_repeat COLON block END neural_when_end
   '''
-  when_debug(p, gv.parse_debug)
 
 def p_repeat(p):
   '''
   repeat : REPEAT COLON neural_repeat_start block WHILE expression END neural_repeat_end
   '''
-  repeat_debug(p, gv.parse_debug)
 
 def p_for(p):
   '''
@@ -394,7 +357,6 @@ def p_for(p):
   for_operator : operator
                | empty
   '''
-  for_debug(p, gv.parse_debug)
 
 def p_read(p):
   '''
@@ -408,7 +370,6 @@ def p_read(p):
   read_access : access
               | empty
   '''
-  read_debug(p, gv.parse_debug)
 
 def p_type(p):
   '''
@@ -417,7 +378,6 @@ def p_type(p):
        | BOOL neural_decl_type
        | STR neural_decl_type
   '''
-  type_debug(p, gv.parse_debug)
 
 def p_empty(p):
   'empty :'
