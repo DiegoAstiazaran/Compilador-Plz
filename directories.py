@@ -9,10 +9,10 @@ class VariableDirectory:
     self._variable_table = {}
 
   # Adds a variable to dictionary
-  def add_variable(self, var_name, type, is_public):
+  def add_variable(self, var_name, type, is_public, memory_address):
     if var_name in self._variable_table:
       helpers.throw_error('Variable ' + var_name + ' already defined in scope.')
-    self._variable_table[var_name] = [type, is_public, None]
+    self._variable_table[var_name] = [type, is_public, None, memory_address]
 
   def add_dimension(self, var_name):
     self._variable_table[var_name][2] = 1 if self._variable_table[var_name][2] == None else 2
@@ -21,13 +21,13 @@ class VariableDirectory:
   def print(self):
     print("Vars:")
     for key, value in self._variable_table.items():
-      print(key, '\t', value[0], '\t', value[1], '\t', value[2])
+      print(key, '\t', value[0], '\t', value[1], '\t', value[2], '\t', value[3])
 
-  def get_variable_type(self, var_name):
+  # This method now returns memory address with type
+  def get_variable_type_address(self, var_name):
     if var_name in self._variable_table:
-      return self._variable_table[var_name][0]
-    else:
-      helpers.throw_error('Undeclared variable ' + var_name)
+      return self._variable_table[var_name][0], self._variable_table[var_name][3]
+    return None
 
 class FunctionDirectory:
   # Initializes object with empty dictionary
@@ -68,13 +68,13 @@ class FunctionDirectory:
       self.get_entry_directory(class_name).add_block(block_name, type, is_public)
 
   # Adds a variable to a VariableDirectory of a block
-  def add_variable(self, var_name, block_name, type, is_public, class_name = None):
+  def add_variable(self, var_name, block_name, type, is_public, memory_address, class_name = None):
     # Adding variable of a block of main function directory
     if class_name == None:
-      self.get_entry_directory(block_name).add_variable(var_name, type, is_public)
+      self.get_entry_directory(block_name).add_variable(var_name, type, is_public, memory_address)
     # Adding variable of a block of a class's function directory
     else:
-      self.get_entry_directory(class_name).add_variable(var_name, block_name, type, is_public)
+      self.get_entry_directory(class_name).add_variable(var_name, block_name, type, is_public, memory_address)
 
   def add_dimension_to_variable(self, var_name, block_name, class_name = None):
     if class_name == None:
@@ -85,12 +85,27 @@ class FunctionDirectory:
   def check_class(self, class_name):
     if class_name not in self._function_table:
       helpers.throw_error('Class ' + class_name + ' is not defined.')
+  
+  def get_variable_type_address_aux(self, var_name, block_name, throw_error, class_name = None):
+    if block_name == Constants.GLOBAL_BLOCK and class_name is None:
+      pair_type_address = self.get_entry_directory(block_name).get_variable_type_address(var_name)
+      if throw_error and pair_type_address is None:
+        helpers.throw_error('Undeclared variable ' + var_name)
+      return pair_type_address
 
-  def get_variable_type(self, var_name, block_name, class_name = None):
-    if class_name == None:
-      return self.get_entry_directory(block_name).get_variable_type(var_name)
-    else:
-      return self.get_entry_directory(class_name).get_variable_type(var_name, block_name)
+    if class_name is None: # funcion
+      pair_type_address = self.get_entry_directory(block_name).get_variable_type_address(var_name)
+    else: # metodo
+      # esto busca en los locales del metodo y en los atributos
+      pair_type_address = self.get_entry_directory(class_name).get_variable_type_address_aux(var_name, block_name, False)
+    
+    if pair_type_address is not None:
+      return pair_type_address
+
+    return self.get_variable_type_address_aux(var_name, Constants.GLOBAL_BLOCK, throw_error)
+
+  def get_variable_type_address(self, var_name, block_name, class_name = None):
+    return self.get_variable_type_address_aux(var_name, block_name, True, class_name)
 
   def get_sub_type(self, block_name, class_name = None):
     if class_name == None:

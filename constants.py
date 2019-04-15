@@ -69,3 +69,79 @@ class QuadOperations:
   ERA             = 'era'
   PARAM           = 'param'
   GOSUB           = 'gosub'
+
+class MemoryTypes:
+  CONSTANTS  = "Constants"
+  SCOPE      = "Scope"
+  TEMPORAL   = "Temporal"
+  ATTRIBUTES = "Attributes"
+  LOCAL      = "Local"
+  GLOBAL     = "Global"
+
+class MemoryRanges:
+  class Constants:
+    INT  = 0
+    FLT  = 1000
+    STR  = 2000
+    BOOL = 4000
+  class Global: # global y temporal
+    class Scope:
+      INT  = 5000
+      FLT  = 6000
+      STR  = 7000
+      BOOL = 9000
+    class Temporal:
+      INT  = 10000
+      FLT  = 11000
+      STR  = 12000
+      BOOL = 14000
+  class Local:
+    class Attributes:
+      INT  = 15000
+      FLT  = 16000
+      STR  = 17000
+      BOOL = 19000
+    class Scope:
+      INT  = 20000
+      FLT  = 21000
+      STR  = 22000
+      BOOL = 24000
+    class Temporal:
+      INT  = 25000
+      FLT  = 26000
+      STR  = 27000
+      BOOL = 29000
+
+# class MemoryRanges:
+#   class Constants:
+#     INT  = 20000
+#     FLT  = 20500
+#     STR  = -10
+#     BOOL = -10
+#   class Global: # global y temporal
+#     class Scope:
+#       INT  = 5000
+#       FLT  = 8000
+#       STR  = -10
+#       BOOL = -10
+#     class Temporal:
+#       INT  = 15000
+#       FLT  = 17000
+#       STR  = -10
+#       BOOL = 19000
+#   class Local: # local y temporal
+#     class Attributes:
+#       INT  = -10
+#       FLT  = -10
+#       STR  = -10
+#       BOOL = -10
+#     class Scope:
+#       INT  = 11000
+#       FLT  = 13000
+#       STR  = -10
+#       BOOL = -10
+#     class Temporal:
+#       INT  = 15000
+#       FLT  = 17000
+#       STR  = -10
+#       BOOL = 19000
