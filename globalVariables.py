@@ -1,5 +1,5 @@
 from directories import FunctionDirectory, SubroutineDirectory
-from structures import Stack, QuadList, TemporalMemory, SemanticCube
+from structures import Stack, QuadList, TemporalMemory, SemanticCube, MemoryManager
 
 # Boolean for debugging parser
 parse_debug = False
@@ -71,6 +71,9 @@ quad_list = QuadList()
 
 # Temporal memory manager
 temporal_memory = TemporalMemory()
+
+#
+memory_manager = MemoryManager()
 
 # For debugging purposes
 # TODO: delete

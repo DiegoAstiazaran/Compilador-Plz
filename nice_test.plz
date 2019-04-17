@@ -24,6 +24,7 @@ class Persona :
     sub Persona(bool b):
       int i_a.
       flt f_a = 5.0.
+      age = i_a.
     end
 
     private sub void new_age(int age, bool b):
@@ -34,8 +35,8 @@ class Persona :
       return age.
     end
 
-    public sub void set_age(int age):
-      age = age.
+    public sub void set_age(int new_age):
+      age = new_age.
     end
 
 end
@@ -53,6 +54,7 @@ class Hombre under Persona :
 
     private sub void set_esposa(str esposa, int erik):
       esposa = esposa.
+      happy = b_b.
     end
 
 end
