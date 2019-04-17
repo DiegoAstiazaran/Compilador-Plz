@@ -941,20 +941,18 @@ def p_neural_new_line(p):
 parser = yacc.yacc()
 
 # Execution of parser with a filename
-while True:
+def execute_parser():
   try:
-      # file = input('Filename: ')
-      file = 'nice_test.plz'
-      with open(file, 'r') as myfile:
-          s = myfile.read()
+    # file = input('Filename: ')
+    file = 'nice_test.plz'
+    with open(file, 'r') as myfile:
+        s = myfile.read()
   except EOFError:
-      break
-  if not file: continue
+      exit()
+  if not file: exit()
   result = parser.parse(s)
   print(result)
   # print(gv.quad_list)
   gv.quad_list.print_with_number()
-  del sys.modules['globalVariables']
-  import globalVariables as gv
-  break # remove this break to loop the tests
   # gv.function_directory.output()
+  return gv.quad_list
