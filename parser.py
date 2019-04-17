@@ -18,7 +18,7 @@ start = 'program'
 
 def p_program(p):
   '''
-  program : neural_global_block program_p block
+  program : neural_start_program neural_global_block program_p neural_start_main block
   program_p : program_pp program_p
             | empty
   program_pp : decl_init
@@ -927,6 +927,16 @@ def p_neural_check_id_is_object(p):
     helpers.throw_error(id_name + " is not an object")
 
 ### Other
+
+def p_neural_start_program(p):
+  '''neural_start_program :'''
+  quad = Quad(QuadOperations.GOTO)
+  gv.quad_list.add(quad)
+
+def p_neural_start_main(p):
+  '''neural_start_main :'''
+  next_quad = gv.quad_list.next()
+  gv.quad_list.add_element_to_quad(0, next_quad)
 
 # Use for debugging
 # TODO: delete
