@@ -1,3 +1,5 @@
+import operator
+
 class Constants:
   # Name for global scope
   GLOBAL_BLOCK = 'global'
@@ -9,7 +11,11 @@ class Constants:
   CONSTRUCTOR_BLOCK = 'constructor'
 
   FALSE_BOTTOM_IF_CONDITION = 'false_bottom_if_condition'
-  
+
+  TRUE = 'True'
+  FALSE = 'False'
+  BOOLEAN = [TRUE, FALSE]
+
 # Enum for types
 class Types:
   INT   = 'int'
@@ -53,8 +59,8 @@ class Operators:
              AND,    OR   ]
   plus_minus = [PLUS, MINUS]
   multiply_divide = [MULTIPLY, DIVIDE]
-  unary = [PLUS, MINUS, NOT, NOT_OP]
-  unary_arithmetic = [PLUS, MINUS]
+  unary = [NOT, NOT_OP]
+  binary = relational + logical + plus_minus + multiply_divide
 
 # Enum for quad operations
 class QuadOperations:
@@ -69,6 +75,15 @@ class QuadOperations:
   ERA             = 'era'
   PARAM           = 'param'
   GOSUB           = 'gosub'
+  PLUS_UNARY      = 'positive'
+  MINUS_UNARY     = 'negative'
+  unary = [PLUS_UNARY, MINUS_UNARY]
+
+class Defaults:
+  INT = 0
+  FLT = 0.0
+  STR = ''
+  BOOL = False
 
 class MemoryTypes:
   CONSTANTS  = "Constants"
@@ -79,12 +94,25 @@ class MemoryTypes:
   GLOBAL     = "Global"
 
 class MemoryRanges:
+  INT       = 0
+  FLT       = 1000
+  STR       = 2000
+  BOOL      = 4000
+  BOOL_MAX  = 5000
+  SCOPE_START      = 0
+  TEMPORAL_START   = 5000
+  ATTRIBUTES_START = 10000
+  ATTRIBUTES_MAX   = 15000
   class Constants:
+    START  = 0
+    END    = 4999
     INT  = 0
     FLT  = 1000
     STR  = 2000
     BOOL = 4000
   class Global: # global y temporal
+    START  = 5000
+    END    = 14999
     class Scope:
       INT  = 5000
       FLT  = 6000
@@ -96,17 +124,19 @@ class MemoryRanges:
       STR  = 12000
       BOOL = 14000
   class Local:
-    class Attributes:
+    START  = 15000
+    END    = 29999
+    class Scope:
       INT  = 15000
       FLT  = 16000
       STR  = 17000
       BOOL = 19000
-    class Scope:
+    class Temporal:
       INT  = 20000
       FLT  = 21000
       STR  = 22000
       BOOL = 24000
-    class Temporal:
+    class Attributes:
       INT  = 25000
       FLT  = 26000
       STR  = 27000

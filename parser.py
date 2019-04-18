@@ -18,12 +18,12 @@ start = 'program'
 
 def p_program(p):
   '''
-  program : neural_start_program neural_global_block program_p neural_start_main block
+  program : neural_global_block program_p block
   program_p : program_pp program_p
             | empty
   program_pp : decl_init
-             | class
-             | subroutine
+             | neural_new_goto class neural_fill_goto
+             | neural_new_goto subroutine neural_fill_goto
   '''
 
 def p_block(p):
@@ -604,6 +604,15 @@ def p_neural_add_to_operator_stack(p):
 
 def p_neural_read_unary_operator(p):
   '''neural_read_unary_operator :'''
+  operator = gv.stack_operators.top()
+  if operator == Operators.PLUS:
+    gv.stack_operators.pop()
+    new_operator = QuadOperations.PLUS_UNARY
+    gv.stack_operators.push(new_operator)
+  elif operator == Operators.MINUS:
+    gv.stack_operators.pop()
+    new_operator = QuadOperations.MINUS_UNARY
+    gv.stack_operators.push(new_operator)
   gv.read_unary_operator = True
 
 def p_neural_operator_stack_push_false(p):
@@ -928,15 +937,18 @@ def p_neural_check_id_is_object(p):
 
 ### Other
 
-def p_neural_start_program(p):
-  '''neural_start_program :'''
+def p_neural_new_goto(p):
+  '''neural_new_goto :'''
   quad = Quad(QuadOperations.GOTO)
+  quad_index = gv.quad_list.next()
   gv.quad_list.add(quad)
+  gv.stack_jumps.push(quad_index)
 
-def p_neural_start_main(p):
-  '''neural_start_main :'''
+def p_neural_fill_goto(p):
+  '''neural_fill_goto :'''
+  quad_index = gv.stack_jumps.pop()
   next_quad = gv.quad_list.next()
-  gv.quad_list.add_element_to_quad(0, next_quad)
+  gv.quad_list.add_element_to_quad(quad_index, next_quad)
 
 # Use for debugging
 # TODO: delete
@@ -953,16 +965,17 @@ parser = yacc.yacc()
 # Execution of parser with a filename
 def execute_parser():
   try:
-    # file = input('Filename: ')
-    file = 'nice_test.plz'
+    file = input('Filename: ')
+    file += '.plz'
+    # file = 'global_test.plz'
     with open(file, 'r') as myfile:
         s = myfile.read()
   except EOFError:
       exit()
   if not file: exit()
-  result = parser.parse(s)
-  print(result)
+  parser.parse(s)
+  # print(result)
   # print(gv.quad_list)
-  gv.quad_list.print_with_number()
+  # gv.quad_list.print_with_number()
   # gv.function_directory.output()
-  return gv.quad_list
+  return gv.quad_list, gv.memory_manager._constant_memory_map, gv.subroutine_directory
