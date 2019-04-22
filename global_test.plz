@@ -1,0 +1,19 @@
+int last.
+flt start.
+
+print: 'value of start: ' end
+read: start end
+print: 'value of last: ' end
+read: last end
+print: '' end
+
+when start <= last repeat:
+  print: start end
+  start = start + 1.
+end
+
+print: '' end
+
+for start from 20 by -1 while start >= 10:
+  print: start end
+end

@@ -1,4 +1,4 @@
-from constants import Types, Operators, Constants, MemoryRanges, MemoryTypes
+from constants import Types, Operators, Constants, MemoryRanges, MemoryTypes, Defaults, QuadOperations
 import helpers
 
 # Pair of operand value and type
@@ -63,13 +63,16 @@ class QuadList:
 
   def add_element_to_quad(self, index, element):
     self._quad_list[index].add_element(element)
+  
+  def get(self, index):
+    return self._quad_list[index]
 
   def print_with_number(self):
     index = 0
     for item in self._quad_list:
       print('#{}\t{}'.format(index, item))
       index += 1
-
+  
 # Quad for intermediate code
 class Quad:
   def __init__(self, instruction, first = None, second = None, third = None):
@@ -88,6 +91,15 @@ class Quad:
 
   def add_element(self, element):
     self._quad.append(element)
+  
+  def get_operation(self):
+    return self._quad[0]
+  
+  def get_items(self):
+    if len(self._quad) > 2:
+      return tuple(self._quad[1:])
+    else:
+      return self._quad[1]
 
 # TODO: delete
 # Temporal memory manager
@@ -136,6 +148,9 @@ class ConstantMemoryManager(SpecificMemoryMapManager):
     new_address = self.get_next(type)
     self._memory[type][value] = new_address
     return new_address
+  
+  def get_map(self):
+    return self._memory
 
 class ScopeMemoryMapManager:
   def __init__(self, type): # Global, Local
@@ -259,7 +274,8 @@ class SemanticCube:
       Operators.OR        : 4,
       Operators.NOT_OP    : 5,
       Operators.NOT       : 5,
-      "unary_arithmetic"  : 6,
+      QuadOperations.PLUS_UNARY : 6,
+      QuadOperations.MINUS_UNARY : 6,
     }
 
     # index for each type in semantic cube matrices
@@ -276,8 +292,6 @@ class SemanticCube:
     operand_left_index = self._types_index.get(operand_left_type, 4)
 
     if operand_right_type == None:
-      if operator in Operators.unary_arithmetic:
-          operator_index = self._operators_index["unary_arithmetic"]
       return self._semantic_cube[operator_index][operand_left_index]
 
     operand_right_index = self._types_index.get(operand_right_type, 4)
@@ -305,3 +319,110 @@ class SubCall:
 
   def get_block_name(self):
     return self._block_name
+
+class VirtualMachineMemoryMap:
+  def __init__(self):
+    setattr(self, Types.INT, [])
+    setattr(self, Types.FLT, [])
+    setattr(self, Types.STR, [])
+    setattr(self, Types.BOOL, [])
+  
+  def fill(self, new_address, type):
+    current_size = len(getattr(self, type))
+    if new_address < current_size:
+      return
+    default_value = getattr(Defaults, type.upper())
+    for _ in range(new_address - current_size + 1):
+      getattr(self, type).append(default_value)
+
+  def get_memory_address_type(self, memory_address):
+    if memory_address >= MemoryRanges.INT and  memory_address < MemoryRanges.FLT: 
+      type = Types.INT
+    elif memory_address >= MemoryRanges.FLT and  memory_address < MemoryRanges.STR:
+      type = Types.FLT
+    elif memory_address >= MemoryRanges.STR and  memory_address < MemoryRanges.BOOL:
+      type = Types.STR
+    elif memory_address >= MemoryRanges.BOOL and  memory_address < MemoryRanges.BOOL_MAX:
+      type = Types.BOOL
+    
+    new_address = memory_address - getattr(MemoryRanges, type.upper())
+    return new_address, type
+
+  def get_memory_value(self, memory_address):
+    new_address, type = self.get_memory_address_type(memory_address)
+    self.fill(new_address, type)
+    return getattr(self, type)[new_address]
+  
+  def set_memory_value(self, memory_address, value):
+    new_address, type = self.get_memory_address_type(memory_address)
+    self.fill(new_address, type)
+    getattr(self, type)[new_address] = value
+
+  def get_memory_type(self, memory_address):
+    _, type = self.get_memory_address_type(memory_address)
+    return type
+
+class VirtualMachineMemoryMapLocal:
+  def __init__(self):
+    setattr(self, MemoryTypes.SCOPE, VirtualMachineMemoryMap())
+    setattr(self, MemoryTypes.TEMPORAL, VirtualMachineMemoryMap())
+  
+  def get_memory_address_type(self, memory_address):
+    if memory_address >= MemoryRanges.SCOPE_START and  memory_address < MemoryRanges.TEMPORAL_START:
+      type = MemoryTypes.SCOPE
+    elif memory_address >= MemoryRanges.TEMPORAL_START and  memory_address < MemoryRanges.ATTRIBUTES_START:
+      type = MemoryTypes.TEMPORAL
+    elif memory_address >= MemoryRanges.ATTRIBUTES_START and  memory_address < MemoryRanges.ATTRIBUTES_MAX:
+      type = MemoryTypes.ATTRIBUTES
+    
+    upper_type = (type + '_start').upper()
+    new_address = memory_address - getattr(MemoryRanges, upper_type)
+    return new_address, type
+  
+  def get_memory_value(self, memory_address):
+    new_address, type = self.get_memory_address_type(memory_address)
+    return getattr(self, type).get_memory_value(new_address)
+  
+  def set_memory_value(self, memory_address, value):
+    new_address, type = self.get_memory_address_type(memory_address)
+    getattr(self, type).set_memory_value(new_address, value)
+  
+  def get_memory_type(self, memory_address):
+    new_address, type = self.get_memory_address_type(memory_address)
+    return getattr(self, type).get_memory_type(new_address)
+
+class VirtualMachineMemoryMapManager:
+  def __init__(self):
+    setattr(self, MemoryTypes.GLOBAL, VirtualMachineMemoryMapLocal())
+    setattr(self, MemoryTypes.CONSTANTS, VirtualMachineMemoryMapLocal())
+    self._execution_stack = Stack()
+  
+  def add_constant_memory(self, constant_memory):
+    constants_map = constant_memory.get_map()
+    for type, type_map in constants_map.items():
+      for key, value in type_map.items():
+        new_address = value - MemoryRanges.Constants.START
+        if type ==  Types.BOOL:
+          key = bool(key)
+        getattr(self, MemoryTypes.CONSTANTS).set_memory_value(new_address, key)
+
+  def get_memory_address_type(self, memory_address):
+    if memory_address >= MemoryRanges.Global.START and memory_address <= MemoryRanges.Global.END:
+      type = MemoryTypes.GLOBAL
+    elif memory_address >= MemoryRanges.Constants.START and memory_address <= MemoryRanges.Constants.END:
+      type = MemoryTypes.CONSTANTS
+
+    new_address = memory_address - getattr(MemoryRanges, type).START
+    return new_address, type
+
+  def get_memory_value(self, memory_address):
+    new_address, type = self.get_memory_address_type(memory_address)
+    return getattr(self, type).get_memory_value(new_address)
+  
+  def set_memory_value(self, memory_address, value):
+    new_address, type = self.get_memory_address_type(memory_address)
+    getattr(self, type).set_memory_value(new_address, value)
+
+  def get_memory_type(self, memory_address):
+    new_address, type = self.get_memory_address_type(memory_address)
+    return getattr(self, type).get_memory_type(new_address)
