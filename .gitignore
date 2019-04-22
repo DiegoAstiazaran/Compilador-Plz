@@ -5,3 +5,4 @@ parsetab.py
 venv/
 __ pycache __
 db.sqlite3
+master.css*
