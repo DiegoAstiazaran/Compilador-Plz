@@ -2,3 +2,6 @@
 parser.out
 parsetab.py
 .vscode
+venv/
+__ pycache __
+db.sqlite3
