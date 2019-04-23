@@ -134,6 +134,10 @@ class SpecificMemoryMapManager:
     setattr(self, type, actual + 1)
     return actual
   
+  def increase_counter(self, type, amount):
+    actual = getattr(self, type)
+    setattr(self, type, actual + amount)
+  
   def reset(self):
     SpecificMemoryMapManager.__init__(self, self._first, self._second)
 
@@ -151,6 +155,9 @@ class ConstantMemoryManager(SpecificMemoryMapManager):
   
   def get_map(self):
     return self._memory
+  
+  def get_map_of_type(self, type):
+    return self._memory[type]
 
 class ScopeMemoryMapManager:
   def __init__(self, type): # Global, Local
@@ -187,9 +194,23 @@ class MemoryManager:
   def get_constant_memory_address(self, value, type):
     return self._constant_memory_map.get_memory_address(value, type)
   
+  def get_constant_from_address(self, address, type):
+    constants = self._constant_memory_map.get_map_of_type(type)
+    for constant, const_address in constants.items():
+      if address == const_address:
+        return constant
+
   def get_last_global(self, type):
     return getattr(self._global_memory_map._scope_memory, type) - 1
   
+  def increase_counter(self, type, memory_type, amount):
+    if memory_type == MemoryTypes.GLOBAL:
+      memory_map = self._global_memory_map
+    elif memory_type == MemoryTypes.LOCAL:
+      memory_map = self._local_memory_map
+
+    memory_map._scope_memory.increase_counter(type, amount)
+
   def reset_local(self): # para el local cada que empieces una funcion o metodo
     self._local_memory_map.get_memory_map(MemoryTypes.SCOPE).reset()
     self._local_memory_map.get_memory_map(MemoryTypes.TEMPORAL).reset()

@@ -12,10 +12,10 @@ class VariableDirectory:
   def add_variable(self, var_name, type, is_public, memory_address):
     if var_name in self._variable_table:
       helpers.throw_error('Variable ' + var_name + ' already defined in scope.')
-    self._variable_table[var_name] = [type, is_public, None, memory_address]
+    self._variable_table[var_name] = [type, is_public, [], memory_address]
 
-  def add_dimension(self, var_name):
-    self._variable_table[var_name][2] = 1 if self._variable_table[var_name][2] == None else 2
+  def add_dimension(self, var_name, dimension_size):
+    self.get_variable_indices(var_name).append(dimension_size)
 
   # Used for debugging and testing purposes
   def print(self):
@@ -28,6 +28,35 @@ class VariableDirectory:
     if var_name in self._variable_table:
       return self._variable_table[var_name][0], self._variable_table[var_name][3]
     return None
+  
+  def get_variable_address(self, var_name):
+    return self._variable_table[var_name][3]
+
+  def get_variable_indices(self, var_name):
+    return self._variable_table[var_name][2]
+  
+  def get_var_name_from_address(self, address):
+    for var_name in self._variable_table.keys():
+      if address == self.get_variable_address(var_name):
+        return var_name
+
+  def get_array_direction(self, address, indices):
+    direction = address + indices[-1]
+    var_name = self.get_var_name_from_address(address)
+    dimensions = self.get_variable_indices(var_name)
+    if len(dimensions) == 2:
+      direction += dimensions[1] * indices[0]
+    return direction
+  
+  def get_array_size(self, var_name):
+    dimensions = self.get_variable_indices(var_name)    
+    array_size = 1
+    for dimension in dimensions:
+      array_size *= dimension
+    return array_size
+
+  def get_variable_type(self, var_name):
+    return self._variable_table[var_name][0]
 
 class FunctionDirectory:
   # Initializes object with empty dictionary
@@ -76,11 +105,11 @@ class FunctionDirectory:
     else:
       self.get_entry_directory(class_name).add_variable(var_name, block_name, type, is_public, memory_address)
 
-  def add_dimension_to_variable(self, var_name, block_name, class_name = None):
+  def add_dimension_to_variable(self, var_name, dimension_size, block_name, class_name = None):
     if class_name == None:
-      self.get_entry_directory(block_name).add_dimension(var_name)
+      self.get_entry_directory(block_name).add_dimension(var_name, dimension_size)
     else:
-      self.get_entry_directory(class_name).add_dimension_to_variable(var_name, block_name)
+      self.get_entry_directory(class_name).add_dimension_to_variable(var_name, dimension_size, block_name)
 
   def check_class(self, class_name):
     if class_name not in self._function_table:
@@ -113,6 +142,12 @@ class FunctionDirectory:
     else:
       return self.get_entry_directory(class_name).get_sub_type(block_name)
 
+  def get_variable_type(self, var_name, block_name, class_name = None):
+    if class_name == None:
+      return self.get_entry_directory(block_name).get_variable_type(var_name)
+    else:
+      return self.get_entry_directory(class_name).get_variable_type(var_name, block_name)
+
   def free_memory(self, block_name, class_name = None):
     if class_name is None:
       self._function_table.pop(block_name)
@@ -121,6 +156,18 @@ class FunctionDirectory:
 
   def check_id_is_class(self, class_name):
     return class_name in self._function_table and self.get_entry_type(class_name) == Constants.CLASS_BLOCK
+
+  def get_array_direction(self, var_name, indices, block_name, class_name = None):
+    if class_name == None:
+      return self.get_entry_directory(block_name).get_array_direction(var_name, indices)
+    else:
+      return self.get_entry_directory(class_name).get_array_direction(var_name, indices, block_name)
+  
+  def get_array_size(self, var_name, block_name, class_name = None):
+    if class_name == None:
+      return self.get_entry_directory(block_name).get_array_size(var_name)
+    else:
+      return self.get_entry_directory(class_name).get_array_size(var_name, block_name)
 
   # Used for debugging and testing purposes
   def output(self):

@@ -78,6 +78,9 @@ memory_manager = MemoryManager()
 #
 global_error = []
 
+#
+array_access_indices = []
+
 # For debugging purposes
 # TODO: delete
 lines_read = []
