@@ -7,5 +7,6 @@ def throw_error(error_message):
   # raise Exception(error)
 
 def throw_error_no_line(error_message):
-  gv.global_error.append(error_message)
+  exit(error_message)
+  # gv.global_error.append(error_message)
   # raise Exception(error_message)
