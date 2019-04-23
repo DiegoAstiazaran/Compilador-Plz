@@ -385,8 +385,7 @@ def p_empty(p):
 
 # Error rule for syntax errors
 def p_error(p):
-  print("Syntax error in input!")
-  helpers.throw_error('Syntax error in input!"')
+  helpers.throw_error('Syntax error in input!')
 
 ################################################################################
 ################                NEURALGIC POINTS                ################
@@ -963,17 +962,8 @@ def p_neural_new_line(p):
 parser = yacc.yacc()
 
 # Execution of parser with a filename
-def execute_parser():
-  try:
-    file = input('Filename: ')
-    file += '.plz'
-    # file = 'global_test.plz'
-    with open(file, 'r') as myfile:
-        s = myfile.read()
-  except EOFError:
-      exit()
-  if not file: exit()
-  parser.parse(s)
+def execute_parser(input):
+  parser.parse(input)
   # print(result)
   # print(gv.quad_list)
   # gv.quad_list.print_with_number()

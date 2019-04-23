@@ -75,6 +75,9 @@ temporal_memory = TemporalMemory()
 #
 memory_manager = MemoryManager()
 
+#
+global_error = []
+
 # For debugging purposes
 # TODO: delete
 lines_read = []

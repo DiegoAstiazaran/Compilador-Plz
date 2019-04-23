@@ -2,6 +2,7 @@ from structures import Quad
 from constants import Operators, QuadOperations, Types, Constants
 from structures import VirtualMachineMemoryMapManager
 from virtualMachineGlobalVariables import operations
+import helpers
 
 def execute_virtual_machine(quad_list, constant_memory, subroutine_directory):
   quad_pointer = 0
@@ -41,14 +42,14 @@ def execute_virtual_machine(quad_list, constant_memory, subroutine_directory):
         try:
           temporal = int(temporal)
         except ValueError:
-          raise Exception("Input value must be an integer")
+          helpers.throw_error_no_line("Input value must be an integer")
       elif type == Types.FLT:
         try:
           temporal = float(temporal)
         except ValueError:
-          raise Exception("Input value must be a float")
+          helpers.throw_error_no_line("Input value must be a float")
       elif type == Types.BOOL and temporal not in Constants.BOOLEAN:
-        raise Exception("Input value must be a boolean")      
+        helpers.throw_error_no_line("Input value must be a boolean")
       memory_manager.set_memory_value(memory_address, temporal)
     elif operation == QuadOperations.GOTO:
       quad_index = quad.get_items()
@@ -65,5 +66,5 @@ def execute_virtual_machine(quad_list, constant_memory, subroutine_directory):
     # elif operation == QuadOperations.PARAM:
     # elif operation == QuadOperations.GOSUB:
     else:
-      raise Exception("Invalid quad operation!")      
+      helpers.throw_error_no_line("Invalid quad operation!")
     quad_pointer += 1

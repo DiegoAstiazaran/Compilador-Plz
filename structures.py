@@ -77,7 +77,7 @@ class QuadList:
 class Quad:
   def __init__(self, instruction, first = None, second = None, third = None):
     if instruction is None:
-      raise Exception("Quad operator must be different from None")
+      helpers.throw_error("Quad operator must be different from None")
     self._quad = [instruction]
     if first is not None:
       self._quad.append(first)
