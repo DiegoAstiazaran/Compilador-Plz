@@ -111,16 +111,16 @@ class TemporalMemory:
     self._next_available += 1
     return 'temp_%d' % (self._next_available - 1)
 
-class SpecificMemoryMapManager:
+class ParserMemoryPrimitivesMap:
   def __init__(self, first_class, second_class = None):
-    if second_class is None:
-      ranges = getattr(MemoryRanges, first_class)
-    else:
-      ranges = getattr(getattr(MemoryRanges, first_class), second_class)
-    setattr(self, Types.INT, ranges.INT)
-    setattr(self, Types.FLT, ranges.FLT)
-    setattr(self, Types.STR, ranges.STR)
-    setattr(self, Types.BOOL, ranges.BOOL)
+    base_address = getattr(MemoryRanges, first_class.upper())
+    if second_class is not None:
+      base_address += getattr(MemoryRanges, second_class.upper())
+
+    setattr(self, Types.INT, base_address + MemoryRanges.INT)
+    setattr(self, Types.FLT, base_address + MemoryRanges.FLT)
+    setattr(self, Types.STR, base_address + MemoryRanges.STR)
+    setattr(self, Types.BOOL, base_address + MemoryRanges.BOOL)
 
     self._first = first_class
     self._second = second_class
@@ -134,12 +134,16 @@ class SpecificMemoryMapManager:
     setattr(self, type, actual + 1)
     return actual
   
+  def increase_counter(self, type, amount):
+    actual = getattr(self, type)
+    setattr(self, type, actual + amount)
+  
   def reset(self):
-    SpecificMemoryMapManager.__init__(self, self._first, self._second)
+    ParserMemoryPrimitivesMap.__init__(self, self._first, self._second)
 
-class ConstantMemoryManager(SpecificMemoryMapManager):
+class ParserMemoryConstantMap(ParserMemoryPrimitivesMap):
   def __init__(self):
-    SpecificMemoryMapManager.__init__(self, MemoryTypes.CONSTANTS)
+    ParserMemoryPrimitivesMap.__init__(self, MemoryTypes.CONSTANTS)
     self._memory = {type:{} for type in Types.primitives}
 
   def get_memory_address(self, value, type):
@@ -151,51 +155,96 @@ class ConstantMemoryManager(SpecificMemoryMapManager):
   
   def get_map(self):
     return self._memory
+  
+  def get_constant_from_address(self, address, type):
+    constants = self._memory[type]
+    for constant, const_address in constants.items():
+      if address == const_address:
+        return constant
 
-class ScopeMemoryMapManager:
+class ParserMemoryManagerScopeMap:
   def __init__(self, type): # Global, Local
-    self._scope_memory = SpecificMemoryMapManager(type, MemoryTypes.SCOPE)
-    self._temporal_memory = SpecificMemoryMapManager(type, MemoryTypes.TEMPORAL)
-    if type == MemoryTypes.LOCAL:
-      self._attributes_memory = SpecificMemoryMapManager(type, MemoryTypes.ATTRIBUTES)
+    scope = ParserMemoryPrimitivesMap(type, MemoryTypes.SCOPE)
+    setattr(self, MemoryTypes.SCOPE, scope)
+    temporal = ParserMemoryPrimitivesMap(type, MemoryTypes.TEMPORAL)
+    setattr(self, MemoryTypes.TEMPORAL, temporal)
+    upper_type = type.upper()
+    pointers = getattr(MemoryRanges, upper_type) + MemoryRanges.POINTERS
+    setattr(self, MemoryTypes.POINTERS, pointers)
+    self.pointers_start = getattr(self, MemoryTypes.POINTERS)
 
   def get_memory_map(self, memory_type):
-    if memory_type == MemoryTypes.SCOPE:
-      return self._scope_memory
-    elif memory_type == MemoryTypes.TEMPORAL:
-      return self._temporal_memory
-    elif memory_type == MemoryTypes.ATTRIBUTES:
-      return self._attributes_memory
+    return getattr(self, memory_type)
+  
+  def get_next_pointer(self):
+    actual = getattr(self, MemoryTypes.POINTERS)
+    setattr(self, MemoryTypes.POINTERS, actual + 1)
+    return actual
+  
+  def reset(self):
+    getattr(self, MemoryTypes.SCOPE).reset()
+    getattr(self, MemoryTypes.TEMPORAL).reset()
+    setattr(self, MemoryTypes.POINTERS, self.pointers_start)
 
-class MemoryManager:
+class ParserMemoryManager:
   def __init__(self):
-    self._constant_memory_map = ConstantMemoryManager()
-    self._global_memory_map = ScopeMemoryMapManager(MemoryTypes.GLOBAL)
-    self._local_memory_map = ScopeMemoryMapManager(MemoryTypes.LOCAL)
+    constants = ParserMemoryConstantMap()
+    setattr(self, MemoryTypes.CONSTANTS, constants)
 
+    global_ = ParserMemoryManagerScopeMap(MemoryTypes.GLOBAL)
+    setattr(self, MemoryTypes.GLOBAL, global_)
+    local = ParserMemoryManagerScopeMap(MemoryTypes.LOCAL)
+    setattr(self, MemoryTypes.LOCAL, local)
+
+    attributes = ParserMemoryPrimitivesMap(MemoryTypes.ATTRIBUTES)
+    setattr(self, MemoryTypes.ATTRIBUTES, attributes)
+
+  # var_type: primitives
+  # memory_type : scope, temporal, pointers
   def get_memory_address(self, var_type, memory_type, current_block, current_class):
     if current_block == Constants.GLOBAL_BLOCK and current_class == None: # global
-      return self._global_memory_map.get_memory_map(memory_type).get_next(var_type)
-    elif current_block == None: # funcion
-      return self._local_memory_map.get_memory_map(memory_type).get_next(var_type)
+      memory_scope = MemoryTypes.GLOBAL
+    elif current_class == None: # funcion
+      memory_scope = MemoryTypes.LOCAL
     else: # clase
       if current_block == None: # attribute
-        return self._local_memory_map.get_memory_map(memory_type).get_next(var_type)
+        memory_scope = MemoryTypes.ATTRIBUTES
       else: # metodo
-        return self._local_memory_map.get_memory_map(memory_type).get_next(var_type)
-  
+        memory_scope = MemoryTypes.LOCAL
+
+    return getattr(self, memory_scope).get_memory_map(memory_type).get_next(var_type)
+
   def get_constant_memory_address(self, value, type):
-    return self._constant_memory_map.get_memory_address(value, type)
+    return getattr(self, MemoryTypes.CONSTANTS).get_memory_address(value, type)
   
+  def get_constant_from_address(self, address, type):
+    return getattr(MemoryTypes.CONSTANTS).get_constant_from_address(address, type)
+
   def get_last_global(self, type):
-    return getattr(self._global_memory_map._scope_memory, type) - 1
+    global_ = getattr(self, MemoryTypes.GLOBAL)
+    global_scope = getattr(global_, MemoryTypes.SCOPE)
+    return getattr(global_scope, type) - 1
   
+  # used only for arrays which are in scope type
+  def increase_counter(self, type, memory_scope, amount):
+    scope_map = getattr(self, memory_scope)
+    getattr(scope_map, MemoryTypes.SCOPE).increase_counter(type, amount)
+
+  def get_next_temporal(self, type, memory_scope):
+    scope_map = getattr(self, memory_scope)
+    return getattr(scope_map, MemoryTypes.TEMPORAL).get_next(type)
+
+  def get_next_pointer(self, memory_scope):
+    return getattr(self, memory_scope).get_next_pointer()
+
+  def get_constant_map(self):
+    return getattr(self, MemoryTypes.CONSTANTS)
+
   def reset_local(self): # para el local cada que empieces una funcion o metodo
-    self._local_memory_map.get_memory_map(MemoryTypes.SCOPE).reset()
-    self._local_memory_map.get_memory_map(MemoryTypes.TEMPORAL).reset()
+    getattr(self, MemoryTypes.LOCAL).reset()
   
   def reset_class(self): # cuando declaras una clase
-    self._local_memory_map.get_memory_map(MemoryTypes.ATTRIBUTES).reset()
+    getattr(self, MemoryTypes.ATTRIBUTES).reset()
 
 # Semantic cuve for resulting types of operations
 class SemanticCube:
@@ -320,7 +369,11 @@ class SubCall:
   def get_block_name(self):
     return self._block_name
 
-class VirtualMachineMemoryMap:
+class VirtualMachineMemoryPointerMap:
+  def __init__(self):
+    self._pointers = []
+  
+class VirtualMachineMemoryPrimitivesMap:
   def __init__(self):
     setattr(self, Types.INT, [])
     setattr(self, Types.FLT, [])
@@ -336,14 +389,10 @@ class VirtualMachineMemoryMap:
       getattr(self, type).append(default_value)
 
   def get_memory_address_type(self, memory_address):
-    if memory_address >= MemoryRanges.INT and  memory_address < MemoryRanges.FLT: 
-      type = Types.INT
-    elif memory_address >= MemoryRanges.FLT and  memory_address < MemoryRanges.STR:
-      type = Types.FLT
-    elif memory_address >= MemoryRanges.STR and  memory_address < MemoryRanges.BOOL:
-      type = Types.STR
-    elif memory_address >= MemoryRanges.BOOL and  memory_address < MemoryRanges.BOOL_MAX:
-      type = Types.BOOL
+    for current_type in Types.primitives:
+      upper_type = current_type.upper()
+      if memory_address >= getattr(MemoryRanges, upper_type) and  memory_address < getattr(MemoryRanges, upper_type + '_MAX'): 
+        type = current_type
     
     new_address = memory_address - getattr(MemoryRanges, type.upper())
     return new_address, type
@@ -362,65 +411,110 @@ class VirtualMachineMemoryMap:
     _, type = self.get_memory_address_type(memory_address)
     return type
 
-class VirtualMachineMemoryMapLocal:
+class VirtualMachineMemoryScopeMap:
   def __init__(self):
-    setattr(self, MemoryTypes.SCOPE, VirtualMachineMemoryMap())
-    setattr(self, MemoryTypes.TEMPORAL, VirtualMachineMemoryMap())
+    setattr(self, MemoryTypes.SCOPE, VirtualMachineMemoryPrimitivesMap())
+    setattr(self, MemoryTypes.TEMPORAL, VirtualMachineMemoryPrimitivesMap())
+    setattr(self, MemoryTypes.POINTERS, [])
   
   def get_memory_address_type(self, memory_address):
-    if memory_address >= MemoryRanges.SCOPE_START and  memory_address < MemoryRanges.TEMPORAL_START:
+    if memory_address >= MemoryRanges.SCOPE and  memory_address < MemoryRanges.SCOPE_MAX:
       type = MemoryTypes.SCOPE
-    elif memory_address >= MemoryRanges.TEMPORAL_START and  memory_address < MemoryRanges.ATTRIBUTES_START:
+    elif memory_address >= MemoryRanges.TEMPORAL and  memory_address < MemoryRanges.TEMPORAL_MAX:
       type = MemoryTypes.TEMPORAL
-    elif memory_address >= MemoryRanges.ATTRIBUTES_START and  memory_address < MemoryRanges.ATTRIBUTES_MAX:
-      type = MemoryTypes.ATTRIBUTES
+    elif memory_address >= MemoryRanges.POINTERS and  memory_address < MemoryRanges.POINTERS_MAX:
+      type = MemoryTypes.POINTERS 
     
-    upper_type = (type + '_start').upper()
+    upper_type = type.upper()
     new_address = memory_address - getattr(MemoryRanges, upper_type)
     return new_address, type
   
+  def get_type(self, memory_address):
+    return self.get_memory_address_type(memory_address)[1]
+
   def get_memory_value(self, memory_address):
     new_address, type = self.get_memory_address_type(memory_address)
+    if type == MemoryTypes.POINTERS:
+      return getattr(self, MemoryTypes.POINTERS)[new_address]
     return getattr(self, type).get_memory_value(new_address)
   
   def set_memory_value(self, memory_address, value):
     new_address, type = self.get_memory_address_type(memory_address)
     getattr(self, type).set_memory_value(new_address, value)
   
+  def set_address_to_pointer(self, memory_address, value):
+    new_address = self.get_memory_address_type(memory_address)[0]
+    pointers = getattr(self, MemoryTypes.POINTERS)
+    self.fill_pointers(new_address)
+    pointers[new_address] = value
+
+  def fill_pointers(self, new_address):
+    pointers = getattr(self, MemoryTypes.POINTERS)
+    current_size = len(pointers)
+    if new_address < current_size:
+      return
+    default_value = None
+    for _ in range(new_address - current_size + 1):
+      pointers.append(default_value)
+
+  def is_pointer(self, memory_address):
+    return memory_address >= MemoryRanges.POINTERS and memory_address < MemoryRanges.POINTERS_MAX
+
   def get_memory_type(self, memory_address):
     new_address, type = self.get_memory_address_type(memory_address)
     return getattr(self, type).get_memory_type(new_address)
 
-class VirtualMachineMemoryMapManager:
+class VirtualMachineMemoryManager:
   def __init__(self):
-    setattr(self, MemoryTypes.GLOBAL, VirtualMachineMemoryMapLocal())
-    setattr(self, MemoryTypes.CONSTANTS, VirtualMachineMemoryMapLocal())
-    self._execution_stack = Stack()
+    setattr(self, MemoryTypes.GLOBAL, VirtualMachineMemoryScopeMap())
+    setattr(self, MemoryTypes.CONSTANTS, VirtualMachineMemoryPrimitivesMap())
+    self._execution_stack = Stack() # For local memory
   
+  # attribute is an object of ConstantMemoryManager that comes from compilation
+  # called only once
   def add_constant_memory(self, constant_memory):
     constants_map = constant_memory.get_map()
     for type, type_map in constants_map.items():
-      for key, value in type_map.items():
-        new_address = value - MemoryRanges.Constants.START
+      for value, address in type_map.items():
         if type ==  Types.BOOL:
-          key = bool(key)
-        getattr(self, MemoryTypes.CONSTANTS).set_memory_value(new_address, key)
+          value = bool(value)
+        getattr(self, MemoryTypes.CONSTANTS).set_memory_value(address, value)
 
   def get_memory_address_type(self, memory_address):
-    if memory_address >= MemoryRanges.Global.START and memory_address <= MemoryRanges.Global.END:
-      type = MemoryTypes.GLOBAL
-    elif memory_address >= MemoryRanges.Constants.START and memory_address <= MemoryRanges.Constants.END:
+    if memory_address >= MemoryRanges.CONSTANTS and memory_address < MemoryRanges.CONSTANTS_MAX:
       type = MemoryTypes.CONSTANTS
+    elif memory_address >= MemoryRanges.GLOBAL and memory_address <= MemoryRanges.GLOBAL_MAX:
+      type = MemoryTypes.GLOBAL
+    elif memory_address >= MemoryRanges.LOCAL and memory_address <= MemoryRanges.LOCAL:
+      type = MemoryTypes.LOCAL
+    else:
+      helpers.throw_error_no_line("Error in address")
 
-    new_address = memory_address - getattr(MemoryRanges, type).START
+    if type != MemoryTypes.LOCAL:
+      upper_type = type.upper()
+      new_address = memory_address - getattr(MemoryRanges, upper_type)
+    # TODO: else
+
     return new_address, type
 
   def get_memory_value(self, memory_address):
+    # TODO: add support for locals
     new_address, type = self.get_memory_address_type(memory_address)
+    if type != MemoryTypes.CONSTANTS and getattr(self, type).is_pointer(new_address):
+      stored_address = getattr(self, type).get_memory_value(new_address)
+      return self.get_memory_value(stored_address)
     return getattr(self, type).get_memory_value(new_address)
   
-  def set_memory_value(self, memory_address, value):
+  def set_memory_value(self, memory_address, value, assign_address = False):
+    # TODO: add support for locals
     new_address, type = self.get_memory_address_type(memory_address)
+    if type != MemoryTypes.CONSTANTS and getattr(self, type).is_pointer(new_address):
+      if assign_address:
+        getattr(self, type).set_address_to_pointer(new_address, value)
+        return
+      stored_address = getattr(self, type).get_memory_value(new_address)
+      self.set_memory_value(stored_address, value)
+      return
     getattr(self, type).set_memory_value(new_address, value)
 
   def get_memory_type(self, memory_address):

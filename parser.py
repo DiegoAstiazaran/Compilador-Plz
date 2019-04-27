@@ -136,7 +136,7 @@ def p_class_block(p):
 def p_declaration(p):
   '''
   declaration : declaration_p neural_check_operator_stack_equal DOT
-  declaration_p : type ID neural_var_decl_id declaration_pp
+  declaration_p : type ID neural_var_decl_id declaration_pp neural_array_decl_end
                 | DICT ID neural_var_decl_id
   declaration_pp : array_size declaration_ppp
                  | empty
@@ -161,7 +161,7 @@ def p_decl_init_var(p):
   '''
   decl_init_var : type ID neural_var_decl_id decl_init_var_p
   decl_init_var_p : decl_init_var_var
-                  | decl_init_var_pp
+                  | decl_init_var_pp neural_array_decl_end
   decl_init_var_var : EQUAL neural_add_to_operator_stack expression
                     | empty
   decl_init_var_pp : array_size decl_init_var_ppp
@@ -261,7 +261,7 @@ def p_var_cte_2(p):
 def p_id_calls(p):
   '''
   id_calls : ID neural_sub_call_first_id id_calls_p
-  id_calls_p : access
+  id_calls_p : neural_add_subcall_first_id_to_stack access
              | neural_sub_call sub_call_args neural_sub_call_end_return_value
              | id_calls_method
              | id_calls_attribute
@@ -333,8 +333,8 @@ def p_operator(p):
 
 def p_access(p):
   '''
-  access : L_SQ_BRACKET expression R_SQ_BRACKET access_p
-  access_p : L_SQ_BRACKET expression R_SQ_BRACKET
+  access : L_SQ_BRACKET expression R_SQ_BRACKET neural_array_access_first access_p neural_array_access_end
+  access_p : L_SQ_BRACKET expression R_SQ_BRACKET neural_array_access_second
            | empty
   '''
 
@@ -469,7 +469,17 @@ def p_neural_decl_type(p):
 
 def p_neural_array_decl(p):
   '''neural_array_decl :'''
-  gv.function_directory.add_dimension_to_variable(gv.current_last_id, gv.current_block, gv.current_class_block)
+  dimension_size = p[-2]
+  gv.function_directory.add_dimension_to_variable(gv.current_last_id, dimension_size, gv.current_block, gv.current_class_block)
+
+def p_neural_array_decl_end(p):
+  '''neural_array_decl_end :'''
+  memory_type = MemoryTypes.GLOBAL
+  if gv.current_block != Constants.GLOBAL_BLOCK and gv.current_class_block == None:
+    memory_type = MemoryTypes.LOCAL
+  array_size = gv.function_directory.get_array_size(gv.current_last_id, gv.current_block, gv.current_class_block)
+  var_type = gv.function_directory.get_variable_type(gv.current_last_id, gv.current_block, gv.current_class_block)
+  gv.memory_manager.increase_counter(var_type, memory_type, array_size - 1)
 
 # Called after ID in subroutine declaration
 def p_neural_sub_decl_id(p):
@@ -541,6 +551,9 @@ def check_operator_stack(operators_list = None):
     if operand_left is None:
       quad = Quad(operator, operand_right.get_value(), result_value)
     else:
+      if operator == Operators.DIVIDE:
+        quad = Quad(QuadOperations.CHECK_DIV, operand_right.get_value())
+        gv.quad_list.add(quad)
       quad = Quad(operator, operand_left.get_value(), operand_right.get_value(), result_value)
 
     gv.quad_list.add(quad)
@@ -949,6 +962,66 @@ def p_neural_fill_goto(p):
   next_quad = gv.quad_list.next()
   gv.quad_list.add_element_to_quad(quad_index, next_quad)
 
+def p_neural_array_access_first(p):
+  '''neural_array_access_first :'''
+  array_access(0)
+
+def p_neural_array_access_second(p):
+  '''neural_array_access_second :'''
+  array_access(1)
+
+def array_access(index):
+  value = gv.stack_operands.pop()
+  if value.get_type() != Types.INT:
+    helpers.throw_error("Expression to access array must resolve as an integer.")
+  array_address = gv.stack_operands.top()
+  dimension_size = gv.function_directory.get_array_dimension(array_address.get_value(), index, gv.current_block, gv.current_class_block)
+  if dimension_size is None:
+    helpers.throw_error("Can't perform such array operation")
+  quad = Quad(QuadOperations.VER, value.get_value(), dimension_size)
+  gv.quad_list.add(quad)
+  gv.array_access_indices.append(value.get_value())
+
+def p_neural_add_subcall_first_id_to_stack(p):
+  '''neural_add_subcall_first_id_to_stack :'''
+  id_name = gv.sub_call_first_id
+  gv.sub_call_first_id = None
+  id_type, id_name = gv.function_directory.get_variable_type_address(id_name, gv.current_block, gv.current_class_block)
+  add_to_operand_stack(id_name, id_type)
+
+def p_neural_array_access_end(p):
+  '''neural_array_access_end :'''
+  array_pair = gv.stack_operands.pop()
+  array_address = array_pair.get_value()
+  indices = gv.array_access_indices
+  gv.array_access_indices = []
+  array_dimension_count = gv.function_directory.get_array_dimension_count(array_address, gv.current_block, gv.current_class_block)
+  if len(indices) != array_dimension_count:
+    helpers.throw_error("Can't perform such array operation")
+  memory_type = MemoryTypes.GLOBAL
+  # TODO: checar otro if como estos y quitar la segunda condicion 
+  if gv.current_block != Constants.GLOBAL_BLOCK:
+    memory_type = MemoryTypes.LOCAL
+  temporal = gv.memory_manager.get_next_temporal(Types.INT, memory_type)
+  array_address_constant_address = gv.memory_manager.get_constant_memory_address(array_address, Types.INT)
+  quad = Quad(Operators.PLUS, indices[-1], array_address_constant_address, temporal) ####
+  gv.quad_list.add(quad)
+  if len(indices) == 2:
+    second_dimension = gv.function_directory.get_array_dimension(array_address, 1, gv.current_block, gv.current_class_block)
+    second_dimension_constant_address = gv.memory_manager.get_constant_memory_address(second_dimension, Types.INT)
+    temporal_mult_result = gv.memory_manager.get_next_temporal(Types.INT, memory_type)
+    quad = Quad(Operators.MULTIPLY, indices[0], second_dimension_constant_address, temporal_mult_result) ###
+    gv.quad_list.add(quad)
+    new_temporal = gv.memory_manager.get_next_temporal(Types.INT, memory_type)
+    quad = Quad(Operators.PLUS, temporal, temporal_mult_result, new_temporal)
+    gv.quad_list.add(quad)
+    temporal = new_temporal
+  pointer = gv.memory_manager.get_next_pointer(memory_type)
+  quad = Quad(QuadOperations.EQUAL_ADDRESS, temporal, pointer)
+  gv.quad_list.add(quad)
+  pair = OperandPair(pointer, array_pair.get_type())
+  gv.stack_operands.push(pair)
+
 # Use for debugging
 # TODO: delete
 def p_neural_new_line(p):
@@ -965,7 +1038,7 @@ parser = yacc.yacc()
 def execute_parser(input):
   parser.parse(input)
   # print(result)
-  # print(gv.quad_list)
+  print(gv.quad_list)
   # gv.quad_list.print_with_number()
   # gv.function_directory.output()
-  return gv.quad_list, gv.memory_manager._constant_memory_map, gv.subroutine_directory
+  return gv.quad_list, gv.memory_manager.get_constant_map(), gv.subroutine_directory

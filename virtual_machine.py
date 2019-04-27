@@ -1,16 +1,16 @@
 from structures import Quad
 from constants import Operators, QuadOperations, Types, Constants
-from structures import VirtualMachineMemoryMapManager
+from structures import VirtualMachineMemoryManager
 from virtualMachineGlobalVariables import operations
 import helpers
 
 def execute_virtual_machine(quad_list, constant_memory, subroutine_directory):
   quad_pointer = 0
-  memory_manager = VirtualMachineMemoryMapManager()
+  memory_manager = VirtualMachineMemoryManager()
   memory_manager.add_constant_memory(constant_memory)
   while(quad_pointer < quad_list.size()):
     quad = quad_list.get(quad_pointer)
-    operation = quad.get_operation()   
+    operation = quad.get_operation()  
     if operation == Operators.EQUAL:
       operand, result_address = quad.get_items()
       operand = memory_manager.get_memory_value(operand)
@@ -21,7 +21,7 @@ def execute_virtual_machine(quad_list, constant_memory, subroutine_directory):
       right_operand = memory_manager.get_memory_value(right_operand)
       temporal = operations[operation](left_operand, right_operand)
       memory_manager.set_memory_value(result_address, temporal)
-    elif operation == QuadOperations.unary or operation in Operators.unary:
+    elif operation in QuadOperations.unary or operation in Operators.unary:
       operand, result_address = quad.get_items()
       operand = memory_manager.get_memory_value(operand)
       temporal = operations[operation](operand)
@@ -61,6 +61,20 @@ def execute_virtual_machine(quad_list, constant_memory, subroutine_directory):
       if (operation == QuadOperations.GOTO_F and not condition) or (operation == QuadOperations.GOTO_T and condition):
         quad_pointer = quad_index
         continue
+    elif operation == QuadOperations.VER:
+      array_index_address, array_diminesion = quad.get_items()
+      array_index = memory_manager.get_memory_value(array_index_address)
+      if array_index < 0 or array_index >= array_diminesion:
+        helpers.throw_error_no_line("Index out of bounds")
+    elif operation == QuadOperations.CHECK_DIV:
+      operand_address = quad.get_items()
+      operand_value = memory_manager.get_memory_value(operand_address)
+      if operand_value == 0:
+        helpers.throw_error_no_line("Can't divide by 0")
+    elif operation == QuadOperations.EQUAL_ADDRESS:
+      operand, result_address = quad.get_items()
+      operand = memory_manager.get_memory_value(operand)
+      memory_manager.set_memory_value(result_address, operand, True)
     # elif operation == QuadOperations.RETURN:
     # elif operation == QuadOperations.ERA:
     # elif operation == QuadOperations.PARAM:

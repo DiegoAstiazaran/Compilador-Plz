@@ -1,5 +1,5 @@
 from directories import FunctionDirectory, SubroutineDirectory
-from structures import Stack, QuadList, TemporalMemory, SemanticCube, MemoryManager
+from structures import Stack, QuadList, TemporalMemory, SemanticCube, ParserMemoryManager
 
 # Boolean for debugging parser
 parse_debug = False
@@ -73,10 +73,13 @@ quad_list = QuadList()
 temporal_memory = TemporalMemory()
 
 #
-memory_manager = MemoryManager()
+memory_manager = ParserMemoryManager()
 
 #
 global_error = []
+
+#
+array_access_indices = []
 
 # For debugging purposes
 # TODO: delete
