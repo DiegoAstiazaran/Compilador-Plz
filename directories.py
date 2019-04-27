@@ -39,14 +39,6 @@ class VariableDirectory:
     for var_name in self._variable_table.keys():
       if address == self.get_variable_address(var_name):
         return var_name
-
-  def get_array_direction(self, address, indices):
-    direction = address + indices[-1]
-    var_name = self.get_var_name_from_address(address)
-    dimensions = self.get_variable_indices(var_name)
-    if len(dimensions) == 2:
-      direction += dimensions[1] * indices[0]
-    return direction
   
   def get_array_size(self, var_name):
     dimensions = self.get_variable_indices(var_name)    
@@ -54,9 +46,21 @@ class VariableDirectory:
     for dimension in dimensions:
       array_size *= dimension
     return array_size
+  
+  def get_array_dimension_count(self, array_address):
+    var_name = self.get_var_name_from_address(array_address)
+    dimensions = self.get_variable_indices(var_name)        
+    return len(dimensions)
 
   def get_variable_type(self, var_name):
     return self._variable_table[var_name][0]
+
+  def get_array_dimension(self, array_address, index):
+    var_name = self.get_var_name_from_address(array_address)
+    dimensions = self.get_variable_indices(var_name)
+    if index >= len(dimensions):
+      return None
+    return dimensions[index]
 
 class FunctionDirectory:
   # Initializes object with empty dictionary
@@ -157,17 +161,23 @@ class FunctionDirectory:
   def check_id_is_class(self, class_name):
     return class_name in self._function_table and self.get_entry_type(class_name) == Constants.CLASS_BLOCK
 
-  def get_array_direction(self, var_name, indices, block_name, class_name = None):
-    if class_name == None:
-      return self.get_entry_directory(block_name).get_array_direction(var_name, indices)
-    else:
-      return self.get_entry_directory(class_name).get_array_direction(var_name, indices, block_name)
-  
   def get_array_size(self, var_name, block_name, class_name = None):
     if class_name == None:
       return self.get_entry_directory(block_name).get_array_size(var_name)
     else:
       return self.get_entry_directory(class_name).get_array_size(var_name, block_name)
+
+  def get_array_dimension(self, array_address, index, block_name, class_name = None):
+    if class_name == None:
+      return self.get_entry_directory(block_name).get_array_dimension(array_address, index)
+    else:
+      return self.get_entry_directory(class_name).get_array_dimension(array_address, index, block_name)
+
+  def get_array_dimension_count(self, array_address, block_name, class_name = None):
+    if class_name == None:
+      return self.get_entry_directory(block_name).get_array_dimension_count(array_address)
+    else:
+      return self.get_entry_directory(class_name).get_array_dimension_count(array_address, block_name)
 
   # Used for debugging and testing purposes
   def output(self):

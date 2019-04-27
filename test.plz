@@ -5,6 +5,7 @@ int x.
 
 for a from x by -b while 7 < 8 + a:
   c = x.
+  print: "Infinite Loop" end
 end
 
 print: 8 end

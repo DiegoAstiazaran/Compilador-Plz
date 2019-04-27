@@ -261,7 +261,7 @@ def p_var_cte_2(p):
 def p_id_calls(p):
   '''
   id_calls : ID neural_sub_call_first_id id_calls_p
-  id_calls_p : access
+  id_calls_p : neural_add_subcall_first_id_to_stack access
              | neural_sub_call sub_call_args neural_sub_call_end_return_value
              | id_calls_method
              | id_calls_attribute
@@ -551,6 +551,9 @@ def check_operator_stack(operators_list = None):
     if operand_left is None:
       quad = Quad(operator, operand_right.get_value(), result_value)
     else:
+      if operator == Operators.DIVIDE:
+        quad = Quad(QuadOperations.CHECK_DIV, operand_right.get_value())
+        gv.quad_list.add(quad)
       quad = Quad(operator, operand_left.get_value(), operand_right.get_value(), result_value)
 
     gv.quad_list.add(quad)
@@ -971,17 +974,52 @@ def array_access(index):
   value = gv.stack_operands.pop()
   if value.get_type() != Types.INT:
     helpers.throw_error("Expression to access array must resolve as an integer.")
+  array_address = gv.stack_operands.top()
+  dimension_size = gv.function_directory.get_array_dimension(array_address.get_value(), index, gv.current_block, gv.current_class_block)
+  if dimension_size is None:
+    helpers.throw_error("Can't perform such array operation")
+  quad = Quad(QuadOperations.VER, value.get_value(), dimension_size)
+  gv.quad_list.add(quad)
   gv.array_access_indices.append(value.get_value())
+
+def p_neural_add_subcall_first_id_to_stack(p):
+  '''neural_add_subcall_first_id_to_stack :'''
+  id_name = gv.sub_call_first_id
+  gv.sub_call_first_id = None
+  id_type, id_name = gv.function_directory.get_variable_type_address(id_name, gv.current_block, gv.current_class_block)
+  add_to_operand_stack(id_name, id_type)
 
 def p_neural_array_access_end(p):
   '''neural_array_access_end :'''
+  array_pair = gv.stack_operands.pop()
+  array_address = array_pair.get_value()
   indices = gv.array_access_indices
-  for item, index in enumerate(indices):
-    indices[item] = gv.memory_manager.get_constant_from_address(index, Types.INT)
   gv.array_access_indices = []
-  var_address = gv.stack_operands.pop()
-  direction = gv.function_directory.get_array_direction(var_address.get_value(), indices, gv.current_block, gv.current_class_block)
-  pair = OperandPair(direction, var_address.get_type())
+  array_dimension_count = gv.function_directory.get_array_dimension_count(array_address, gv.current_block, gv.current_class_block)
+  if len(indices) != array_dimension_count:
+    helpers.throw_error("Can't perform such array operation")
+  memory_type = MemoryTypes.GLOBAL
+  # TODO: checar otro if como estos y quitar la segunda condicion 
+  if gv.current_block != Constants.GLOBAL_BLOCK:
+    memory_type = MemoryTypes.LOCAL
+  temporal = gv.memory_manager.get_next_temporal(Types.INT, memory_type)
+  array_address_constant_address = gv.memory_manager.get_constant_memory_address(array_address, Types.INT)
+  quad = Quad(Operators.PLUS, indices[-1], array_address_constant_address, temporal) ####
+  gv.quad_list.add(quad)
+  if len(indices) == 2:
+    second_dimension = gv.function_directory.get_array_dimension(array_address, 1, gv.current_block, gv.current_class_block)
+    second_dimension_constant_address = gv.memory_manager.get_constant_memory_address(second_dimension, Types.INT)
+    temporal_mult_result = gv.memory_manager.get_next_temporal(Types.INT, memory_type)
+    quad = Quad(Operators.MULTIPLY, indices[0], second_dimension_constant_address, temporal_mult_result) ###
+    gv.quad_list.add(quad)
+    new_temporal = gv.memory_manager.get_next_temporal(Types.INT, memory_type)
+    quad = Quad(Operators.PLUS, temporal, temporal_mult_result, new_temporal)
+    gv.quad_list.add(quad)
+    temporal = new_temporal
+  pointer = gv.memory_manager.get_next_pointer(memory_type)
+  quad = Quad(QuadOperations.EQUAL_ADDRESS, temporal, pointer)
+  gv.quad_list.add(quad)
+  pair = OperandPair(pointer, array_pair.get_type())
   gv.stack_operands.push(pair)
 
 # Use for debugging
@@ -1003,4 +1041,4 @@ def execute_parser(input):
   print(gv.quad_list)
   # gv.quad_list.print_with_number()
   # gv.function_directory.output()
-  return gv.quad_list, gv.memory_manager._constant_memory_map, gv.subroutine_directory
+  return gv.quad_list, gv.memory_manager.get_constant_map(), gv.subroutine_directory

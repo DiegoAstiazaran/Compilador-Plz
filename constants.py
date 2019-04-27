@@ -77,6 +77,9 @@ class QuadOperations:
   GOSUB           = 'gosub'
   PLUS_UNARY      = 'positive'
   MINUS_UNARY     = 'negative'
+  VER             = 'ver'
+  CHECK_DIV       = 'check_div'
+  EQUAL_ADDRESS   = 'eq_address' 
   unary = [PLUS_UNARY, MINUS_UNARY]
 
 class Defaults:
@@ -86,92 +89,41 @@ class Defaults:
   BOOL = False
 
 class MemoryTypes:
+  GLOBAL     = "Global"
+  LOCAL      = "Local"
   CONSTANTS  = "Constants"
   SCOPE      = "Scope"
   TEMPORAL   = "Temporal"
   ATTRIBUTES = "Attributes"
-  LOCAL      = "Local"
-  GLOBAL     = "Global"
+  POINTERS   = "Pointers"
 
 class MemoryRanges:
-  INT       = 0
-  FLT       = 1000
-  STR       = 2000
-  BOOL      = 4000
-  BOOL_MAX  = 5000
-  SCOPE_START      = 0
-  TEMPORAL_START   = 5000
-  ATTRIBUTES_START = 10000
-  ATTRIBUTES_MAX   = 15000
-  class Constants:
-    START  = 0
-    END    = 4999
-    INT  = 0
-    FLT  = 1000
-    STR  = 2000
-    BOOL = 4000
-  class Global: # global y temporal
-    START  = 5000
-    END    = 14999
-    class Scope:
-      INT  = 5000
-      FLT  = 6000
-      STR  = 7000
-      BOOL = 9000
-    class Temporal:
-      INT  = 10000
-      FLT  = 11000
-      STR  = 12000
-      BOOL = 14000
-  class Local:
-    START  = 15000
-    END    = 29999
-    class Scope:
-      INT  = 15000
-      FLT  = 16000
-      STR  = 17000
-      BOOL = 19000
-    class Temporal:
-      INT  = 20000
-      FLT  = 21000
-      STR  = 22000
-      BOOL = 24000
-    class Attributes:
-      INT  = 25000
-      FLT  = 26000
-      STR  = 27000
-      BOOL = 29000
+  INT          = 0       # 0
+  INT_SIZE     = 1000
+  INT_MAX      = INT + INT_SIZE
+  FLT          = INT_MAX # 1000
+  FLT_SIZE     = 1000
+  FLT_MAX      = FLT + FLT_SIZE
+  STR          = FLT_MAX # 2000
+  STR_SIZE     = 2000
+  STR_MAX      = STR + STR_SIZE
+  BOOL         = STR_MAX # 4000
+  BOOL_SIZE    = 1000
+  BOOL_MAX     = BOOL + BOOL_SIZE 
+  TYPES_LIMIT  = BOOL_MAX # 5000
 
-# class MemoryRanges:
-#   class Constants:
-#     INT  = 20000
-#     FLT  = 20500
-#     STR  = -10
-#     BOOL = -10
-#   class Global: # global y temporal
-#     class Scope:
-#       INT  = 5000
-#       FLT  = 8000
-#       STR  = -10
-#       BOOL = -10
-#     class Temporal:
-#       INT  = 15000
-#       FLT  = 17000
-#       STR  = -10
-#       BOOL = 19000
-#   class Local: # local y temporal
-#     class Attributes:
-#       INT  = -10
-#       FLT  = -10
-#       STR  = -10
-#       BOOL = -10
-#     class Scope:
-#       INT  = 11000
-#       FLT  = 13000
-#       STR  = -10
-#       BOOL = -10
-#     class Temporal:
-#       INT  = 15000
-#       FLT  = 17000
-#       STR  = -10
-#       BOOL = 19000
+  SCOPE        = 0                       # 0
+  SCOPE_MAX    = SCOPE + TYPES_LIMIT
+  TEMPORAL     = SCOPE_MAX               # 5000
+  TEMPORAL_MAX = TEMPORAL + TYPES_LIMIT
+  POINTERS     = TEMPORAL + BOOL_MAX     # 10000 # Aqui no hay tipos
+  POINTERS_SIZE = 1000
+  POINTERS_MAX = POINTERS + POINTERS_SIZE # 11000
+  
+  CONSTANTS     = 0 # -> primitives
+  CONSTANTS_MAX = CONSTANTS + TYPES_LIMIT
+  GLOBAL        = 10000                   # 10000 # -> scope, temporal, pointers
+  GLOBAL_MAX    = GLOBAL + POINTERS_MAX   # 21000
+  LOCAL         = 20000                   # 30000 # -> scope, temporal, pointers
+  LOCAL_MAX     = LOCAL + POINTERS_MAX    # 41000
+  ATTRIBUTES    = 0 # -> primitives    # new map for each class
