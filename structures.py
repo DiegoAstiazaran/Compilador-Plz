@@ -127,12 +127,18 @@ class ParserMemoryPrimitivesMap:
 
   def get_next(self, type):
     if type not in Types.primitives:
-      return None
+      directions = {}
+      for prim in Types.primitives:
+        directions[prim] = self.get_next_no_increase(prim)
+      return directions
       # TODO: use this error when constructors work
       # helpers.throw_error("Type must be a primitive")
     actual = getattr(self, type)
     setattr(self, type, actual + 1)
     return actual
+  
+  def get_next_no_increase(self, type):
+    return getattr(self, type)
   
   def increase_counter(self, type, amount):
     actual = getattr(self, type)
@@ -207,8 +213,9 @@ class ParserMemoryManager:
     elif current_class == None: # funcion
       memory_scope = MemoryTypes.LOCAL
     else: # clase
-      if current_block == None: # attribute
+      if current_block == Constants.GLOBAL_BLOCK: # attribute
         memory_scope = MemoryTypes.ATTRIBUTES
+        return getattr(self, memory_scope).get_next(var_type)
       else: # metodo
         memory_scope = MemoryTypes.LOCAL
 
@@ -347,9 +354,11 @@ class SemanticCube:
     return self._semantic_cube[operator_index][operand_left_index][operand_right_index]
 
 class SubCall:
-  def __init__(self, sub_name, block_name):
+  def __init__(self, sub_name, block_name, object_name = None):
+    # block name is the class
     if block_name == None:
       block_name = Constants.GLOBAL_BLOCK
+    self._object_name = object_name
     self._sub_name = sub_name
     self._block_name = block_name
     self._param_count = 0
@@ -368,6 +377,9 @@ class SubCall:
 
   def get_block_name(self):
     return self._block_name
+
+  def is_class_method(self):
+    return self._object_name is not None
 
 class VirtualMachineMemoryPointerMap:
   def __init__(self):

@@ -80,6 +80,7 @@ class QuadOperations:
   VER             = 'ver'
   CHECK_DIV       = 'check_div'
   EQUAL_ADDRESS   = 'eq_address' 
+  THIS_PARAM      = 'this_param'
   unary = [PLUS_UNARY, MINUS_UNARY]
 
 class Defaults:

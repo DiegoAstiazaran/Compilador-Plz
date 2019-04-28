@@ -1,4 +1,4 @@
-from constants import Constants
+from constants import Constants, Types
 import helpers
 
 # Stores variables for a block
@@ -61,6 +61,17 @@ class VariableDirectory:
     if index >= len(dimensions):
       return None
     return dimensions[index]
+
+  def get_size_by_type(self):
+    sizes = {type:0 for type in Types.primitives}
+    for var_name in self._variable_table.keys():
+      size = 1 if not self.is_array(var_name) else self.get_array_size(var_name)
+      type = self.get_variable_type(var_name)
+      sizes[type] += size
+    return sizes
+
+  def is_array(self, var_name):
+    return len(self.get_variable_indices(var_name)) > 0
 
 class FunctionDirectory:
   # Initializes object with empty dictionary
@@ -178,6 +189,9 @@ class FunctionDirectory:
       return self.get_entry_directory(block_name).get_array_dimension_count(array_address)
     else:
       return self.get_entry_directory(class_name).get_array_dimension_count(array_address, block_name)
+
+  def get_class_variables_size(self, class_name):
+    return self.get_entry_directory(class_name).get_entry_directory(Constants.GLOBAL_BLOCK).get_size_by_type()
 
   # Used for debugging and testing purposes
   def output(self):

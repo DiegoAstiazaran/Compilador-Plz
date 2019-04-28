@@ -1,9 +1,6 @@
 from directories import FunctionDirectory, SubroutineDirectory
 from structures import Stack, QuadList, TemporalMemory, SemanticCube, ParserMemoryManager
 
-# Boolean for debugging parser
-parse_debug = False
-
 # Main directory with global scope, functions and classes.
 function_directory = FunctionDirectory()
 
@@ -11,6 +8,7 @@ function_directory = FunctionDirectory()
 subroutine_directory = SubroutineDirectory()
 
 # Current block of function_directory.
+# "Global" si no esta en un metodo
 current_block = None
 
 # Current block when current_block is a class.
@@ -19,6 +17,7 @@ current_class_block = None
 # Current last type read in a declaration or initialization
 current_last_type = None
 
+#
 current_param_type = None
 
 # Defines if current class block is public

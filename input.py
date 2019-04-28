@@ -1,7 +1,8 @@
 def get_input():
   try:
-    file = input('Filename: ')
-    file += '.plz'
+    # file = input('Filename: ')
+    file = "class"
+    file = 'tests/' + file + '_test.plz'
     with open(file, 'r') as myfile:
         s = myfile.read()
   except EOFError:

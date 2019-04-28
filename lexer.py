@@ -42,6 +42,7 @@ reserved = {
   'True' : 'TRUE',
   'False' : 'FALSE',
   'dict' : 'DICT',
+  'this' : 'THIS'
 }
 
 # List of tokens that include reserved words tokens

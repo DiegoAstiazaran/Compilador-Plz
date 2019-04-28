@@ -45,7 +45,7 @@ def p_statement(p):
 
 def p_sub_call(p):
   '''
-  sub_call : ID neural_sub_call_first_id sub_call_p neural_sub_call sub_call_args DOT
+  sub_call : ID neural_sub_call_first_id sub_call_p neural_sub_call sub_call_args neural_sub_call_end_no_return_value DOT
   sub_call_p : MONEY neural_check_id_is_object ID neural_sub_call_second_id
              | empty
   '''
@@ -167,11 +167,13 @@ def p_decl_init_var(p):
   decl_init_var_pp : array_size decl_init_var_ppp
   decl_init_var_ppp : decl_init_var_array
                     | decl_init_var_matrix
+  
   decl_init_var_array : EQUAL L_BRACKET array_content R_BRACKET
                       | empty
   array_content : expression array_content_p
   array_content_p : COMMA array_content
                   | empty
+  
   decl_init_var_matrix : array_size decl_init_var_matrix_p
   decl_init_var_matrix_p : EQUAL L_BRACKET matrix_content R_BRACKET
                          | empty
@@ -180,7 +182,6 @@ def p_decl_init_var(p):
                    | empty
   '''
   # TODO: Put neural_add_to_operator_stack back after EQUAL in array and matrix initialization
-
 
 def p_decl_init_dict(p):
   '''
@@ -195,7 +196,7 @@ def p_decl_init_dict(p):
 
 def p_decl_init_obj(p):
   '''
-  decl_init_obj : CLASS_NAME ID neural_var_decl_id EQUAL CLASS_NAME neural_constructor_call sub_call_args neural_sub_call_end_return_value
+  decl_init_obj : CLASS_NAME ID neural_var_decl_id neural_constructor_call sub_call_args neural_sub_call_end_no_return_value
   '''
   # TODO: Put neural_add_to_operator_stack back after EQUAL
 
@@ -358,6 +359,7 @@ def p_for(p):
                | empty
   '''
 
+# You can read an id or attribute of id(obj) with a possible array access
 def p_read(p):
   '''
   read : READ COLON read_list END
@@ -445,12 +447,17 @@ def p_neural_var_decl_id(p):
   gv.current_last_id = p[-1]
 
   memory_address = gv.memory_manager.get_memory_address(gv.current_last_type, MemoryTypes.SCOPE, gv.current_block, gv.current_class_block)
-  
-  # TODO: remove
-  if memory_address is None:
-    memory_address = gv.current_last_id
 
   gv.function_directory.add_variable(gv.current_last_id, gv.current_block, gv.current_last_type, gv.current_is_public, memory_address, gv.current_class_block)
+
+  if gv.current_last_type not in Types.primitives:
+    class_variables_size = gv.function_directory.get_class_variables_size(gv.current_last_type)
+    for type, size in class_variables_size.items():
+      memory_type = MemoryTypes.GLOBAL
+      if gv.current_block != Constants.GLOBAL_BLOCK and gv.current_class_block == None: # check
+        memory_type = MemoryTypes.LOCAL
+      gv.memory_manager.increase_counter(type, memory_type, size)
+
   # Add operand to operand stack in case it is a initialization
   add_to_operand_stack(memory_address, gv.current_last_type)
 
@@ -867,26 +874,23 @@ def p_neural_sub_call(p):
   '''neural_sub_call :'''
   if gv.sub_call_second_id == None:
     sub_call_name = gv.sub_call_first_id
+    object_name = None
     sub_call_class_name = None
   else:
     sub_call_name = gv.sub_call_second_id
     object_name = gv.sub_call_first_id
     sub_call_class_name, _ = gv.function_directory.get_variable_type_address(object_name, gv.current_block, gv.current_class_block)
 
-  sub_call = SubCall(sub_call_name, sub_call_class_name)
-  gv.stack_sub_calls.push(sub_call)
-
   if not gv.subroutine_directory.check_sub_exists(sub_call_name, sub_call_class_name):
     helpers.throw_error("Method " + sub_call_name + " doesn't exist.")
   
   if sub_call_class_name != None and gv.current_class_block != sub_call_class_name and not gv.subroutine_directory.is_method_public(sub_call_name, sub_call_class_name):
     helpers.throw_error("Method " + sub_call_name + " is not public and cannot be called in current location.")
-  
-  quad = Quad(QuadOperations.ERA, sub_call_class_name, sub_call_name)
-  gv.quad_list.add(quad)
 
   gv.sub_call_first_id = None
   gv.sub_call_second_id = None
+
+  sub_call_helper(sub_call_name, sub_call_class_name, object_name)
 
 def p_neural_sub_call_arg(p):
   '''neural_sub_call_arg :'''
@@ -914,31 +918,48 @@ def p_neural_sub_call_end_return_value(p):
   '''neural_sub_call_end_return_value :'''
   current_sub_call = gv.stack_sub_calls.pop()
   return_type = gv.subroutine_directory.get_sub_type(current_sub_call.get_sub_name(), current_sub_call.get_block_name())
+  if return_type == Types.VOID:
+    helpers.throw_error("Subcall does not have a return value.")
   temporal = gv.memory_manager.get_memory_address(return_type, MemoryTypes.TEMPORAL, gv.current_block, gv.current_class_block)
-  if gv.function_directory.check_id_is_class(return_type):
-    # TODO: fix this for constructor
-    return_value = gv.temporal_memory.get_available()
-  else:
-    return_value = gv.memory_manager.get_last_global(return_type)
+
+  return_value = gv.memory_manager.get_last_global(return_type)
     
   quad = Quad(Operators.EQUAL, return_value, temporal)
   gv.quad_list.add(quad)
   temporal_operand = OperandPair(temporal, return_type)
   gv.stack_operands.push(temporal_operand)
 
+def p_neural_sub_call_end_no_return_value(p):
+  '''neural_sub_call_end_no_return_value :'''
+  current_sub_call = gv.stack_sub_calls.pop()
+  return_type = gv.subroutine_directory.get_sub_type(current_sub_call.get_sub_name(), current_sub_call.get_block_name())
+
 def p_neural_constructor_call(p):
   '''neural_constructor_call :'''
-  sub_call_name = p[-1]
-  sub_call_class_name = p[-1]
-
-  sub_call = SubCall(sub_call_name, sub_call_class_name)
-  gv.stack_sub_calls.push(sub_call)
+  if gv.current_block != Constants.GLOBAL_BLOCK:
+    helpers.throw_error("Objects can only be declared in global scope")
+  
+  sub_call_name = p[-3]
+  sub_call_class_name = p[-3]
+  object_name = p[-2]
 
   if not gv.subroutine_directory.check_block_exists(sub_call_class_name):
     helpers.throw_error("Class " + sub_call_class_name + " doesn't exist.")
   
+  sub_call_helper(sub_call_name, sub_call_class_name, object_name)
+
+def sub_call_helper(sub_call_name, sub_call_class_name, object_name):
+  sub_call = SubCall(sub_call_name, sub_call_class_name, object_name)
+  gv.stack_sub_calls.push(sub_call)
+
   quad = Quad(QuadOperations.ERA, sub_call_class_name, sub_call_name)
   gv.quad_list.add(quad)
+
+  if object_name is not None:
+    memory_address = gv.function_directory.get_variable_type_address(object_name, gv.current_block, gv.current_class_block)[1]
+    for type in Types.primitives:
+      quad = Quad(QuadOperations.THIS_PARAM, type, memory_address[type])
+      gv.quad_list.add(quad)
 
 def p_neural_check_id_is_object(p):
   '''neural_check_id_is_object :'''

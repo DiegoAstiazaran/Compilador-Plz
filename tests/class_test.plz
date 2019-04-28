@@ -1,0 +1,30 @@
+int i.
+
+class Person:
+  attributes:
+    public int age.
+    public str name.
+
+  methods:
+    sub Person(str s_name, int i_age):
+      name = s_name.
+      age = i_age.
+    end
+
+    public sub int get_age():
+      print: "this returns age" end
+      return age.
+    end
+
+    public sub str get_name():
+      print: "this returns name" end
+      return name.
+    end
+end
+
+sub void printDate():
+  print: 'today is sabado' end
+end
+
+Person p1("Diego", 20 + 2).
+printDate().
