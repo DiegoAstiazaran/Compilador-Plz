@@ -520,3 +520,7 @@ class VirtualMachineMemoryManager:
   def get_memory_type(self, memory_address):
     new_address, type = self.get_memory_address_type(memory_address)
     return getattr(self, type).get_memory_type(new_address)
+
+  def new_local_memory(self):
+    local_memory = VirtualMachineMemoryScopeMap()
+    self._execution_stack.push(local_memory)

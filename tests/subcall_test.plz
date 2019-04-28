@@ -1,0 +1,9 @@
+int x.
+
+sub int get_number_plus_two(int number):
+  return number + 2.
+end
+
+x = get_number_plus_two(10).
+
+print: x end

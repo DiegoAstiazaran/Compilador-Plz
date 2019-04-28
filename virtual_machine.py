@@ -1,7 +1,7 @@
 from structures import Quad
 from constants import Operators, QuadOperations, Types, Constants
 from structures import VirtualMachineMemoryManager
-from virtualMachineGlobalVariables import operations
+from virtual_machine_global_variables import operations
 import helpers
 
 def execute_virtual_machine(quad_list, constant_memory, subroutine_directory):
@@ -75,8 +75,11 @@ def execute_virtual_machine(quad_list, constant_memory, subroutine_directory):
       operand, result_address = quad.get_items()
       operand = memory_manager.get_memory_value(operand)
       memory_manager.set_memory_value(result_address, operand, True)
+    elif operation == QuadOperations.ERA:
+      sub_call_name = quad.get_items()
+      # subroutine_directory.
+      memory_manager.new_local_memory()
     # elif operation == QuadOperations.RETURN:
-    # elif operation == QuadOperations.ERA:
     # elif operation == QuadOperations.PARAM:
     # elif operation == QuadOperations.GOSUB:
     else:
