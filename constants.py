@@ -12,6 +12,8 @@ class Constants:
 
   FALSE_BOTTOM_IF_CONDITION = 'false_bottom_if_condition'
 
+  FALSE_BOTTOM_EXPRESSION = 'false_bottom_expression'
+
   TRUE = 'True'
   FALSE = 'False'
   BOOLEAN = [TRUE, FALSE]
@@ -125,6 +127,6 @@ class MemoryRanges:
   CONSTANTS_MAX = CONSTANTS + TYPES_LIMIT
   GLOBAL        = 10000                   # 10000 # -> scope, temporal, pointers
   GLOBAL_MAX    = GLOBAL + POINTERS_MAX   # 21000
-  LOCAL         = 20000                   # 30000 # -> scope, temporal, pointers
+  LOCAL         = 30000                   # 30000 # -> scope, temporal, pointers
   LOCAL_MAX     = LOCAL + POINTERS_MAX    # 41000
   ATTRIBUTES    = 0 # -> primitives    # new map for each class

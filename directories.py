@@ -241,7 +241,7 @@ class ParamDirectory:
   def check_arg(self, type, index, subroutine_name):
     if index >= self.get_param_count(subroutine_name):
       helpers.throw_error("Call not valid, more arguments than expected")
-    return self.get_params(subroutine_name)[index] == type
+    return self.get_params(subroutine_name)[index].get_type() == type
   
   def get_param_count(self, subroutine_name):
     return len(self.get_params(subroutine_name))
@@ -254,6 +254,9 @@ class ParamDirectory:
   
   def get_param_type(self, param_count, subroutine_name):
     return self.get_params(subroutine_name)[param_count]
+
+  def get_sub_call(self, subroutine_name):
+    return self._param_table[subroutine_name]
 
 class SubroutineDirectory:
   def __init__(self):
@@ -304,3 +307,7 @@ class SubroutineDirectory:
   
   def get_param_type(self, param_count, subroutine_name, block_name):
     return self._subroutine_directory[block_name].get_param_type(param_count, subroutine_name)
+  
+  def get_sub_call(self, subroutine_name, block_name):
+    return self._subroutine_directory[block_name].get_sub_call(subroutine_name)
+  

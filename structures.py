@@ -98,8 +98,17 @@ class Quad:
   def get_items(self):
     if len(self._quad) > 2:
       return tuple(self._quad[1:])
-    else:
+    if len(self._quad) == 2:
       return self._quad[1]
+    else:
+      return None
+    # Use this when lineno is included in quad      
+    # if len(self._quad) > 3:
+    #   return tuple(self._quad[1:-1])
+    # if len(self._quad) == 3:
+    #   return self._quad[1]
+    # else:
+    #   return None
 
 # TODO: delete
 # Temporal memory manager
@@ -354,7 +363,7 @@ class SemanticCube:
     return self._semantic_cube[operator_index][operand_left_index][operand_right_index]
 
 class SubCall:
-  def __init__(self, sub_name, block_name, object_name = None):
+  def __init__(self, sub_name, block_name, object_name):
     # block name is the class
     if block_name == None:
       block_name = Constants.GLOBAL_BLOCK
@@ -380,6 +389,12 @@ class SubCall:
 
   def is_class_method(self):
     return self._object_name is not None
+
+  def add_return_temporal_address(self, memory_address):
+    self._return_temporal_address = memory_address
+  
+  def get_return_temporal_address(self):
+    return self._return_temporal_address
 
 class VirtualMachineMemoryPointerMap:
   def __init__(self):
@@ -481,7 +496,13 @@ class VirtualMachineMemoryManager:
     setattr(self, MemoryTypes.GLOBAL, VirtualMachineMemoryScopeMap())
     setattr(self, MemoryTypes.CONSTANTS, VirtualMachineMemoryPrimitivesMap())
     self._execution_stack = Stack() # For local memory
+    self._pending_execution_stack = Stack()
   
+  def get_current_attr(self, type):
+    if type == MemoryTypes.LOCAL:
+      return self.get_current_local_memory()
+    return getattr(self, type)
+
   # attribute is an object of ConstantMemoryManager that comes from compilation
   # called only once
   def add_constant_memory(self, constant_memory):
@@ -497,14 +518,14 @@ class VirtualMachineMemoryManager:
       type = MemoryTypes.CONSTANTS
     elif memory_address >= MemoryRanges.GLOBAL and memory_address <= MemoryRanges.GLOBAL_MAX:
       type = MemoryTypes.GLOBAL
-    elif memory_address >= MemoryRanges.LOCAL and memory_address <= MemoryRanges.LOCAL:
+    elif memory_address >= MemoryRanges.LOCAL and memory_address <= MemoryRanges.LOCAL_MAX:
       type = MemoryTypes.LOCAL
     else:
       helpers.throw_error_no_line("Error in address")
 
-    if type != MemoryTypes.LOCAL:
-      upper_type = type.upper()
-      new_address = memory_address - getattr(MemoryRanges, upper_type)
+    # if type != MemoryTypes.LOCAL:
+    upper_type = type.upper()
+    new_address = memory_address - getattr(MemoryRanges, upper_type)
     # TODO: else
 
     return new_address, type
@@ -512,23 +533,67 @@ class VirtualMachineMemoryManager:
   def get_memory_value(self, memory_address):
     # TODO: add support for locals
     new_address, type = self.get_memory_address_type(memory_address)
-    if type != MemoryTypes.CONSTANTS and getattr(self, type).is_pointer(new_address):
+    if type != MemoryTypes.CONSTANTS and self.get_current_attr(type).is_pointer(new_address):
       stored_address = getattr(self, type).get_memory_value(new_address)
       return self.get_memory_value(stored_address)
-    return getattr(self, type).get_memory_value(new_address)
+    return self.get_current_attr(type).get_memory_value(new_address)
   
   def set_memory_value(self, memory_address, value, assign_address = False):
     # TODO: add support for locals
     new_address, type = self.get_memory_address_type(memory_address)
-    if type != MemoryTypes.CONSTANTS and getattr(self, type).is_pointer(new_address):
+    if type != MemoryTypes.CONSTANTS and self.get_current_attr(type).is_pointer(new_address):
       if assign_address:
-        getattr(self, type).set_address_to_pointer(new_address, value)
+        self.get_current_attr(type).set_address_to_pointer(new_address, value)
         return
-      stored_address = getattr(self, type).get_memory_value(new_address)
+      stored_address = self.get_current_attr(type).get_memory_value(new_address)
       self.set_memory_value(stored_address, value)
       return
-    getattr(self, type).set_memory_value(new_address, value)
+    self.get_current_attr(type).set_memory_value(new_address, value)
 
   def get_memory_type(self, memory_address):
     new_address, type = self.get_memory_address_type(memory_address)
     return getattr(self, type).get_memory_type(new_address)
+
+  def new_local_memory(self, sub_call):
+    local_memory = VirtualMachineMemoryScopeMap()
+    # sub_call -> [goto, params, return_temporal_address, return_quad_position]
+    self._pending_execution_stack.push([sub_call, local_memory])
+  
+  def get_current_local_memory(self):
+    return self._execution_stack.top()[1]
+  
+  def get_next_local_memory(self):
+    return self._pending_execution_stack.top()[1]
+
+  def get_sub_call(self):
+    return self._pending_execution_stack.top()[0]
+  
+  def get_sub_call_arg_address(self, param_counter):
+    sub_call = self.get_sub_call()
+    return sub_call[1][param_counter].get_value()
+
+  def get_sub_call_start(self):
+    sub_call = self.get_sub_call()
+    return sub_call[0]
+
+  def set_arg_value(self, memory_address, value):
+    local_memory = self.get_next_local_memory()
+    new_address = self.get_memory_address_type(memory_address)[0]
+    local_memory.set_memory_value(new_address, value)
+  
+  def set_quad_pointer(self, quad_pointer):
+    self._pending_execution_stack.top()[0][3] = quad_pointer
+  
+  def set_new_local_memory(self):
+    local_memory = self._pending_execution_stack.pop()
+    self._execution_stack.push(local_memory)
+  
+  def get_return_position(self):
+    return self._execution_stack.top()[0][3]
+  
+  def get_return_temporal_address(self):
+    return self._execution_stack.top()[0][2]
+
+  def pop_local_memory(self):
+    self._execution_stack.pop()
+  

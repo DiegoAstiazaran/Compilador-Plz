@@ -3,6 +3,7 @@ from constants import Operators, QuadOperations, Types, Constants
 from structures import VirtualMachineMemoryManager
 from virtualMachineGlobalVariables import operations
 import helpers
+from copy import copy
 
 def execute_virtual_machine(quad_list, constant_memory, subroutine_directory):
   quad_pointer = 0
@@ -10,7 +11,7 @@ def execute_virtual_machine(quad_list, constant_memory, subroutine_directory):
   memory_manager.add_constant_memory(constant_memory)
   while(quad_pointer < quad_list.size()):
     quad = quad_list.get(quad_pointer)
-    operation = quad.get_operation()  
+    operation = quad.get_operation()
     if operation == Operators.EQUAL:
       operand, result_address = quad.get_items()
       operand = memory_manager.get_memory_value(operand)
@@ -75,10 +76,40 @@ def execute_virtual_machine(quad_list, constant_memory, subroutine_directory):
       operand, result_address = quad.get_items()
       operand = memory_manager.get_memory_value(operand)
       memory_manager.set_memory_value(result_address, operand, True)
-    # elif operation == QuadOperations.RETURN:
-    # elif operation == QuadOperations.ERA:
-    # elif operation == QuadOperations.PARAM:
-    # elif operation == QuadOperations.GOSUB:
+    elif operation == QuadOperations.ERA:
+      x = quad.get_items()
+      if len(quad.get_items()) == 2:
+        class_block_name, block_name = quad.get_items()
+      else:
+        class_block_name, block_name, return_temporal_address = quad.get_items()
+      sub_call = copy(subroutine_directory.get_sub_call(block_name, class_block_name))
+      if 'return_temporal_address' in locals():
+        sub_call[2] = return_temporal_address
+      memory_manager.new_local_memory(sub_call)
+    elif operation == QuadOperations.PARAM:
+      param_address, param_counter = quad.get_items()
+      arg_address = memory_manager.get_sub_call_arg_address(param_counter)
+      param_value = memory_manager.get_memory_value(param_address)
+      memory_manager.set_arg_value(arg_address, param_value)
+    elif operation == QuadOperations.GOSUB:
+      start = memory_manager.get_sub_call_start()
+      memory_manager.set_quad_pointer(quad_pointer)
+      memory_manager.set_new_local_memory()
+      quad_pointer = start
+      continue
+    elif operation == QuadOperations.RETURN:
+      return_address = quad.get_items()
+      if return_address:
+        return_value = memory_manager.get_memory_value(return_address)
+        return_temporal_address = memory_manager.get_return_temporal_address()
+      
+      return_position = memory_manager.get_return_position()
+      memory_manager.pop_local_memory()
+
+      if return_address:
+        memory_manager.set_memory_value(return_temporal_address, return_value)
+
+      quad_pointer = return_position
     else:
       helpers.throw_error_no_line("Invalid quad operation!")
     quad_pointer += 1

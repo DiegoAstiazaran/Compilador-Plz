@@ -75,7 +75,7 @@ def p_class(p):
 
 def p_expression(p):
   '''
-  expression : mini_expression neural_check_operator_stack_logical expression_p
+  expression : neural_expression_start mini_expression neural_check_operator_stack_logical expression_p neural_expression_end
   expression_p : logical expression
                | empty
   '''
@@ -466,8 +466,8 @@ def p_neural_var_decl_id(p):
 
 def p_neural_param_decl(p):
   '''neural_param_decl :'''
-  gv.stack_operands.pop()
-  gv.subroutine_directory.add_param(gv.current_block, gv.current_param_type, gv.current_class_block)
+  param = gv.stack_operands.pop()
+  gv.subroutine_directory.add_param(gv.current_block, param, gv.current_class_block)
 
 # Called after each primitive type
 def p_neural_decl_type(p):
@@ -504,6 +504,14 @@ def p_neural_sub_decl_id(p):
 #################################################
 #######  Expression Quad Constructions  #########
 #################################################
+
+def p_neural_expression_start(p):
+  '''neural_expression_start :'''
+  gv.stack_operators.push(Constants.FALSE_BOTTOM_EXPRESSION)
+
+def p_neural_expression_end(p):
+  '''neural_expression_end :'''
+  gv.stack_operators.pop()
 
 ### Check operator stack
 
@@ -921,9 +929,7 @@ def p_neural_sub_call_end_return_value(p):
   if return_type == Types.VOID:
     helpers.throw_error("Subcall does not have a return value.")
   temporal = gv.memory_manager.get_memory_address(return_type, MemoryTypes.TEMPORAL, gv.current_block, gv.current_class_block)
-
-  return_value = gv.memory_manager.get_last_global(return_type)
-    
+  return_value = current_sub_call.get_return_temporal_address()
   quad = Quad(Operators.EQUAL, return_value, temporal)
   gv.quad_list.add(quad)
   temporal_operand = OperandPair(temporal, return_type)
@@ -950,9 +956,19 @@ def p_neural_constructor_call(p):
 
 def sub_call_helper(sub_call_name, sub_call_class_name, object_name):
   sub_call = SubCall(sub_call_name, sub_call_class_name, object_name)
-  gv.stack_sub_calls.push(sub_call)
+
+  if sub_call_class_name is None:
+    sub_call_class_name = Constants.GLOBAL_BLOCK
 
   quad = Quad(QuadOperations.ERA, sub_call_class_name, sub_call_name)
+
+  type = gv.subroutine_directory.get_sub_type(sub_call_name, sub_call_class_name)
+  if type in Types.primitives:
+    memory_address = gv.memory_manager.get_memory_address(type, MemoryTypes.TEMPORAL, gv.current_block, None)
+    quad.add_element(memory_address)
+    sub_call.add_return_temporal_address(memory_address)
+
+  gv.stack_sub_calls.push(sub_call)
   gv.quad_list.add(quad)
 
   if object_name is not None:
