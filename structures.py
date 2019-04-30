@@ -2,21 +2,27 @@ from constants import Types, Operators, Constants, MemoryRanges, MemoryTypes, De
 import helpers
 
 # Pair of operand value and type
-class OperandPair:
-  def __init__(self, operand_value, operand_type):
-    self._pair = (operand_value, operand_type)
+class OperandItem:
+  def __init__(self, operand_value, operand_type, block_name = None, class_name = None):
+    self._item = (operand_value, operand_type, block_name, class_name)
 
   def __str__(self):
-    return str(self._pair)
+    return str(self._item)
 
   def __repr__(self):
-    return str(self._pair)
+    return str(self._item)
 
   def get_value(self):
-    return self._pair[0]
+    return self._item[0]
 
   def get_type(self):
-    return self._pair[1]
+    return self._item[1]
+  
+  def get_block_name(self):
+    return self._item[2]
+  
+  def get_class_name(self):
+    return self._item[3]
 
 # Implementantion of stack
 class Stack:
@@ -109,16 +115,6 @@ class Quad:
     #   return self._quad[1]
     # else:
     #   return None
-
-# TODO: delete
-# Temporal memory manager
-class TemporalMemory:
-  def __init__(self):
-    self._next_available = 0
-
-  def get_available(self):
-    self._next_available += 1
-    return 'temp_%d' % (self._next_available - 1)
 
 class ParserMemoryPrimitivesMap:
   def __init__(self, first_class, second_class = None):
@@ -244,7 +240,8 @@ class ParserMemoryManager:
   # used only for arrays which are in scope type
   def increase_counter(self, type, memory_scope, amount):
     scope_map = getattr(self, memory_scope)
-    getattr(scope_map, MemoryTypes.SCOPE).increase_counter(type, amount)
+    primitives_map = getattr(scope_map, MemoryTypes.SCOPE) if memory_scope != MemoryTypes.ATTRIBUTES else scope_map
+    primitives_map.increase_counter(type, amount)
 
   def get_next_temporal(self, type, memory_scope):
     scope_map = getattr(self, memory_scope)
@@ -582,7 +579,7 @@ class VirtualMachineMemoryManager:
     local_memory.set_memory_value(new_address, value)
   
   def set_quad_pointer(self, quad_pointer):
-    self._pending_execution_stack.top()[0][3] = quad_pointer
+    self._pending_execution_stack.top()[0].append(quad_pointer)
   
   def set_new_local_memory(self):
     local_memory = self._pending_execution_stack.pop()

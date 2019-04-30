@@ -19,9 +19,18 @@ sub int iterative_factorial(int number):
   return result.
 end
 
-x = get_number_plus_two(10).
+sub int print_(str string):
+  print: string end
+  return 9.
+end
 
-print: recursive_factorial(3) end
+read: x end
+print: get_number_plus_two(x) end
 
-print: iterative_factorial(10) end
+read: x end
+print: recursive_factorial(x) end
 
+read: x end
+print: iterative_factorial(x) end
+
+print_('diego').

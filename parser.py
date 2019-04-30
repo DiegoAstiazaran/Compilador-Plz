@@ -6,9 +6,8 @@ import ply.yacc as yacc # Import yacc module
 from lexer import tokens, lexer   # Import tokens and lexer defined in lexer
 import globalVariables as gv      # Import global variables
 from constants import Constants, Types, Operators, QuadOperations, MemoryTypes # Imports some constants
-from structures import OperandPair, Quad, SubCall                 # Import OperandPair and Quad class
+from structures import OperandItem, Quad, SubCall                 # Import OperandItem and Quad class
 import helpers                    # Import helpers
-import sys                        # TODO: delete
 
 # Sets main grammar rule
 start = 'program'
@@ -136,9 +135,9 @@ def p_class_block(p):
 def p_declaration(p):
   '''
   declaration : declaration_p neural_check_operator_stack_equal DOT
-  declaration_p : type ID neural_var_decl_id declaration_pp neural_array_decl_end
+  declaration_p : type ID neural_var_decl_id declaration_pp 
                 | DICT ID neural_var_decl_id
-  declaration_pp : array_size declaration_ppp
+  declaration_pp : array_size declaration_ppp neural_array_decl_end
                  | empty
   declaration_ppp : array_size
                   | empty
@@ -202,11 +201,16 @@ def p_decl_init_obj(p):
 
 def p_assignment(p):
   '''
-  assignment : ID neural_add_to_operand_stack_id assignment_obj assignment_access EQUAL neural_add_to_operator_stack expression neural_check_operator_stack_equal DOT
-  assignment_obj : AT ID
-                 | empty
-  assignment_access : access
-                    | empty
+  assignment : id_attr_access EQUAL neural_add_to_operator_stack expression neural_check_operator_stack_equal DOT
+  '''
+
+def p_id_attr_access(p):
+  '''
+  id_attr_access : ID neural_add_to_operand_stack_id id_attr_access_obj id_attr_access_access neural_restart_object
+  id_attr_access_obj : AT ID neural_at_attribute
+                     | empty
+  id_attr_access_access : access
+                        | empty
   '''
 
 def p_constructor(p):
@@ -366,11 +370,7 @@ def p_read(p):
   read_list : read_p read_list_p
   read_list_p : COMMA read_list
               | empty
-  read_p : ID neural_read_stmt read_obj read_access
-  read_obj : AT ID
-           | empty
-  read_access : access
-              | empty
+  read_p : id_attr_access neural_read_stmt
   '''
 
 def p_type(p):
@@ -420,7 +420,7 @@ def p_neural_class_decl_end(p):
 def p_neural_class_decl_inheritance(p):
   '''neural_class_decl_inheritance :'''
   class_name = p[-1]
-  gv.function_directory.check_class(class_name)
+  gv.function_directory.check_class_exists(class_name)
 
 # Called after PRIVATE in public section of class declaration
 def p_neural_class_decl_private(p):
@@ -451,7 +451,7 @@ def p_neural_var_decl_id(p):
   gv.function_directory.add_variable(gv.current_last_id, gv.current_block, gv.current_last_type, gv.current_is_public, memory_address, gv.current_class_block)
 
   if gv.current_last_type not in Types.primitives:
-    class_variables_size = gv.function_directory.get_class_variables_size(gv.current_last_type)
+    class_variables_size = gv.function_directory.get_class_variables_memory_size(gv.current_last_type)
     for type, size in class_variables_size.items():
       memory_type = MemoryTypes.GLOBAL
       if gv.current_block != Constants.GLOBAL_BLOCK and gv.current_class_block == None: # check
@@ -477,13 +477,17 @@ def p_neural_decl_type(p):
 def p_neural_array_decl(p):
   '''neural_array_decl :'''
   dimension_size = p[-2]
-  gv.function_directory.add_dimension_to_variable(gv.current_last_id, dimension_size, gv.current_block, gv.current_class_block)
+  gv.function_directory.add_dimension(gv.current_last_id, gv.current_block, dimension_size, gv.current_class_block)
 
 def p_neural_array_decl_end(p):
   '''neural_array_decl_end :'''
-  memory_type = MemoryTypes.GLOBAL
-  if gv.current_block != Constants.GLOBAL_BLOCK and gv.current_class_block == None:
+  if gv.current_block == Constants.GLOBAL_BLOCK and gv.current_class_block == None:
+    memory_type = MemoryTypes.GLOBAL
+  elif gv.current_class_block != None:
+    memory_type = MemoryTypes.ATTRIBUTES
+  else:
     memory_type = MemoryTypes.LOCAL
+  
   array_size = gv.function_directory.get_array_size(gv.current_last_id, gv.current_block, gv.current_class_block)
   var_type = gv.function_directory.get_variable_type(gv.current_last_id, gv.current_block, gv.current_class_block)
   gv.memory_manager.increase_counter(var_type, memory_type, array_size - 1)
@@ -500,6 +504,34 @@ def p_neural_sub_decl_id(p):
     gv.current_last_type = gv.current_block
   gv.subroutine_directory.add_subroutine(gv.current_class_block, gv.current_block, gv.quad_list.next(), gv.current_is_public, gv.current_last_type)
   gv.current_last_type = None
+
+def p_neural_at_attribute(p):
+  '''neural_at_attribute :'''
+  object_pair = gv.stack_operands.pop()
+  object_address = object_pair.get_value()
+  object_name = gv.function_directory.get_var_name_from_address(object_address, gv.current_block, gv.current_class_block)
+  object_type = object_pair.get_type()
+  attribute_name = p[-1]
+
+  if not gv.function_directory.is_class(object_type):
+    helpers.throw_error(object_name + " is not an object")
+  
+  if not gv.function_directory.attribute_exists(attribute_name, object_type):
+    helpers.throw_error("Attribute " + attribute_name + " doesn't exist.")
+
+  if gv.current_class_block != object_type and not gv.function_directory.is_attribute_public(attribute_name, object_type):
+    helpers.throw_error("Attribute " + attribute_name + " is not public and cannot be called in current location.")
+  
+  attribute_type, attribute_address, attribute_block, attribute_class = gv.function_directory.get_variable_item(attribute_name, Constants.GLOBAL_BLOCK, object_type)
+  new_address = object_address[attribute_type] + attribute_address
+  new_item = OperandItem(new_address, attribute_type, attribute_block, attribute_class) #
+  gv.current_object = [object_type, attribute_name]
+  
+  gv.stack_operands.push(new_item)
+
+def p_neural_restart_object(p):
+  '''neural_restart_object :'''
+  gv.current_object = None
 
 #################################################
 #######  Expression Quad Constructions  #########
@@ -540,8 +572,9 @@ def p_neural_check_operator_stack_equal(p):
   first = gv.stack_operands.pop()
   if not gv.stack_operators.empty() and gv.stack_operators.top() == Operators.EQUAL:
     operand_id = gv.stack_operands.pop()
+    operand_id_type = operand_id.get_type() if operand_id.get_type() in Types.primitives else operand_id.get_type()[0]
     operator = gv.stack_operators.pop()
-    if first.get_type() != operand_id.get_type():
+    if first.get_type() != operand_id_type:
       helpers.throw_error('Type mismatch')
     quad = Quad(operator, first.get_value(), operand_id.get_value())
     gv.quad_list.add(quad)
@@ -572,7 +605,7 @@ def check_operator_stack(operators_list = None):
       quad = Quad(operator, operand_left.get_value(), operand_right.get_value(), result_value)
 
     gv.quad_list.add(quad)
-    result = OperandPair(result_value, result_type)
+    result = OperandItem(result_value, result_type)
     gv.stack_operands.push(result)
     gv.read_unary_operator = False
 
@@ -609,18 +642,18 @@ def p_neural_add_to_operand_stack_bool(p):
 def p_neural_add_to_operand_stack_id(p):
   '''neural_add_to_operand_stack_id :'''
   id_name = p[-1]
-  id_type, id_name = gv.function_directory.get_variable_type_address(id_name, gv.current_block, gv.current_class_block)
-  add_to_operand_stack(id_name, id_type)
+  id_type, id_name, id_block, id_class = gv.function_directory.get_variable_item(id_name, gv.current_block, gv.current_class_block)
+  add_to_operand_stack(id_name, id_type, id_block, id_class)
 
 def p_neural_id_calls_p_empty(p):
   '''neural_id_calls_p_empty :'''
   id_name = gv.sub_call_first_id
-  id_type, id_name = gv.function_directory.get_variable_type_address(id_name, gv.current_block, gv.current_class_block)
-  add_to_operand_stack(id_name, id_type)
+  id_type, id_name, id_block, id_class = gv.function_directory.get_variable_item(id_name, gv.current_block, gv.current_class_block)
+  add_to_operand_stack(id_name, id_type, id_block, id_class)
   gv.sub_call_first_id = None
 
-def add_to_operand_stack(operand_value, operand_type):
-  gv.stack_operands.push(OperandPair(operand_value, operand_type))
+def add_to_operand_stack(operand_value, operand_type, block_name = None, class_name = None):
+  gv.stack_operands.push(OperandItem(operand_value, operand_type, block_name, class_name))
 
 ### Modify operator stack
 
@@ -672,11 +705,10 @@ def p_neural_write_space(p):
 
 def p_neural_read(p):
   '''neural_read_stmt :'''
-  id_name = p[-1]
-  id_type, id_name = gv.function_directory.get_variable_type_address(id_name, gv.current_block, gv.current_class_block)
-  if id_type not in Types.primitives:
-    helpers.throw_error("Cannot assign input to " + id_name)
-  quad = Quad(QuadOperations.READ, id_name)
+  read_item = gv.stack_operands.pop()
+  if read_item.get_type() not in Types.primitives:
+    helpers.throw_error("Cannot assign input")
+  quad = Quad(QuadOperations.READ, read_item.get_value())
   gv.quad_list.add(quad)
 
 ### Return
@@ -828,10 +860,10 @@ def p_neural_repeat_end(p):
 def p_neural_for_id(p):
   '''neural_for_id :'''
   id_name = p[-1]
-  id_type, id_name = gv.function_directory.get_variable_type_address(id_name, gv.current_block, gv.current_class_block)
+  id_type, id_name, id_block, id_class = gv.function_directory.get_variable_item(id_name, gv.current_block, gv.current_class_block)
   if id_type != Types.INT and id_type != Types.FLT:
     helpers.throw_error("Variable must be integer or float")
-  add_to_operand_stack(id_name, id_type)
+  add_to_operand_stack(id_name, id_type, id_block, id_class)
 
 def p_neural_for_assignment(p):
   '''neural_for_assignment :'''
@@ -887,12 +919,12 @@ def p_neural_sub_call(p):
   else:
     sub_call_name = gv.sub_call_second_id
     object_name = gv.sub_call_first_id
-    sub_call_class_name, _ = gv.function_directory.get_variable_type_address(object_name, gv.current_block, gv.current_class_block)
+    sub_call_class_name = gv.function_directory.get_variable_type(object_name, gv.current_block, gv.current_class_block)
 
-  if not gv.subroutine_directory.check_sub_exists(sub_call_name, sub_call_class_name):
+  if not gv.subroutine_directory.subroutine_exists(sub_call_name, sub_call_class_name):
     helpers.throw_error("Method " + sub_call_name + " doesn't exist.")
   
-  if sub_call_class_name != None and gv.current_class_block != sub_call_class_name and not gv.subroutine_directory.is_method_public(sub_call_name, sub_call_class_name):
+  if sub_call_class_name != None and gv.current_class_block != sub_call_class_name and not gv.subroutine_directory.is_public(sub_call_name, sub_call_class_name):
     helpers.throw_error("Method " + sub_call_name + " is not public and cannot be called in current location.")
 
   gv.sub_call_first_id = None
@@ -925,20 +957,20 @@ def p_neural_sub_call_args_end(p):
 def p_neural_sub_call_end_return_value(p):
   '''neural_sub_call_end_return_value :'''
   current_sub_call = gv.stack_sub_calls.pop()
-  return_type = gv.subroutine_directory.get_sub_type(current_sub_call.get_sub_name(), current_sub_call.get_block_name())
+  return_type = gv.subroutine_directory.get_type(current_sub_call.get_sub_name(), current_sub_call.get_block_name())
   if return_type == Types.VOID:
     helpers.throw_error("Subcall does not have a return value.")
   temporal = gv.memory_manager.get_memory_address(return_type, MemoryTypes.TEMPORAL, gv.current_block, gv.current_class_block)
   return_value = current_sub_call.get_return_temporal_address()
   quad = Quad(Operators.EQUAL, return_value, temporal)
   gv.quad_list.add(quad)
-  temporal_operand = OperandPair(temporal, return_type)
+  temporal_operand = OperandItem(temporal, return_type)
   gv.stack_operands.push(temporal_operand)
 
 def p_neural_sub_call_end_no_return_value(p):
   '''neural_sub_call_end_no_return_value :'''
   current_sub_call = gv.stack_sub_calls.pop()
-  return_type = gv.subroutine_directory.get_sub_type(current_sub_call.get_sub_name(), current_sub_call.get_block_name())
+  return_type = gv.subroutine_directory.get_type(current_sub_call.get_sub_name(), current_sub_call.get_block_name())
 
 def p_neural_constructor_call(p):
   '''neural_constructor_call :'''
@@ -949,7 +981,7 @@ def p_neural_constructor_call(p):
   sub_call_class_name = p[-3]
   object_name = p[-2]
 
-  if not gv.subroutine_directory.check_block_exists(sub_call_class_name):
+  if not gv.subroutine_directory.block_exists(sub_call_class_name):
     helpers.throw_error("Class " + sub_call_class_name + " doesn't exist.")
   
   sub_call_helper(sub_call_name, sub_call_class_name, object_name)
@@ -962,7 +994,7 @@ def sub_call_helper(sub_call_name, sub_call_class_name, object_name):
 
   quad = Quad(QuadOperations.ERA, sub_call_class_name, sub_call_name)
 
-  type = gv.subroutine_directory.get_sub_type(sub_call_name, sub_call_class_name)
+  type = gv.subroutine_directory.get_type(sub_call_name, sub_call_class_name)
   if type in Types.primitives:
     memory_address = gv.memory_manager.get_memory_address(type, MemoryTypes.TEMPORAL, gv.current_block, None)
     quad.add_element(memory_address)
@@ -972,7 +1004,7 @@ def sub_call_helper(sub_call_name, sub_call_class_name, object_name):
   gv.quad_list.add(quad)
 
   if object_name is not None:
-    memory_address = gv.function_directory.get_variable_type_address(object_name, gv.current_block, gv.current_class_block)[1]
+    memory_address = gv.function_directory.get_variable_address(object_name, gv.current_block, gv.current_class_block)
     for type in Types.primitives:
       quad = Quad(QuadOperations.THIS_PARAM, type, memory_address[type])
       gv.quad_list.add(quad)
@@ -980,8 +1012,8 @@ def sub_call_helper(sub_call_name, sub_call_class_name, object_name):
 def p_neural_check_id_is_object(p):
   '''neural_check_id_is_object :'''
   id_name = gv.sub_call_first_id
-  id_type, _ = gv.function_directory.get_variable_type_address(id_name, gv.current_block, gv.current_class_block)
-  if not gv.function_directory.check_id_is_class(id_type):
+  id_type = gv.function_directory.get_variable_type(id_name, gv.current_block, gv.current_class_block)
+  if not gv.function_directory.is_class(id_type):
     helpers.throw_error(id_name + " is not an object")
 
 ### Other
@@ -1011,8 +1043,18 @@ def array_access(index):
   value = gv.stack_operands.pop()
   if value.get_type() != Types.INT:
     helpers.throw_error("Expression to access array must resolve as an integer.")
-  array_address = gv.stack_operands.top()
-  dimension_size = gv.function_directory.get_array_dimension(array_address.get_value(), index, gv.current_block, gv.current_class_block)
+  array_pair = gv.stack_operands.top()
+
+  if gv.current_object is None:
+    block = gv.current_block
+    class_block = gv.current_class_block
+    array_address = array_pair.get_value()
+  else:
+    block = Constants.GLOBAL_BLOCK
+    class_block = gv.current_object[0]
+    array_address = gv.current_object[1]
+
+  dimension_size = gv.function_directory.get_variable_dimension(array_address, block, index, class_block)
   if dimension_size is None:
     helpers.throw_error("Can't perform such array operation")
   quad = Quad(QuadOperations.VER, value.get_value(), dimension_size)
@@ -1023,16 +1065,23 @@ def p_neural_add_subcall_first_id_to_stack(p):
   '''neural_add_subcall_first_id_to_stack :'''
   id_name = gv.sub_call_first_id
   gv.sub_call_first_id = None
-  id_type, id_name = gv.function_directory.get_variable_type_address(id_name, gv.current_block, gv.current_class_block)
-  add_to_operand_stack(id_name, id_type)
+  id_type, id_name, id_block, id_class = gv.function_directory.get_variable_item(id_name, gv.current_block, gv.current_class_block)
+  add_to_operand_stack(id_name, id_type, id_block, id_class)
 
 def p_neural_array_access_end(p):
   '''neural_array_access_end :'''
-  array_pair = gv.stack_operands.pop()
-  array_address = array_pair.get_value()
+  array_item = gv.stack_operands.pop()
   indices = gv.array_access_indices
   gv.array_access_indices = []
-  array_dimension_count = gv.function_directory.get_array_dimension_count(array_address, gv.current_block, gv.current_class_block)
+  array_address = array_item.get_value()
+  array_type = array_item.get_type()
+  block_name = array_item.get_block_name()
+  class_name = array_item.get_class_name()
+
+  if gv.current_object is not None:
+    array_address = gv.current_object[1]
+
+  array_dimension_count = gv.function_directory.get_array_dimensions_count(array_address, block_name, class_name)
   if len(indices) != array_dimension_count:
     helpers.throw_error("Can't perform such array operation")
   memory_type = MemoryTypes.GLOBAL
@@ -1044,7 +1093,7 @@ def p_neural_array_access_end(p):
   quad = Quad(Operators.PLUS, indices[-1], array_address_constant_address, temporal) ####
   gv.quad_list.add(quad)
   if len(indices) == 2:
-    second_dimension = gv.function_directory.get_array_dimension(array_address, 1, gv.current_block, gv.current_class_block)
+    second_dimension = gv.function_directory.get_variable_dimension(array_address, gv.current_block, 1, gv.current_class_block)
     second_dimension_constant_address = gv.memory_manager.get_constant_memory_address(second_dimension, Types.INT)
     temporal_mult_result = gv.memory_manager.get_next_temporal(Types.INT, memory_type)
     quad = Quad(Operators.MULTIPLY, indices[0], second_dimension_constant_address, temporal_mult_result) ###
@@ -1056,7 +1105,7 @@ def p_neural_array_access_end(p):
   pointer = gv.memory_manager.get_next_pointer(memory_type)
   quad = Quad(QuadOperations.EQUAL_ADDRESS, temporal, pointer)
   gv.quad_list.add(quad)
-  pair = OperandPair(pointer, array_pair.get_type())
+  pair = OperandItem(pointer, array_type)
   gv.stack_operands.push(pair)
 
 # Use for debugging
@@ -1074,8 +1123,7 @@ parser = yacc.yacc()
 # Execution of parser with a filename
 def execute_parser(input):
   parser.parse(input)
-  # print(result)
   print(gv.quad_list)
   # gv.quad_list.print_with_number()
-  # gv.function_directory.output()
+  gv.subroutine_directory.fix_for_virtual_machine()
   return gv.quad_list, gv.memory_manager.get_constant_map(), gv.subroutine_directory

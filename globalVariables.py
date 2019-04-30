@@ -1,10 +1,11 @@
-from directories import FunctionDirectory, SubroutineDirectory
-from structures import Stack, QuadList, TemporalMemory, SemanticCube, ParserMemoryManager
+from function_directory import FunctionDirectory
+from subroutine_directory import SubroutineDirectory
+from structures import Stack, QuadList, SemanticCube, ParserMemoryManager
 
 # Main directory with global scope, functions and classes.
 function_directory = FunctionDirectory()
 
-#
+# Directory with subrotine headers
 subroutine_directory = SubroutineDirectory()
 
 # Current block of function_directory.
@@ -50,6 +51,9 @@ sub_call_first_id = None
 #
 sub_call_second_id = None
 
+#
+current_object = None
+
 # Semantic cube object
 semantic_cube = SemanticCube()
 
@@ -67,9 +71,6 @@ stack_sub_calls = Stack()
 
 # List of quads
 quad_list = QuadList()
-
-# Temporal memory manager
-temporal_memory = TemporalMemory()
 
 #
 memory_manager = ParserMemoryManager()

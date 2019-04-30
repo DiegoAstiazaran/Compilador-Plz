@@ -1,7 +1,7 @@
 from structures import Quad
 from constants import Operators, QuadOperations, Types, Constants
 from structures import VirtualMachineMemoryManager
-from virtualMachineGlobalVariables import operations
+from virtual_machine_global_variables import operations
 import helpers
 from copy import copy
 
@@ -77,15 +77,14 @@ def execute_virtual_machine(quad_list, constant_memory, subroutine_directory):
       operand = memory_manager.get_memory_value(operand)
       memory_manager.set_memory_value(result_address, operand, True)
     elif operation == QuadOperations.ERA:
-      x = quad.get_items()
       if len(quad.get_items()) == 2:
         class_block_name, block_name = quad.get_items()
+        return_temporal_address = None
       else:
         class_block_name, block_name, return_temporal_address = quad.get_items()
-      sub_call = copy(subroutine_directory.get_sub_call(block_name, class_block_name))
-      if 'return_temporal_address' in locals():
-        sub_call[2] = return_temporal_address
-      memory_manager.new_local_memory(sub_call)
+      subroutine_call = copy(subroutine_directory.get_subroutine(block_name, class_block_name))
+      subroutine_call.append(return_temporal_address) # position 2 of array
+      memory_manager.new_local_memory(subroutine_call)
     elif operation == QuadOperations.PARAM:
       param_address, param_counter = quad.get_items()
       arg_address = memory_manager.get_sub_call_arg_address(param_counter)

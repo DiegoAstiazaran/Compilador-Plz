@@ -1,9 +1,10 @@
-int i.
+int a.
 
 class Person:
   attributes:
-    public int age.
+    public int age(3).
     public str name.
+    public int numbers(10).
 
   methods:
     sub Person(str s_name, int i_age):
@@ -22,9 +23,21 @@ class Person:
     end
 end
 
+Person p1("Diego", 20 + 2).
+int b.
+int array_global(15).
+
 sub void printDate():
   print: 'today is sabado' end
 end
 
-Person p1("Diego", 20 + 2).
+a = 1.
+b = 2.
+
+p1@name = 'andres'.
+
+array_global[3] = a.
+
+p1@numbers[4] = 10.
+
 printDate().
