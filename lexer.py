@@ -25,6 +25,7 @@ reserved = {
   'from' : 'FROM',
   'by' : 'BY',
   'read' : 'READ',
+  'read_ln' : 'READ_LN',
   'or' : 'OR',
   'and' : 'AND',
   'not' : 'NOT',
