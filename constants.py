@@ -68,6 +68,9 @@ class Operators:
 class QuadOperations:
   WRITE           = 'write'
   READ            = 'read'
+  READ_ITEM       = 'read_item'
+  READ_END        = 'read_end'
+  READ_LN         = 'real_ln'
   WRITE_NEW_LINE  = 'write_new_line'
   WRITE_SPACE     = 'write_space'
   RETURN          = 'return'

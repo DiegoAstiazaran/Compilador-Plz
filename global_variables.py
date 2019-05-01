@@ -43,7 +43,7 @@ current_condition_has_else = False
 condition_end = False
 
 # Operator value for current for cycle
-current_for_operator = None
+stack_for_operators = Stack()
 
 #
 sub_call_first_id = None
@@ -74,9 +74,6 @@ quad_list = QuadList()
 
 #
 memory_manager = ParserMemoryManager()
-
-#
-global_error = []
 
 #
 array_access_indices = []

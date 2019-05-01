@@ -138,7 +138,7 @@ class FunctionDirectory:
 
   # Returns type, address, block, class of var_name
   # Checks on all possible scopes
-  def get_variable_item(self, var_name, block_name, class_name, throw_error = True):
+  def get_variable_item_deep(self, var_name, block_name, class_name, throw_error = True):
     # Glocal scope
     if block_name == Constants.GLOBAL_BLOCK and class_name is None:
       type_, address_ = self.get_entry_directory(block_name).get_variable_type_address(var_name)
@@ -156,23 +156,23 @@ class FunctionDirectory:
     # metodo de una clase
     else:
       # esto busca en los locales del metodo y en los atributos
-      type_, address_, block_, class_ = self.get_entry_directory(class_name).get_variable_item(var_name, block_name, None, False)
+      type_, address_, block_, class_ = self.get_entry_directory(class_name).get_variable_item_deep(var_name, block_name, None, False)
       class_ = class_name
     
     if address_ is not None:
       return type_, address_, block_, class_
 
-    return self.get_variable_item(var_name, Constants.GLOBAL_BLOCK, None, throw_error)
+    return self.get_variable_item_deep(var_name, Constants.GLOBAL_BLOCK, None, throw_error)
 
   # Returns type of var_name
   # Checks on all possible scopes
-  def get_variable_type(self, var_name, block_name, class_name, throw_error = True):
-    return self.get_variable_item(var_name, block_name, class_name, throw_error)[0]
+  def get_variable_type_deep(self, var_name, block_name, class_name, throw_error = True):
+    return self.get_variable_item_deep(var_name, block_name, class_name, throw_error)[0]
 
   # Returns address of var_name
   # Checks on all possible scopes
-  def get_variable_address(self, var_name, block_name, class_name, throw_error = True):
-    return self.get_variable_item(var_name, block_name, class_name, throw_error)[1]
+  def get_variable_address_deep(self, var_name, block_name, class_name, throw_error = True):
+    return self.get_variable_item_deep(var_name, block_name, class_name, throw_error)[1]
 
   # Checks if block exists in function table
   def block_exists(self, block_name):
