@@ -72,8 +72,9 @@ def p_class(p):
 
 def p_expression(p):
   '''
-  expression : neural_expression_start mini_expression neural_check_operator_stack_logical expression_p neural_expression_end
-  expression_p : logical expression
+  expression : neural_expression_start expression_p neural_expression_end
+  expression_p : mini_expression neural_check_operator_stack_logical expression_pp
+  expression_pp : logical expression_p
                | empty
   '''
 
