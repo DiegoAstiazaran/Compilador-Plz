@@ -57,7 +57,7 @@ def p_neural_repeat_end(p):
 def p_neural_for_id(p):
   '''neural_for_id :'''
   id_name = p[-1]
-  id_type, id_name, id_block, id_class = gv.function_directory.get_variable_item(id_name, gv.current_block, gv.current_class_block)
+  id_type, id_name, id_block, id_class = gv.function_directory.get_variable_item_deep(id_name, gv.current_block, gv.current_class_block)
   if id_type != Types.INT and id_type != Types.FLT:
     helpers.throw_error("Variable must be integer or float")
   add_to_operand_stack(id_name, id_type, id_block, id_class)

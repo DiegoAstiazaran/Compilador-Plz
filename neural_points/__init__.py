@@ -10,5 +10,3 @@ from .miscellaneous import *
 from .classes import *
 
 __all__ = list(filter(lambda method_name: method_name.startswith('p_'), dir()))
-
-print(__all__)

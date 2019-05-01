@@ -364,11 +364,11 @@ def p_for(p):
 # You can read an id or attribute of id(obj) with a possible array access
 def p_read(p):
   '''
-  read : READ COLON read_list END
-  read_list : read_p read_list_p
+  read : READ neural_read_start COLON read_list END neural_read_end
+       | READ_LN COLON id_attr_access neural_read_ln END
+  read_list : id_attr_access neural_read_item read_list_p
   read_list_p : COMMA read_list
               | empty
-  read_p : id_attr_access neural_read_stmt
   '''
 
 def p_type(p):
