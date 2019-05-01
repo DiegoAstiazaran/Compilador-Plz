@@ -33,42 +33,82 @@ def p_statement(p):
   '''
   statement : read
             | write
-            | assignment
             | condition
             | cycle
             | return
             | sub_call
+            | assignment
   '''
 
-def p_sub_call(p):
+# Read grammar
+
+def p_read(p):
   '''
-  sub_call : ID neural_sub_call_first_id sub_call_p neural_sub_call sub_call_args neural_sub_call_end_no_return_value DOT
-  sub_call_p : MONEY neural_check_id_is_object ID neural_sub_call_second_id
-             | empty
+  read : READ neural_read_start COLON read_list END neural_read_end
+       | READ_LN COLON id_attr_access neural_read_ln END
+  read_list : id_attr_access neural_read_item read_list_p
+  read_list_p : COMMA read_list
+              | empty
   '''
 
-def p_sub_call_args(p):
+# Write grammar
+
+def p_write(p):
   '''
-  sub_call_args : L_PAREN sub_call_args_p R_PAREN neural_sub_call_args_end
-  sub_call_args_p : expression neural_sub_call_arg sub_call_args_pp
-                  | empty
-  sub_call_args_pp : COMMA sub_call_args_p
-                  | empty
+  write : PRINT COLON write_p neural_write_new_line END
+  write_p : expression neural_write_expression write_pp
+  write_pp : neural_write_space COMMA write_p
+           | empty
   '''
 
-def p_return(p):
+# Condition grammar
+
+def p_condition(p):
   '''
-  return : RETURN return_expression neural_return_expression DOT
-  return_expression : expression neural_return_value
-                    | empty
+  condition : IF neural_condition_if condition_p condition_else END neural_condition_end
+  condition_p : expression neural_condition_new_quad COLON block neural_condition_end_block condition_elsif
+  condition_elsif : ELSIF neural_condition_fill_quad condition_p
+               | empty
+  condition_else : ELSE neural_condition_else neural_condition_fill_quad COLON block
+                | empty
   '''
 
-def p_class(p):
+# Cycles grammar
+
+def p_cycle(p):
   '''
-  class : CLASS CLASS_NAME neural_class_decl class_inheritance COLON class_block END neural_class_decl_end
-  class_inheritance : UNDER CLASS_NAME neural_class_decl_inheritance
-          | empty
+  cycle : when
+        | repeat
+        | for
   '''
+
+def p_when(p):
+  '''
+  when : WHEN neural_when_before_expression expression REPEAT neural_when_repeat COLON block END neural_when_end
+  '''
+
+def p_repeat(p):
+  '''
+  repeat : REPEAT COLON neural_repeat_start block WHILE expression END neural_repeat_end
+  '''
+
+def p_for(p):
+  '''
+  for : FOR ID neural_for_id FROM for_p neural_for_assignment BY for_operator var_cte_1 WHILE neural_for_before_expression expression neural_for_after_expression COLON block END neural_for_end
+  for_p : id_calls
+        | CTE_I neural_add_to_operand_stack_int
+        | CTE_F neural_add_to_operand_stack_flt
+  for_operator : operator
+               | empty
+  '''
+
+def p_var_cte_1(p):
+  '''
+  var_cte_1 : ID    neural_add_to_operand_stack_id
+            | CTE_I neural_add_to_operand_stack_int
+  '''
+
+# Expression grammar
 
 def p_expression(p):
   '''
@@ -114,6 +154,93 @@ def p_factor(p):
            | empty
   '''
 
+def p_var_cte_2(p):
+  '''
+  var_cte_2 : CTE_I   neural_add_to_operand_stack_int
+            | CTE_F   neural_add_to_operand_stack_flt
+            | CTE_STR neural_add_to_operand_stack_str
+            | cte_b
+            | id_calls
+  '''
+
+def p_cte_b(p):
+  '''
+  cte_b : TRUE  neural_add_to_operand_stack_bool
+        | FALSE neural_add_to_operand_stack_bool
+  '''
+
+def p_relational(p):
+  '''
+  relational : L_THAN     neural_add_to_operator_stack
+             | G_THAN     neural_add_to_operator_stack
+             | NOT_EQ     neural_add_to_operator_stack
+             | L_THAN_EQ  neural_add_to_operator_stack
+             | G_THAN_EQ  neural_add_to_operator_stack
+             | EQ_TO      neural_add_to_operator_stack
+             | GT         neural_add_to_operator_stack
+             | LT         neural_add_to_operator_stack
+             | GTE        neural_add_to_operator_stack
+             | LTE        neural_add_to_operator_stack
+             | EQ         neural_add_to_operator_stack
+             | NEQ        neural_add_to_operator_stack
+  '''
+
+def p_logical(p):
+  '''
+  logical : OR_OP   neural_add_to_operator_stack
+          | AND_OP  neural_add_to_operator_stack
+          | OR      neural_add_to_operator_stack
+          | AND     neural_add_to_operator_stack
+  '''
+
+def p_operator(p):
+  '''
+  operator : PLUS     neural_add_to_operator_stack
+           | MINUS    neural_add_to_operator_stack
+           | MULTIPLY neural_add_to_operator_stack
+           | DIVIDE   neural_add_to_operator_stack
+  '''
+
+def p_id_calls(p):
+  '''
+  id_calls : ID neural_sub_call_first_id id_calls_p
+  id_calls_p : neural_add_subcall_first_id_to_stack access
+             | neural_sub_call sub_call_args neural_sub_call_end_return_value
+             | id_calls_method
+             | id_calls_attribute
+             | empty neural_id_calls_p_empty
+  id_calls_method : MONEY neural_check_id_is_object ID neural_sub_call_second_id neural_sub_call sub_call_args neural_sub_call_end_return_value
+  id_calls_attribute : AT neural_check_id_is_object ID neural_id_calls_p_empty id_calls_attribute_p
+  id_calls_attribute_p : access
+                       | empty
+  '''
+
+def p_access(p):
+  '''
+  access : L_SQ_BRACKET expression R_SQ_BRACKET neural_array_access_first access_p neural_array_access_end
+  access_p : L_SQ_BRACKET expression R_SQ_BRACKET neural_array_access_second
+           | empty
+  '''
+
+# Basic grammars
+
+def p_type(p):
+  '''
+  type : INT neural_decl_type
+       | FLT neural_decl_type
+       | BOOL neural_decl_type
+       | STR neural_decl_type
+  '''
+
+# Class declaration grammar
+
+def p_class(p):
+  '''
+  class : CLASS CLASS_NAME neural_class_decl class_inheritance COLON class_block END neural_class_decl_end
+  class_inheritance : UNDER CLASS_NAME neural_class_decl_inheritance
+          | empty
+  '''
+
 def p_class_block(p):
   '''
   class_block : class_block_attributes class_block_methods
@@ -147,11 +274,60 @@ def p_array_size(p):
   array_size : L_PAREN CTE_I R_PAREN neural_array_decl
   '''
 
+# Subroutine declaration grammar
+
+def p_subroutine(p):
+  '''
+  subroutine : SUB subroutine_return_type ID neural_sub_decl_id subroutine_common
+  '''
+
+def p_constructor(p):
+  '''
+  constructor : SUB CLASS_NAME neural_sub_decl_id subroutine_common
+  '''
+
+def p_subroutine_common(p):
+  '''
+  subroutine_common : L_PAREN subroutine_common_params R_PAREN COLON subroutine_common_declarations block neural_sub_end END neural_sub_end neural_sub_constructor_end neural_global_block
+  subroutine_common_params : type ID neural_var_decl_id neural_param_decl subroutine_common_params_p
+                           | empty
+  subroutine_common_params_p : COMMA subroutine_common_params
+                             | empty
+  subroutine_common_declarations : decl_init subroutine_common_p
+                                 | empty
+  '''
+
+def p_return(p):
+  '''
+  return : RETURN return_expression neural_return_expression DOT
+  return_expression : expression neural_return_value
+                    | empty
+  '''
+
+# Subroutine call grammar
+
+def p_sub_call(p):
+  '''
+  sub_call : ID neural_sub_call_first_id sub_call_p neural_sub_call sub_call_args neural_sub_call_end_no_return_value DOT
+  sub_call_p : MONEY neural_check_id_is_object ID neural_sub_call_second_id
+             | empty
+  '''
+
+def p_sub_call_args(p):
+  '''
+  sub_call_args : L_PAREN sub_call_args_p R_PAREN neural_sub_call_args_end
+  sub_call_args_p : expression neural_sub_call_arg sub_call_args_pp
+                  | empty
+  sub_call_args_pp : COMMA sub_call_args_p
+                  | empty
+  '''
+
+# Declarations with initialization grammar
+
 def p_decl_init(p):
   '''
   decl_init : decl_init_p neural_check_operator_stack_equal DOT
   decl_init_p : decl_init_var
-              | decl_init_dict
               | decl_init_obj
   '''
 
@@ -181,28 +357,21 @@ def p_decl_init_var(p):
   '''
   # TODO: Put neural_add_to_operator_stack back after EQUAL in array and matrix initialization
 
-def p_decl_init_dict(p):
-  '''
-  decl_init_dict : DICT ID neural_var_decl_id dict_init_dict_p
-  dict_init_dict_p : EQUAL L_BRACKET initialization_dict R_BRACKET
-                   | empty
-  initialization_dict : var_cte_3 COLON expression initialization_dict_p
-  initialization_dict_p : COMMA initialization_dict
-                        | empty
-  '''
-  # TODO: Put neural_add_to_operator_stack back after EQUAL
-
 def p_decl_init_obj(p):
   '''
   decl_init_obj : CLASS_NAME ID neural_var_decl_id neural_constructor_call sub_call_args neural_sub_call_end_no_return_value
   '''
   # TODO: Put neural_add_to_operator_stack back after EQUAL
 
+# Assignments grammar
+
 def p_assignment(p):
   '''
   assignment : id_attr_access EQUAL neural_add_to_operator_stack expression neural_check_operator_stack_equal DOT
   '''
 
+# Id or attribute of id(obj) with a possible array access
+# Must leave address is stack_operands
 def p_id_attr_access(p):
   '''
   id_attr_access : ID neural_add_to_operand_stack_id id_attr_access_obj id_attr_access_access neural_restart_object
@@ -212,173 +381,7 @@ def p_id_attr_access(p):
                         | empty
   '''
 
-def p_constructor(p):
-  '''
-  constructor : SUB CLASS_NAME neural_sub_decl_id L_PAREN constructor_params R_PAREN COLON constructor_p block neural_sub_constructor_end END neural_global_block
-  constructor_params : type ID neural_var_decl_id neural_param_decl constructor_params_p
-                     | empty
-  constructor_params_p : COMMA constructor_params
-                       | empty
-  constructor_p : decl_init constructor_p
-                | empty
-  '''
-
-def p_relational(p):
-  '''
-  relational : L_THAN     neural_add_to_operator_stack
-             | G_THAN     neural_add_to_operator_stack
-             | NOT_EQ     neural_add_to_operator_stack
-             | L_THAN_EQ  neural_add_to_operator_stack
-             | G_THAN_EQ  neural_add_to_operator_stack
-             | EQ_TO      neural_add_to_operator_stack
-             | GT         neural_add_to_operator_stack
-             | LT         neural_add_to_operator_stack
-             | GTE        neural_add_to_operator_stack
-             | LTE        neural_add_to_operator_stack
-             | EQ         neural_add_to_operator_stack
-             | NEQ        neural_add_to_operator_stack
-  '''
-
-def p_logical(p):
-  '''
-  logical : OR_OP   neural_add_to_operator_stack
-          | AND_OP  neural_add_to_operator_stack
-          | OR      neural_add_to_operator_stack
-          | AND     neural_add_to_operator_stack
-  '''
-
-def p_var_cte_1(p):
-  '''
-  var_cte_1 : ID    neural_add_to_operand_stack_id
-            | CTE_I neural_add_to_operand_stack_int
-  '''
-
-def p_var_cte_2(p):
-  '''
-  var_cte_2 : CTE_I   neural_add_to_operand_stack_int
-            | CTE_F   neural_add_to_operand_stack_flt
-            | CTE_STR neural_add_to_operand_stack_str
-            | cte_b
-            | id_calls
-  '''
-
-def p_id_calls(p):
-  '''
-  id_calls : ID neural_sub_call_first_id id_calls_p
-  id_calls_p : neural_add_subcall_first_id_to_stack access
-             | neural_sub_call sub_call_args neural_sub_call_end_return_value
-             | id_calls_method
-             | id_calls_attribute
-             | empty neural_id_calls_p_empty
-  id_calls_method : MONEY neural_check_id_is_object ID neural_sub_call_second_id neural_sub_call sub_call_args neural_sub_call_end_return_value
-  id_calls_attribute : AT neural_check_id_is_object ID neural_id_calls_p_empty id_calls_attribute_p
-  id_calls_attribute_p : access
-                       | empty
-  '''
-
-def p_var_cte_3(p):
-  '''
-  var_cte_3 : ID
-            | CTE_I
-            | CTE_STR
-  '''
-
-def p_cte_b(p):
-  '''
-  cte_b : TRUE  neural_add_to_operand_stack_bool
-        | FALSE neural_add_to_operand_stack_bool
-  '''
-
-def p_subroutine(p):
-  '''
-  subroutine : SUB subroutine_return_type ID neural_sub_decl_id L_PAREN subroutine_params R_PAREN COLON subroutine_p block neural_sub_end neural_sub_constructor_end END neural_global_block
-  subroutine_return_type : type
-                         | VOID neural_decl_type
-  subroutine_params : type ID neural_var_decl_id neural_param_decl subroutine_params_p
-                    | empty
-  subroutine_params_p : COMMA subroutine_params
-                    | empty
-  subroutine_p : decl_init subroutine_p
-               | empty
-  '''
-
-def p_write(p):
-  '''
-  write : PRINT COLON write_p neural_write_new_line END
-  write_p : expression neural_write_expression write_pp
-  write_pp : neural_write_space COMMA write_p
-           | empty
-  '''
-
-def p_condition(p):
-  '''
-  condition : IF neural_condition_if condition_p condition_else END neural_condition_end
-  condition_p : expression neural_condition_new_quad COLON block neural_condition_end_block condition_elsif
-  condition_elsif : ELSIF neural_condition_fill_quad condition_p
-               | empty
-  condition_else : ELSE neural_condition_else neural_condition_fill_quad COLON block
-                | empty
-  '''
-
-def p_cycle(p):
-  '''
-  cycle : when
-        | repeat
-        | for
-  '''
-
-def p_operator(p):
-  '''
-  operator : PLUS     neural_add_to_operator_stack
-           | MINUS    neural_add_to_operator_stack
-           | MULTIPLY neural_add_to_operator_stack
-           | DIVIDE   neural_add_to_operator_stack
-  '''
-
-def p_access(p):
-  '''
-  access : L_SQ_BRACKET expression R_SQ_BRACKET neural_array_access_first access_p neural_array_access_end
-  access_p : L_SQ_BRACKET expression R_SQ_BRACKET neural_array_access_second
-           | empty
-  '''
-
-def p_when(p):
-  '''
-  when : WHEN neural_when_before_expression expression REPEAT neural_when_repeat COLON block END neural_when_end
-  '''
-
-def p_repeat(p):
-  '''
-  repeat : REPEAT COLON neural_repeat_start block WHILE expression END neural_repeat_end
-  '''
-
-def p_for(p):
-  '''
-  for : FOR ID neural_for_id FROM for_p neural_for_assignment BY for_operator var_cte_1 WHILE neural_for_before_expression expression neural_for_after_expression COLON block END neural_for_end
-  for_p : id_calls
-        | CTE_I neural_add_to_operand_stack_int
-        | CTE_F neural_add_to_operand_stack_flt
-  for_operator : operator
-               | empty
-  '''
-
-# You can read an id or attribute of id(obj) with a possible array access
-def p_read(p):
-  '''
-  read : READ neural_read_start COLON read_list END neural_read_end
-       | READ_LN COLON id_attr_access neural_read_ln END
-  read_list : id_attr_access neural_read_item read_list_p
-  read_list_p : COMMA read_list
-              | empty
-  '''
-
-def p_type(p):
-  '''
-  type : INT neural_decl_type
-       | FLT neural_decl_type
-       | BOOL neural_decl_type
-       | STR neural_decl_type
-  '''
+# Other
 
 def p_empty(p):
   'empty :'
