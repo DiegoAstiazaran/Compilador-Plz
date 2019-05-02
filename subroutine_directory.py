@@ -96,9 +96,9 @@ class SubroutineDirectory:
     self._subroutine_directory[block_name] = SubroutineParamDirectory()
   
   # Adds a subroutine to directory
-  def add_subroutine(self, block_name, subroutine_name, start, is_public, type):
+  def add_subroutine(self, block_name, subroutine_name, start_quad, is_public, type):
     block_name = self.fix_block_name(block_name)
-    self._subroutine_directory[block_name].add_subroutine(subroutine_name, start, is_public, type)
+    self._subroutine_directory[block_name].add_subroutine(subroutine_name, start_quad, is_public, type)
   
   # Add param to subroutine
   # Param is an OperandPair

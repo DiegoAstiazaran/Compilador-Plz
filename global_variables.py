@@ -1,6 +1,9 @@
+from constants import Constants
 from function_directory import FunctionDirectory
 from subroutine_directory import SubroutineDirectory
-from structures import Stack, QuadList, SemanticCube, ParserMemoryManager
+from structures import Stack, QuadList
+from semantic_cube import SemanticCube
+from parser_memory import ParserMemoryManager
 
 # Main directory with global scope, functions and classes.
 function_directory = FunctionDirectory()
@@ -8,9 +11,9 @@ function_directory = FunctionDirectory()
 # Directory with subrotine headers
 subroutine_directory = SubroutineDirectory()
 
-# Current block of function_directory.
+# Current block of function_directory
 # "Global" si no esta en un metodo
-current_block = None
+current_block = Constants.GLOBAL_BLOCK
 
 # Current block when current_block is a class.
 current_class_block = None
@@ -77,6 +80,9 @@ memory_manager = ParserMemoryManager()
 
 #
 array_access_indices = []
+
+#
+array_init_values = []
 
 # For debugging purposes
 # TODO: delete

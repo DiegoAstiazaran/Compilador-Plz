@@ -67,7 +67,6 @@ class Operators:
 # Enum for quad operations
 class QuadOperations:
   WRITE           = 'write'
-  READ            = 'read'
   READ_ITEM       = 'read_item'
   READ_END        = 'read_end'
   READ_LN         = 'real_ln'

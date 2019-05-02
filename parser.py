@@ -5,6 +5,7 @@ import ply.yacc as yacc # Import yacc module
 
 from lexer import tokens, lexer   # Import tokens and lexer defined in lexer
 import global_variables as gv      # Import global variables
+import helpers
 from neural_points import *
 
 # Sets main grammar rule
@@ -13,9 +14,10 @@ start = 'program'
 # Functions for all grammar rules
 # Function name indicates what each of them are used for
 
+
 def p_program(p):
   '''
-  program : neural_global_block program_p block
+  program : program_p block
   program_p : program_pp program_p
             | empty
   program_pp : decl_init
@@ -44,7 +46,7 @@ def p_statement(p):
 
 def p_read(p):
   '''
-  read : READ neural_read_start COLON read_list END neural_read_end
+  read : READ COLON read_list END neural_read_end
        | READ_LN COLON id_attr_access neural_read_ln END
   read_list : id_attr_access neural_read_item read_list_p
   read_list_p : COMMA read_list
@@ -201,6 +203,7 @@ def p_operator(p):
            | DIVIDE   neural_add_to_operator_stack
   '''
 
+#
 def p_id_calls(p):
   '''
   id_calls : ID neural_sub_call_first_id id_calls_p
@@ -215,11 +218,13 @@ def p_id_calls(p):
                        | empty
   '''
 
+#
 def p_access(p):
   '''
-  access : L_SQ_BRACKET expression R_SQ_BRACKET neural_array_access_first access_p neural_array_access_end
-  access_p : L_SQ_BRACKET expression R_SQ_BRACKET neural_array_access_second
+  access : access_pp neural_array_access_first access_p neural_array_access_end
+  access_p : access_pp neural_array_access_second
            | empty
+  access_pp : L_SQ_BRACKET expression R_SQ_BRACKET
   '''
 
 # Basic grammars
@@ -260,12 +265,10 @@ def p_class_block(p):
 
 def p_declaration(p):
   '''
-  declaration : declaration_p neural_check_operator_stack_equal DOT
-  declaration_p : type ID neural_var_decl_id declaration_pp 
-                | DICT ID neural_var_decl_id
-  declaration_pp : array_size declaration_ppp neural_array_decl_end
+  declaration : type ID neural_var_decl_id declaration_p neural_check_operator_stack_equal DOT
+  declaration_p : array_size declaration_pp neural_array_decl_end
                  | empty
-  declaration_ppp : array_size
+  declaration_pp : array_size
                   | empty
   '''
 
@@ -279,6 +282,8 @@ def p_array_size(p):
 def p_subroutine(p):
   '''
   subroutine : SUB subroutine_return_type ID neural_sub_decl_id subroutine_common
+  subroutine_return_type : type
+                         | VOID neural_decl_type
   '''
 
 def p_constructor(p):
@@ -288,12 +293,12 @@ def p_constructor(p):
 
 def p_subroutine_common(p):
   '''
-  subroutine_common : L_PAREN subroutine_common_params R_PAREN COLON subroutine_common_declarations block neural_sub_end END neural_sub_end neural_sub_constructor_end neural_global_block
+  subroutine_common : L_PAREN subroutine_common_params R_PAREN COLON subroutine_common_declarations block END neural_sub_end
   subroutine_common_params : type ID neural_var_decl_id neural_param_decl subroutine_common_params_p
                            | empty
   subroutine_common_params_p : COMMA subroutine_common_params
                              | empty
-  subroutine_common_declarations : decl_init subroutine_common_p
+  subroutine_common_declarations : decl_init subroutine_common_declarations
                                  | empty
   '''
 
@@ -335,43 +340,45 @@ def p_decl_init_var(p):
   '''
   decl_init_var : type ID neural_var_decl_id decl_init_var_p
   decl_init_var_p : decl_init_var_var
-                  | decl_init_var_pp neural_array_decl_end
+                  | decl_init_var_pp
   decl_init_var_var : EQUAL neural_add_to_operator_stack expression
                     | empty
   decl_init_var_pp : array_size decl_init_var_ppp
-  decl_init_var_ppp : decl_init_var_array
+  decl_init_var_ppp : neural_array_decl_end decl_init_var_array
                     | decl_init_var_matrix
   
-  decl_init_var_array : EQUAL L_BRACKET array_content R_BRACKET
+  decl_init_var_array : EQUAL L_BRACKET array_content R_BRACKET neural_array_init_end
                       | empty
-  array_content : expression array_content_p
+  array_content : expression neural_array_init_value array_content_p
   array_content_p : COMMA array_content
                   | empty
   
-  decl_init_var_matrix : array_size decl_init_var_matrix_p
-  decl_init_var_matrix_p : EQUAL L_BRACKET matrix_content R_BRACKET
+  decl_init_var_matrix : array_size neural_array_decl_end decl_init_var_matrix_p
+  decl_init_var_matrix_p : EQUAL L_BRACKET matrix_content R_BRACKET neural_array_init_end
                          | empty
-  matrix_content : L_BRACKET array_content R_BRACKET matrix_content_p
+  matrix_content : neural_matrix_init_array L_BRACKET array_content R_BRACKET matrix_content_p
   matrix_content_p : COMMA matrix_content
                    | empty
   '''
-  # TODO: Put neural_add_to_operator_stack back after EQUAL in array and matrix initialization
 
+#
 def p_decl_init_obj(p):
   '''
   decl_init_obj : CLASS_NAME ID neural_var_decl_id neural_constructor_call sub_call_args neural_sub_call_end_no_return_value
   '''
-  # TODO: Put neural_add_to_operator_stack back after EQUAL
 
 # Assignments grammar
 
+#
 def p_assignment(p):
   '''
   assignment : id_attr_access EQUAL neural_add_to_operator_stack expression neural_check_operator_stack_equal DOT
   '''
 
+#
 # Id or attribute of id(obj) with a possible array access
 # Must leave address is stack_operands
+#
 def p_id_attr_access(p):
   '''
   id_attr_access : ID neural_add_to_operand_stack_id id_attr_access_obj id_attr_access_access neural_restart_object
@@ -399,4 +406,4 @@ def execute_parser(input):
   print(gv.quad_list)
   # gv.quad_list.print_with_number()
   gv.subroutine_directory.fix_for_virtual_machine()
-  return gv.quad_list, gv.memory_manager.get_constant_map(), gv.subroutine_directory
+  return gv.quad_list, gv.memory_manager.get_constants_map(), gv.subroutine_directory

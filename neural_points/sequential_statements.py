@@ -26,12 +26,6 @@ def p_neural_write_space(p):
 
 ### Read
 
-# Called when read statement starts
-def p_neural_read_start(p):
-  '''neural_read_start :'''
-  quad = Quad(QuadOperations.READ)
-  gv.quad_list.add(quad)
-
 # Called after each item to be read in a read statement
 def p_neural_read_item(p):
   '''neural_read_item :'''

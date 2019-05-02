@@ -42,7 +42,6 @@ reserved = {
   'neq' : 'NEQ',
   'True' : 'TRUE',
   'False' : 'FALSE',
-  'dict' : 'DICT',
   'this' : 'THIS'
 }
 

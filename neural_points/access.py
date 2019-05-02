@@ -40,7 +40,7 @@ def p_neural_add_subcall_first_id_to_stack(p):
   '''neural_add_subcall_first_id_to_stack :'''
   id_name = gv.sub_call_first_id
   gv.sub_call_first_id = None
-  id_type, id_name, id_block, id_class = gv.function_directory.get_variable_item(id_name, gv.current_block, gv.current_class_block)
+  id_type, id_name, id_block, id_class = gv.function_directory.get_variable_item_deep(id_name, gv.current_block, gv.current_class_block)
   add_to_operand_stack(id_name, id_type, id_block, id_class)
 
 def p_neural_array_access_end(p):
@@ -59,25 +59,24 @@ def p_neural_array_access_end(p):
   array_dimension_count = gv.function_directory.get_array_dimensions_count(array_address, block_name, class_name)
   if len(indices) != array_dimension_count:
     helpers.throw_error("Can't perform such array operation")
-  memory_type = MemoryTypes.GLOBAL
-  # TODO: checar otro if como estos y quitar la segunda condicion 
-  if gv.current_block != Constants.GLOBAL_BLOCK:
-    memory_type = MemoryTypes.LOCAL
-  temporal = gv.memory_manager.get_next_temporal(Types.INT, memory_type)
+
+  temporal = gv.memory_manager.get_memory_address(Types.INT, MemoryTypes.TEMPORAL, gv.current_block, gv.current_class_block)
   array_address_constant_address = gv.memory_manager.get_constant_memory_address(array_address, Types.INT)
   quad = Quad(Operators.PLUS, indices[-1], array_address_constant_address, temporal) ####
   gv.quad_list.add(quad)
+
   if len(indices) == 2:
     second_dimension = gv.function_directory.get_variable_dimension(array_address, gv.current_block, 1, gv.current_class_block)
     second_dimension_constant_address = gv.memory_manager.get_constant_memory_address(second_dimension, Types.INT)
-    temporal_mult_result = gv.memory_manager.get_next_temporal(Types.INT, memory_type)
+    temporal_mult_result = gv.memory_manager.get_memory_address(Types.INT, MemoryTypes.TEMPORAL, gv.current_block, gv.current_class_block)
     quad = Quad(Operators.MULTIPLY, indices[0], second_dimension_constant_address, temporal_mult_result) ###
     gv.quad_list.add(quad)
-    new_temporal = gv.memory_manager.get_next_temporal(Types.INT, memory_type)
+    new_temporal = gv.memory_manager.get_memory_address(Types.INT, MemoryTypes.TEMPORAL, gv.current_block, gv.current_class_block)
     quad = Quad(Operators.PLUS, temporal, temporal_mult_result, new_temporal)
     gv.quad_list.add(quad)
     temporal = new_temporal
-  pointer = gv.memory_manager.get_next_pointer(memory_type)
+  
+  pointer = gv.memory_manager.get_next_pointer(gv.current_block, gv.current_class_block)
   quad = Quad(QuadOperations.EQUAL_ADDRESS, temporal, pointer)
   gv.quad_list.add(quad)
   pair = OperandItem(pointer, array_type)

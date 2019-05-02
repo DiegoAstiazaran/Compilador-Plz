@@ -231,12 +231,6 @@ class FunctionDirectory:
                        [var_name, dimension_size],
                        block_name, class_name)
 
-  # Return type of variable
-  # def get_variable_type(self, var_name, block_name, class_name = None):
-  #   return self.common_method("get_variable_type",
-  #                             [var_name],
-  #                             block_name, class_name)
-
   # Return size of an array
   def get_array_size(self, var_name, block_name, class_name = None):
     return self.common_method("get_array_size",

@@ -17,6 +17,7 @@ def p_neural_class_decl_end(p):
 # Called after CLASS_NAME when inheriting a class
 def p_neural_class_decl_inheritance(p):
   '''neural_class_decl_inheritance :'''
+  # TODO: complete
   class_name = p[-1]
   gv.function_directory.check_class_exists(class_name)
 
@@ -29,3 +30,8 @@ def p_neural_class_decl_private(p):
 def p_neural_class_decl_public(p):
   '''neural_class_decl_public :'''
   gv.current_is_public = True
+
+# 
+def p_neural_is_public_none(p):
+  '''neural_is_public_none :'''
+  gv.current_is_public = None

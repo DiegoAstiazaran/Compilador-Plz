@@ -2,6 +2,7 @@ from constants import Constants, Operators, Types, MemoryTypes, QuadOperations
 from structures import Quad, OperandItem
 import global_variables as gv      # Import global variables
 import helpers
+from lexer import lexer # TODO:delete all lexer imports
 
 # Called before every expression so two expressions are not combined
 def p_neural_expression_start(p):
