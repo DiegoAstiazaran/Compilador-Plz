@@ -347,15 +347,21 @@ def p_decl_init_var(p):
   decl_init_var_ppp : neural_array_decl_end decl_init_var_array
                     | decl_init_var_matrix
   
-  decl_init_var_array : EQUAL L_BRACKET array_content R_BRACKET neural_array_init_end
+  decl_init_var_array : EQUAL decl_init_var_array_p neural_array_init_end
                       | empty
+  decl_init_var_array_p : neural_array_init_list L_BRACKET array_content R_BRACKET
+                        | expression neural_array_init_single_value
   array_content : expression neural_array_init_value array_content_p
   array_content_p : COMMA array_content
                   | empty
   
   decl_init_var_matrix : array_size neural_array_decl_end decl_init_var_matrix_p
-  decl_init_var_matrix_p : EQUAL L_BRACKET matrix_content R_BRACKET neural_array_init_end
+  decl_init_var_matrix_p : EQUAL decl_init_var_matrix_pp neural_array_init_end
                          | empty
+  decl_init_var_matrix_pp : neural_array_init_list L_BRACKET decl_init_var_matrix_ppp R_BRACKET
+                          | expression neural_array_init_single_value
+  decl_init_var_matrix_ppp : matrix_content
+                           | array_content
   matrix_content : neural_matrix_init_array L_BRACKET array_content R_BRACKET matrix_content_p
   matrix_content_p : COMMA matrix_content
                    | empty

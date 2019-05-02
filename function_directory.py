@@ -40,8 +40,10 @@ class VariableDirectory:
     return None, None
   
   # Returns array/matrix total amount of items
-  # var_name must exist in directory
-  def get_array_size(self, var_name):
+  # var_name_address can be address or var_name
+  # var_name_address must exist in directory
+  def get_array_size(self, var_name_address):
+    var_name = self.fix_var_name(var_name_address)
     dimensions = self.get_variable_dimensions(var_name)    
     array_size = 1
     for dimension in dimensions:

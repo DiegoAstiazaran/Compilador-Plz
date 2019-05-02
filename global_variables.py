@@ -82,7 +82,7 @@ memory_manager = ParserMemoryManager()
 array_access_indices = []
 
 #
-array_init_values = []
+array_init_values = None
 
 # For debugging purposes
 # TODO: delete

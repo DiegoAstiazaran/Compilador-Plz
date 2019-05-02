@@ -1,7 +1,7 @@
 import itertools
 
 from constants import Types, MemoryTypes, Operators
-from structures import Quad
+from structures import Quad, OperandItem
 import global_variables as gv      # Import global variables
 import helpers
 
@@ -52,6 +52,15 @@ def p_neural_array_decl_end(p):
   var_type = gv.stack_operands.top().get_type()
   gv.memory_manager.increase_counter(var_type, array_size - 1, gv.current_block, gv.current_class_block)
 
+def p_neural_array_init_list(p):
+  '''neural_array_init_list :'''
+  gv.array_init_values = []
+
+def p_neural_array_init_single_value(p):
+  '''neural_array_init_single_value :'''
+  value = gv.stack_operands.pop()
+  gv.array_init_values = value
+
 def p_neural_array_init_value(p):
   '''neural_array_init_value :'''
   value = gv.stack_operands.pop()
@@ -71,22 +80,36 @@ def p_neural_array_init_end(p):
   array_address = array_item.get_value()
   dimensions_count = gv.function_directory.get_array_dimensions_count(array_address, gv.current_block, gv.current_class_block)
   first_dimension_size = gv.function_directory.get_variable_dimension(array_address, gv.current_block, 0, gv.current_class_block)
-  if dimensions_count == 1:
-    if len(gv.array_init_values) != first_dimension_size:
-      helpers.throw_error("Amount of items in initialization does not match size.")
-  else:
-    arrays_sizes = list(map(len, gv.array_init_values))
-    second_dimension_size = gv.function_directory.get_variable_dimension(array_address, gv.current_block, 1, gv.current_class_block)
-    if len(set(arrays_sizes))!= 1 or \
-       len(gv.array_init_values) != first_dimension_size or \
-       len(gv.array_init_values[0]) != second_dimension_size:
-      helpers.throw_error("Amount of items in initialization does not match size.")
-    gv.array_init_values = list(itertools.chain.from_iterable(gv.array_init_values))
-
-  for index, value in enumerate(gv.array_init_values):
+  if type(gv.array_init_values) is OperandItem:
+    value = gv.array_init_values
     if value.get_type() != array_type:
       helpers.throw_error("Type mismatch in initialization.")
-    quad = Quad(Operators.EQUAL, value.get_value(), array_address + index)
-    gv.quad_list.add(quad)
+    array_size = gv.function_directory.get_array_size(array_address, gv.current_block, gv.current_class_block)
+    for index in range(array_size):
+      quad = Quad(Operators.EQUAL, value.get_value(), array_address + index)
+      gv.quad_list.add(quad)
+  else:
+    if dimensions_count == 1:
+      if len(gv.array_init_values) != first_dimension_size:
+        helpers.throw_error("Amount of items in initialization does not match size.")
+    else:
+      second_dimension_size = gv.function_directory.get_variable_dimension(array_address, gv.current_block, 1, gv.current_class_block)
+      if type(gv.array_init_values[0]) is list:
+        arrays_sizes = list(map(len, gv.array_init_values))
+        if len(set(arrays_sizes))!= 1 or \
+          len(gv.array_init_values) != first_dimension_size or \
+          len(gv.array_init_values[0]) != second_dimension_size:
+          helpers.throw_error("Amount of items in initialization does not match size.")
+        gv.array_init_values = list(itertools.chain.from_iterable(gv.array_init_values))
+      else:
+        if len(gv.array_init_values) != second_dimension_size:
+          helpers.throw_error("Amount of items in initialization does not match size.")
+        gv.array_init_values = gv.array_init_values * first_dimension_size
 
-  gv.array_init_values = []
+    for index, value in enumerate(gv.array_init_values):
+      if value.get_type() != array_type:
+        helpers.throw_error("Type mismatch in initialization.")
+      quad = Quad(Operators.EQUAL, value.get_value(), array_address + index)
+      gv.quad_list.add(quad)
+
+  gv.array_init_values = None
