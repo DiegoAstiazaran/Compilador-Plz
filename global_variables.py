@@ -1,17 +1,19 @@
-from directories import FunctionDirectory, SubroutineDirectory
-from structures import Stack, QuadList, TemporalMemory, SemanticCube, ParserMemoryManager
-
-# Boolean for debugging parser
-parse_debug = False
+from constants import Constants
+from function_directory import FunctionDirectory
+from subroutine_directory import SubroutineDirectory
+from structures import Stack, QuadList
+from semantic_cube import SemanticCube
+from parser_memory import ParserMemoryManager
 
 # Main directory with global scope, functions and classes.
 function_directory = FunctionDirectory()
 
-#
+# Directory with subrotine headers
 subroutine_directory = SubroutineDirectory()
 
-# Current block of function_directory.
-current_block = None
+# Current block of function_directory
+# "Global" si no esta en un metodo
+current_block = Constants.GLOBAL_BLOCK
 
 # Current block when current_block is a class.
 current_class_block = None
@@ -19,6 +21,7 @@ current_class_block = None
 # Current last type read in a declaration or initialization
 current_last_type = None
 
+#
 current_param_type = None
 
 # Defines if current class block is public
@@ -43,13 +46,16 @@ current_condition_has_else = False
 condition_end = False
 
 # Operator value for current for cycle
-current_for_operator = None
+stack_for_operators = Stack()
 
 #
 sub_call_first_id = None
 
 #
 sub_call_second_id = None
+
+#
+current_object = None
 
 # Semantic cube object
 semantic_cube = SemanticCube()
@@ -69,17 +75,17 @@ stack_sub_calls = Stack()
 # List of quads
 quad_list = QuadList()
 
-# Temporal memory manager
-temporal_memory = TemporalMemory()
-
 #
 memory_manager = ParserMemoryManager()
 
 #
-global_error = []
+array_access_indices = []
 
 #
-array_access_indices = []
+array_init_values = None
+
+#
+current_this = False
 
 # For debugging purposes
 # TODO: delete

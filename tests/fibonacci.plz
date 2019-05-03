@@ -1,0 +1,16 @@
+int num.
+
+sub int fib(int n):
+  if n == 1 | n == 0 :
+    return n.
+  else:
+    return fib(n-1) + fib(n-2).
+  end
+end
+
+int i.
+
+for i from 0 by 1 while i < 10:
+  read: num end
+  print: 'fib of ', num, ' is ', fib(num) end
+end

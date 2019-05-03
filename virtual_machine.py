@@ -1,16 +1,19 @@
 from structures import Quad
 from constants import Operators, QuadOperations, Types, Constants
-from structures import VirtualMachineMemoryManager
-from virtualMachineGlobalVariables import operations
+from virtual_machine_memory import VirtualMachineMemoryManager
+from virtual_machine_global_variables import operations
 import helpers
+from copy import copy
 
 def execute_virtual_machine(quad_list, constant_memory, subroutine_directory):
   quad_pointer = 0
   memory_manager = VirtualMachineMemoryManager()
   memory_manager.add_constant_memory(constant_memory)
+  items_to_read = []
+  values_read = []
   while(quad_pointer < quad_list.size()):
     quad = quad_list.get(quad_pointer)
-    operation = quad.get_operation()  
+    operation = quad.get_operation()
     if operation == Operators.EQUAL:
       operand, result_address = quad.get_items()
       operand = memory_manager.get_memory_value(operand)
@@ -34,23 +37,53 @@ def execute_virtual_machine(quad_list, constant_memory, subroutine_directory):
       print(end = '\n')
     elif operation == QuadOperations.WRITE_SPACE:
       print(end = ' ')
-    elif operation == QuadOperations.READ:
+    elif operation == QuadOperations.READ_ITEM:
       memory_address = quad.get_items()
-      temporal = input()
+      items_to_read.append(memory_address)
+    elif operation == QuadOperations.READ_END:
+      # TODO: specify how read works in documentation
+      while(len(values_read) < len(items_to_read)):
+        temporal_values_read = input().split()
+        values_read.extend(temporal_values_read)
+      
+      for value_read, memory_address in zip(values_read, items_to_read):
+        type = memory_manager.get_memory_type(memory_address)
+        if type == Types.INT:
+          try:
+            value_read = int(value_read)
+          except ValueError:
+            helpers.throw_error_no_line("Input value must be an integer")
+        elif type == Types.FLT:
+          try:
+            value_read = float(value_read)
+          except ValueError:
+            helpers.throw_error_no_line("Input value must be a float")
+        elif type == Types.BOOL and value_read not in Constants.BOOLEAN:
+          helpers.throw_error_no_line("Input value must be a boolean")
+        memory_manager.set_memory_value(memory_address, value_read)
+      
+      del values_read[:len(items_to_read)]
+      items_to_read = []
+    elif operation == QuadOperations.READ_LN:
+      items_to_read = []      
+      memory_address = quad.get_items()
+
+      value_read = input()
+
       type = memory_manager.get_memory_type(memory_address)
       if type == Types.INT:
         try:
-          temporal = int(temporal)
+          value_read = int(value_read)
         except ValueError:
           helpers.throw_error_no_line("Input value must be an integer")
       elif type == Types.FLT:
         try:
-          temporal = float(temporal)
+          value_read = float(value_read)
         except ValueError:
           helpers.throw_error_no_line("Input value must be a float")
-      elif type == Types.BOOL and temporal not in Constants.BOOLEAN:
+      elif type == Types.BOOL and value_read not in Constants.BOOLEAN:
         helpers.throw_error_no_line("Input value must be a boolean")
-      memory_manager.set_memory_value(memory_address, temporal)
+      memory_manager.set_memory_value(memory_address, value_read)
     elif operation == QuadOperations.GOTO:
       quad_index = quad.get_items()
       quad_pointer = quad_index
@@ -75,10 +108,44 @@ def execute_virtual_machine(quad_list, constant_memory, subroutine_directory):
       operand, result_address = quad.get_items()
       operand = memory_manager.get_memory_value(operand)
       memory_manager.set_memory_value(result_address, operand, True)
-    # elif operation == QuadOperations.RETURN:
-    # elif operation == QuadOperations.ERA:
-    # elif operation == QuadOperations.PARAM:
-    # elif operation == QuadOperations.GOSUB:
+    elif operation == QuadOperations.ERA:
+      if len(quad.get_items()) == 2:
+        class_block_name, block_name = quad.get_items()
+        return_temporal_address = None
+      else:
+        class_block_name, block_name, return_temporal_address = quad.get_items()
+      subroutine_call = copy(subroutine_directory.get_subroutine(block_name, class_block_name))
+      subroutine_call.append(return_temporal_address) # position 2 of array
+      memory_manager.new_local_memory(subroutine_call)
+    elif operation == QuadOperations.PARAM:
+      param_address, param_counter = quad.get_items()
+      arg_address = memory_manager.get_sub_call_arg_address(param_counter)
+      param_value = memory_manager.get_memory_value(param_address)
+      memory_manager.set_arg_value(arg_address, param_value)
+    elif operation == QuadOperations.GOSUB:
+      start = memory_manager.get_sub_call_start()
+      memory_manager.set_quad_pointer(quad_pointer)
+      memory_manager.set_new_local_memory()
+      quad_pointer = start
+      continue
+    elif operation == QuadOperations.RETURN:
+      return_address = quad.get_items()
+      if return_address is not None:
+        return_value = memory_manager.get_memory_value(return_address)
+        return_temporal_address = memory_manager.get_return_temporal_address()
+      
+      return_position = memory_manager.get_return_position()
+      memory_manager.pop_local_memory()
+
+      if return_address is not None:
+        memory_manager.set_memory_value(return_temporal_address, return_value)
+
+      quad_pointer = return_position
+    elif operation == QuadOperations.THIS_PARAM:
+      type, memory_address = quad.get_items()
+      this_index = Types.primitives.index(type)
+      arg_address = memory_manager.get_sub_call_arg_address(this_index)
+      memory_manager.set_arg_value(arg_address, memory_address)
     else:
       helpers.throw_error_no_line("Invalid quad operation!")
     quad_pointer += 1

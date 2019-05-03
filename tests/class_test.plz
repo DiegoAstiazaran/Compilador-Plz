@@ -1,0 +1,43 @@
+int a.
+
+class Person:
+  attributes:
+    public int age(3).
+    public str name.
+    public int numbers(10).
+
+  methods:
+    sub Person(str s_name, int i_age):
+      name = s_name.
+      age = i_age.
+    end
+
+    public sub int get_age():
+      print: "this returns age" end
+      return age.
+    end
+
+    public sub str get_name():
+      print: "this returns name" end
+      return name.
+    end
+end
+
+Person p1("Diego", 20 + 2).
+int b.
+int array_global(15).
+
+sub void printDate():
+  print: 'today is sabado' end
+end
+
+a = 1.
+b = 2.
+
+p1@name = 'andres'.
+
+array_global[3] = a.
+
+p1@numbers[4] = 10.
+
+printDate().

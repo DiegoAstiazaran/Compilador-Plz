@@ -25,6 +25,7 @@ reserved = {
   'from' : 'FROM',
   'by' : 'BY',
   'read' : 'READ',
+  'read_ln' : 'READ_LN',
   'or' : 'OR',
   'and' : 'AND',
   'not' : 'NOT',
@@ -41,7 +42,7 @@ reserved = {
   'neq' : 'NEQ',
   'True' : 'TRUE',
   'False' : 'FALSE',
-  'dict' : 'DICT',
+  'this' : 'THIS'
 }
 
 # List of tokens that include reserved words tokens

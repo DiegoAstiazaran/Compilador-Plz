@@ -1,0 +1,36 @@
+int x.
+
+sub int get_number_plus_two(int number):
+  return number + 2.
+end
+
+sub int recursive_factorial(int number):
+  if number == 0:
+    return 1.
+  end
+  return number * recursive_factorial(number - 1).
+end
+
+sub int iterative_factorial(int number):
+  int result = 1. 
+  for number from number by -1 while number > 0:
+    result = result * number.
+  end
+  return result.
+end
+
+sub int print_(str string):
+  print: string end
+  return 9.
+end
+
+read: x end
+print: get_number_plus_two(x) end
+
+read: x end
+print: recursive_factorial(x) end
+
+read: x end
+print: iterative_factorial(x) end
+
+print_('diego').

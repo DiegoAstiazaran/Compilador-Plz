@@ -12,6 +12,8 @@ class Constants:
 
   FALSE_BOTTOM_IF_CONDITION = 'false_bottom_if_condition'
 
+  FALSE_BOTTOM_EXPRESSION = 'false_bottom_expression'
+
   TRUE = 'True'
   FALSE = 'False'
   BOOLEAN = [TRUE, FALSE]
@@ -65,7 +67,9 @@ class Operators:
 # Enum for quad operations
 class QuadOperations:
   WRITE           = 'write'
-  READ            = 'read'
+  READ_ITEM       = 'read_item'
+  READ_END        = 'read_end'
+  READ_LN         = 'real_ln'
   WRITE_NEW_LINE  = 'write_new_line'
   WRITE_SPACE     = 'write_space'
   RETURN          = 'return'
@@ -80,13 +84,18 @@ class QuadOperations:
   VER             = 'ver'
   CHECK_DIV       = 'check_div'
   EQUAL_ADDRESS   = 'eq_address' 
+  THIS_PARAM      = 'this_param'
   unary = [PLUS_UNARY, MINUS_UNARY]
 
 class Defaults:
-  INT = 0
-  FLT = 0.0
-  STR = ''
-  BOOL = False
+  INT = None
+  FLT = None
+  STR = None
+  BOOL = None
+  # INT = 0
+  # FLT = 0.0
+  # STR = ''
+  # BOOL = False
 
 class MemoryTypes:
   GLOBAL     = "Global"
@@ -124,6 +133,6 @@ class MemoryRanges:
   CONSTANTS_MAX = CONSTANTS + TYPES_LIMIT
   GLOBAL        = 10000                   # 10000 # -> scope, temporal, pointers
   GLOBAL_MAX    = GLOBAL + POINTERS_MAX   # 21000
-  LOCAL         = 20000                   # 30000 # -> scope, temporal, pointers
+  LOCAL         = 30000                   # 30000 # -> scope, temporal, pointers
   LOCAL_MAX     = LOCAL + POINTERS_MAX    # 41000
   ATTRIBUTES    = 0 # -> primitives    # new map for each class
