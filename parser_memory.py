@@ -3,9 +3,19 @@ import helpers
 
 class ParserMemoryPrimitivesMap:
   def __init__(self, first_class, second_class = None):
+    self._first = first_class
+    self._second = second_class
     base_address = getattr(MemoryRanges, first_class.upper())
     if second_class is not None:
       base_address += getattr(MemoryRanges, second_class.upper())
+
+    if first_class == MemoryTypes.ATTRIBUTES:
+      for type in Types.primitives:
+        setattr(self, type, base_address)
+        upper_size = type.upper() + '_SIZE'
+        setattr(self, type + '_max', base_address + getattr(MemoryRanges, upper_size))
+
+      return
 
     for type in Types.primitives:
       # start
@@ -13,9 +23,6 @@ class ParserMemoryPrimitivesMap:
       # max, can't get to this number
       type_max = type + '_max'
       setattr(self, type_max, base_address + getattr(MemoryRanges, type_max.upper()))
-
-    self._first = first_class
-    self._second = second_class
 
   def get_next(self, type):
     if type not in Types.primitives: # When getting memory for objects

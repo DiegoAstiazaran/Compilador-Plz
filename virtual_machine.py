@@ -141,6 +141,11 @@ def execute_virtual_machine(quad_list, constant_memory, subroutine_directory):
         memory_manager.set_memory_value(return_temporal_address, return_value)
 
       quad_pointer = return_position
+    elif operation == QuadOperations.THIS_PARAM:
+      type, memory_address = quad.get_items()
+      this_index = Types.primitives.index(type)
+      arg_address = memory_manager.get_sub_call_arg_address(this_index)
+      memory_manager.set_arg_value(arg_address, memory_address)
     else:
       helpers.throw_error_no_line("Invalid quad operation!")
     quad_pointer += 1

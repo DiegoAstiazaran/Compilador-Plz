@@ -84,6 +84,9 @@ array_access_indices = []
 #
 array_init_values = None
 
+#
+current_this = False
+
 # For debugging purposes
 # TODO: delete
 lines_read = []

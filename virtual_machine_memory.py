@@ -1,5 +1,6 @@
 from constants import Types, Defaults, MemoryRanges, MemoryTypes
 from structures import Stack
+import helpers
 
 class VirtualMachineMemoryPointerMap:
   def __init__(self):
@@ -32,7 +33,10 @@ class VirtualMachineMemoryPrimitivesMap:
   def get_memory_value(self, memory_address):
     new_address, type = self.get_memory_address_type(memory_address)
     self.fill(new_address, type)
-    return getattr(self, type)[new_address]
+    value = getattr(self, type)[new_address]
+    if value is None:
+      helpers.throw_error_no_line("Error: variable referenced before assignment")
+    return value
   
   def set_memory_value(self, memory_address, value):
     new_address, type = self.get_memory_address_type(memory_address)

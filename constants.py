@@ -88,10 +88,14 @@ class QuadOperations:
   unary = [PLUS_UNARY, MINUS_UNARY]
 
 class Defaults:
-  INT = 0
-  FLT = 0.0
-  STR = ''
-  BOOL = False
+  INT = None
+  FLT = None
+  STR = None
+  BOOL = None
+  # INT = 0
+  # FLT = 0.0
+  # STR = ''
+  # BOOL = False
 
 class MemoryTypes:
   GLOBAL     = "Global"

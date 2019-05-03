@@ -1,7 +1,7 @@
 def get_input():
   try:
     # file = input('Filename: ')
-    file = "matrix_mult"
+    file = "class_test"
     file = 'tests/' + file + '.plz'
     with open(file, 'r') as myfile:
         s = myfile.read()

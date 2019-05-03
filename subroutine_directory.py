@@ -72,7 +72,8 @@ class SubroutineDirectory:
   # Returns amount of params of subroutine
   def get_param_count(self, subroutine_name, block_name):
     block_name = self.fix_block_name(block_name)
-    return self._subroutine_directory[block_name].get_param_count(subroutine_name)
+    param_count = self._subroutine_directory[block_name].get_param_count(subroutine_name)
+    return param_count if block_name == Constants.GLOBAL_BLOCK else param_count - 4
   
   # Returns type of subroutine
   def get_type(self, subroutine_name, block_name):
@@ -101,7 +102,7 @@ class SubroutineDirectory:
     self._subroutine_directory[block_name].add_subroutine(subroutine_name, start_quad, is_public, type)
   
   # Add param to subroutine
-  # Param is an OperandPair
+  # Param is an OperandItem
   def add_param(self, subroutine_name, param, block_name):
     block_name = self.fix_block_name(block_name)
     self._subroutine_directory[block_name].add_param(subroutine_name, param)
@@ -130,3 +131,7 @@ class SubroutineDirectory:
   def fix_for_virtual_machine(self):
     for block_name in self._subroutine_directory.keys():
       self._subroutine_directory[block_name].fix_for_virtual_machine()
+
+  def fix_param_count(self, param_count, subroutine_name, block_name):
+    block_name = self.fix_block_name(block_name)
+    return param_count if block_name == Constants.GLOBAL_BLOCK else param_count + 4

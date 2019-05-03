@@ -313,7 +313,7 @@ def p_return(p):
 
 def p_sub_call(p):
   '''
-  sub_call : ID neural_sub_call_first_id sub_call_p neural_sub_call sub_call_args neural_sub_call_end_no_return_value DOT
+  sub_call : this_operator ID neural_sub_call_first_id sub_call_p neural_sub_call sub_call_args neural_sub_call_end_no_return_value DOT
   sub_call_p : MONEY neural_check_id_is_object ID neural_sub_call_second_id
              | empty
   '''
@@ -331,8 +331,8 @@ def p_sub_call_args(p):
 
 def p_decl_init(p):
   '''
-  decl_init : decl_init_p neural_check_operator_stack_equal DOT
-  decl_init_p : decl_init_var
+  decl_init : decl_init_p DOT
+  decl_init_p : decl_init_var neural_check_operator_stack_equal
               | decl_init_obj
   '''
 
@@ -387,12 +387,18 @@ def p_assignment(p):
 #
 def p_id_attr_access(p):
   '''
-  id_attr_access : ID neural_add_to_operand_stack_id id_attr_access_obj id_attr_access_access neural_restart_object
+  id_attr_access : this_operator ID neural_add_to_operand_stack_id id_attr_access_obj id_attr_access_access neural_id_attr_access_end
   id_attr_access_obj : AT ID neural_at_attribute
                      | empty
   id_attr_access_access : access
                         | empty
   '''
+
+def p_this_operator(p):
+  '''this_operator : THIS DOT neural_this
+                   | empty
+  '''
+
 
 # Other
 
