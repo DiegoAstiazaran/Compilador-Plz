@@ -27,3 +27,5 @@ operations = {
   QuadOperations.PLUS_UNARY : operator.pos,
   QuadOperations.MINUS_UNARY : operator.neg,
 }
+
+line_number = None

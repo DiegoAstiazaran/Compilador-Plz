@@ -61,6 +61,7 @@ def p_neural_array_access_end(p):
     helpers.throw_error("Can't perform such array operation")
 
   temporal = gv.memory_manager.get_memory_address(Types.INT, MemoryTypes.TEMPORAL, gv.current_block, gv.current_class_block)
+  # TODO: lo de abajo guarda un numero,checar
   array_address_constant_address = gv.memory_manager.get_constant_memory_address(array_address, Types.INT)
   quad = Quad(Operators.PLUS, indices[-1], array_address_constant_address, temporal) ####
   gv.quad_list.add(quad)

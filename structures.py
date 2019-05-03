@@ -1,5 +1,6 @@
 from constants import Constants
 import helpers
+from lexer import lexer
 
 # Item for operands inserted to stack
 class OperandItem:
@@ -82,6 +83,7 @@ class QuadList:
 # Quad for intermediate code
 class Quad:
   def __init__(self, instruction, first = None, second = None, third = None):
+    self._lineno = lexer.lineno
     if instruction is None:
       helpers.throw_error("Quad operator must be different from None")
     self._quad = [instruction]
@@ -101,6 +103,9 @@ class Quad:
   def get_operation(self):
     return self._quad[0]
   
+  def get_line_number(self):
+    return self._lineno
+
   def get_items(self):
     if len(self._quad) > 2:
       return tuple(self._quad[1:])
@@ -108,14 +113,7 @@ class Quad:
       return self._quad[1]
     else:
       return None
-    # Use this when lineno is included in quad      
-    # if len(self._quad) > 3:
-    #   return tuple(self._quad[1:-1])
-    # if len(self._quad) == 3:
-    #   return self._quad[1]
-    # else:
-    #   return None
-
+  
 class SubCall:
   def __init__(self, sub_name, block_name, object_name):
     # block name is the class

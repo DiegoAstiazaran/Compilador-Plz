@@ -1,7 +1,7 @@
 from structures import Quad
 from constants import Operators, QuadOperations, Types, Constants
 from virtual_machine_memory import VirtualMachineMemoryManager
-from virtual_machine_global_variables import operations
+import virtual_machine_global_variables as gv
 import helpers
 from copy import copy
 
@@ -14,6 +14,7 @@ def execute_virtual_machine(quad_list, constant_memory, subroutine_directory):
   while(quad_pointer < quad_list.size()):
     quad = quad_list.get(quad_pointer)
     operation = quad.get_operation()
+    gv.line_number = quad.get_line_number()
     if operation == Operators.EQUAL:
       operand, result_address = quad.get_items()
       operand = memory_manager.get_memory_value(operand)
@@ -22,7 +23,7 @@ def execute_virtual_machine(quad_list, constant_memory, subroutine_directory):
       left_operand, right_operand, result_address = quad.get_items()
       left_operand = memory_manager.get_memory_value(left_operand)
       right_operand = memory_manager.get_memory_value(right_operand)
-      temporal = operations[operation](left_operand, right_operand)
+      temporal = gv.operations[operation](left_operand, right_operand)
       memory_manager.set_memory_value(result_address, temporal)
     elif operation in QuadOperations.unary or operation in Operators.unary:
       operand, result_address = quad.get_items()

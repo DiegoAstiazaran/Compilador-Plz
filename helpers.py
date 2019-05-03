@@ -1,4 +1,5 @@
 from lexer import lexer
+import virtual_machine_global_variables as gv
 
 def throw_error(error_message):
   error = 'Line %d: %s' % (lexer.lineno, error_message)
@@ -6,5 +7,6 @@ def throw_error(error_message):
   # raise Exception(error)
 
 def throw_error_no_line(error_message):
-  exit(error_message)
+  error = 'Line %d: %s' % (gv.line_number, error_message)
+  exit(error)
   # raise Exception(error_message)

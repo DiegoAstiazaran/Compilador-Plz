@@ -415,7 +415,7 @@ def execute_parser(input):
   # Build the parser
   parser = yacc.yacc()
   parser.parse(input)
-  print(gv.quad_list)
-  # gv.quad_list.print_with_number()
+  # print(gv.quad_list)
+  gv.quad_list.print_with_number()
   gv.subroutine_directory.fix_for_virtual_machine()
   return gv.quad_list, gv.memory_manager.get_constants_map(), gv.subroutine_directory
