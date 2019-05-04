@@ -138,16 +138,16 @@ class VirtualMachineMemoryManager:
 
     return new_address, type
 
-  def get_memory_value(self, memory_address):
-    # TODO: add support for locals
+  def get_memory_value(self, memory_address, read_address = False):
     new_address, type = self.get_memory_address_type(memory_address)
     if type != MemoryTypes.CONSTANTS and self.get_current_attr(type).is_pointer(new_address):
-      stored_address = getattr(self, type).get_memory_value(new_address)
+      stored_address = self.get_current_attr(type).get_memory_value(new_address)
+      if read_address:
+        return stored_address
       return self.get_memory_value(stored_address)
     return self.get_current_attr(type).get_memory_value(new_address)
   
   def set_memory_value(self, memory_address, value, assign_address = False):
-    # TODO: add support for locals
     new_address, type = self.get_memory_address_type(memory_address)
     if type != MemoryTypes.CONSTANTS and self.get_current_attr(type).is_pointer(new_address):
       if assign_address:
@@ -160,7 +160,7 @@ class VirtualMachineMemoryManager:
 
   def get_memory_type(self, memory_address):
     new_address, type = self.get_memory_address_type(memory_address)
-    return getattr(self, type).get_memory_type(new_address)
+    return self.get_current_attr(type).get_memory_type(new_address)
 
   def new_local_memory(self, sub_call):
     local_memory = VirtualMachineMemoryScopeMap()

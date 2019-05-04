@@ -183,18 +183,18 @@ def p_neural_sub_call_args_end(p):
   gv.quad_list.add(quad)
 
 # check
-def p_neural_sub_call_end_return_value(p):
-  '''neural_sub_call_end_return_value :'''
-  current_sub_call = gv.stack_sub_calls.pop()
-  return_type = gv.subroutine_directory.get_type(current_sub_call.get_sub_name(), current_sub_call.get_block_name())
-  if return_type == Types.VOID:
-    helpers.throw_error("Subcall does not have a return value.")
-  temporal = gv.memory_manager.get_memory_address(return_type, MemoryTypes.TEMPORAL, gv.current_block, gv.current_class_block)
-  return_value = current_sub_call.get_return_temporal_address()
-  quad = Quad(Operators.EQUAL, return_value, temporal)
-  gv.quad_list.add(quad)
-  temporal_operand = OperandItem(temporal, return_type)
-  gv.stack_operands.push(temporal_operand)
+# def p_neural_sub_call_end_return_value(p):
+#   '''neural_sub_call_end_return_value :'''
+#   current_sub_call = gv.stack_sub_calls.pop()
+#   return_type = gv.subroutine_directory.get_type(current_sub_call.get_sub_name(), current_sub_call.get_block_name())
+#   if return_type == Types.VOID:
+#     helpers.throw_error("Subcall does not have a return value.")
+#   temporal = gv.memory_manager.get_memory_address(return_type, MemoryTypes.TEMPORAL, gv.current_block, gv.current_class_block)
+#   return_value = current_sub_call.get_return_temporal_address()
+#   quad = Quad(Operators.EQUAL, return_value, temporal)
+#   gv.quad_list.add(quad)
+#   temporal_operand = OperandItem(temporal, return_type)
+#   gv.stack_operands.push(temporal_operand)
 
 def p_neural_sub_call_end_no_return_value(p):
   '''neural_sub_call_end_no_return_value :'''

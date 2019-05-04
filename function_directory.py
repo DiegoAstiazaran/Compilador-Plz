@@ -57,6 +57,11 @@ class VariableDirectory:
     var_name = self.fix_var_name(var_name_address)
     dimensions = self.get_variable_dimensions(var_name)        
     return len(dimensions)
+  
+  def get_array_dimensions_count_(self, var_address, type):
+    var_name = self.get_var_name_from_address_(var_address, type)
+    dimensions = self.get_variable_dimensions(var_name)        
+    return len(dimensions)
 
   # Returns indexed variable dimension
   # var_name_address must exist in directory
@@ -81,6 +86,11 @@ class VariableDirectory:
   def get_var_name_from_address(self, address):
     for var_name in self._variable_table.keys():
       if address == self.get_variable_address(var_name):
+        return var_name
+  
+  def get_var_name_from_address_(self, var_address, type):
+    for var_name in self._variable_table.keys():
+      if var_address == self.get_variable_address(var_name) and self.get_variable_type(var_name) == type:
         return var_name
 
   # Returns amount of memory used by variable
@@ -137,6 +147,17 @@ class FunctionDirectory:
   # Return directory stored in dictionary entry
   def get_entry_directory(self, block_name):
     return self._function_table[block_name][1]
+
+  def get_variable_item(self, var_name, block_name, class_name = None):
+    if class_name is None:
+      type_, address_ = self.get_entry_directory(block_name). \
+                        get_variable_type_address(var_name)
+    else:
+      type_, address_ = self.get_entry_directory(class_name).get_entry_directory(block_name). \
+                        get_variable_type_address(var_name)
+    if type_ is None:
+      helpers.throw_error('Undeclared variable ' + var_name)
+    return type_, address_, block_name, class_name
 
   # Returns type, address, block, class of var_name
   # Checks on all possible scopes
@@ -251,6 +272,10 @@ class FunctionDirectory:
     return self.common_method("get_array_dimensions_count",
                               [var_name_address],
                               block_name, class_name)
+
+  def get_array_dimensions_count_(self, var_address, type, block_name, class_name):
+    return self.get_entry_directory(class_name).get_entry_directory(block_name). \
+           get_array_dimensions_count_(var_address, type)
 
   # Returns var_name of address
   def get_var_name_from_address(self, memory_address, block_name, class_name = None):

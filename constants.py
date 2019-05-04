@@ -83,7 +83,8 @@ class QuadOperations:
   MINUS_UNARY     = 'negative'
   VER             = 'ver'
   CHECK_DIV       = 'check_div'
-  EQUAL_ADDRESS   = 'eq_address' 
+  WRITE_ADDRESS   = 'write_address' 
+  READ_ADDRESS    = 'read_address'
   THIS_PARAM      = 'this_param'
   unary = [PLUS_UNARY, MINUS_UNARY]
 

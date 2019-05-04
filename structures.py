@@ -4,8 +4,12 @@ from lexer import lexer
 
 # Item for operands inserted to stack
 class OperandItem:
-  def __init__(self, operand_value, operand_type, block_name = None, class_name = None):
+  def __init__(self, operand_value, operand_type, block_name = None, class_name = None, is_pending = False):
     self._item = (operand_value, operand_type, block_name, class_name)
+    # Used for 'this' reference
+    self._pending_object_reference = is_pending
+    # Used for object @ attribute
+    self._object_reference = None
 
   def __str__(self):
     return str(self._item)
@@ -24,6 +28,18 @@ class OperandItem:
   
   def get_class_name(self):
     return self._item[3]
+
+  def set_pending_object_reference(self, is_pending):
+    self._pending_object_reference = is_pending
+  
+  def has_pending_object_reference(self):
+    return self._pending_object_reference
+  
+  def set_object_reference(self, address):
+    self._object_reference = address
+  
+  def get_object_reference(self):
+    return self._object_reference
 
 # Implementantion of stack
 class Stack:
