@@ -20,11 +20,3 @@ def p_neural_fill_goto(p):
   next_quad = gv.quad_list.next()
   gv.quad_list.add_element_to_quad(quad_index, next_quad)
 
-# Use for debugging
-# TODO: delete
-def p_neural_new_line(p):
-  '''neural_new_line :'''
-  line = lexer.lineno
-  if line not in gv.lines_read:
-    print('Line #%d\n' % (line) )
-  gv.lines_read.append(line)

@@ -2,14 +2,17 @@ int a.
 
 class Person:
   attributes:
-    public int age(3).
+    public int age.
     public str name.
     public int numbers(10).
 
   methods:
     sub Person(str s_name, int i_age):
-      name = s_name.
+      str s = "checar age, es un arreglo y no lo estoy usando como tal".
+      this.name = s_name.
       age = i_age.
+      numbers[0] = 0.
+      numbers[9] = 9.
     end
 
     public sub int get_age():
@@ -26,6 +29,7 @@ end
 Person p1("Diego", 20 + 2).
 int b.
 int array_global(15).
+str ss.
 
 sub void printDate():
   print: 'today is sabado' end
@@ -41,3 +45,4 @@ array_global[3] = a.
 p1@numbers[4] = 10.
 
 printDate().
+

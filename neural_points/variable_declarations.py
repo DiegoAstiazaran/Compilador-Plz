@@ -4,6 +4,7 @@ from constants import Types, MemoryTypes, Operators
 from structures import Quad, OperandItem
 import global_variables as gv      # Import global variables
 import helpers
+from lexer import lexer
 
 from .expressions import add_to_operand_stack
 

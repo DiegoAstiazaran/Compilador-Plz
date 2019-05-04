@@ -14,7 +14,6 @@ start = 'program'
 # Functions for all grammar rules
 # Function name indicates what each of them are used for
 
-
 def p_program(p):
   '''
   program : program_p block
@@ -203,22 +202,23 @@ def p_operator(p):
            | DIVIDE   neural_add_to_operator_stack
   '''
 
-#
 def p_id_calls(p):
   '''
-  id_calls : ID neural_sub_call_first_id id_calls_p
-  id_calls_p : neural_add_subcall_first_id_to_stack access
-             | neural_sub_call sub_call_args neural_sub_call_end_return_value
-             | id_calls_method
-             | id_calls_attribute
-             | empty neural_id_calls_p_empty
-  id_calls_method : MONEY neural_check_id_is_object ID neural_sub_call_second_id neural_sub_call sub_call_args neural_sub_call_end_return_value
-  id_calls_attribute : AT neural_check_id_is_object ID neural_id_calls_p_empty id_calls_attribute_p
-  id_calls_attribute_p : access
-                       | empty
+  id_calls : id_attr_access
+           | sub_call
   '''
 
-#
+# Id or attribute of id(obj) with a possible array access
+# Must leave address is stack_operands
+def p_id_attr_access(p):
+  '''
+  id_attr_access : this_operator ID neural_add_to_operand_stack_id id_attr_access_obj id_attr_access_access neural_id_attr_access_end
+  id_attr_access_obj : AT ID neural_at_attribute
+                     | empty
+  id_attr_access_access : access
+                        | empty neural_create_pointer
+  '''
+
 def p_access(p):
   '''
   access : access_pp neural_array_access_first access_p neural_array_access_end
@@ -367,7 +367,6 @@ def p_decl_init_var(p):
                    | empty
   '''
 
-#
 def p_decl_init_obj(p):
   '''
   decl_init_obj : CLASS_NAME ID neural_var_decl_id neural_constructor_call sub_call_args neural_sub_call_end_no_return_value
@@ -375,30 +374,15 @@ def p_decl_init_obj(p):
 
 # Assignments grammar
 
-#
 def p_assignment(p):
   '''
   assignment : id_attr_access EQUAL neural_add_to_operator_stack expression neural_check_operator_stack_equal DOT
-  '''
-
-#
-# Id or attribute of id(obj) with a possible array access
-# Must leave address is stack_operands
-#
-def p_id_attr_access(p):
-  '''
-  id_attr_access : this_operator ID neural_add_to_operand_stack_id id_attr_access_obj id_attr_access_access neural_id_attr_access_end
-  id_attr_access_obj : AT ID neural_at_attribute
-                     | empty
-  id_attr_access_access : access
-                        | empty
   '''
 
 def p_this_operator(p):
   '''this_operator : THIS DOT neural_this
                    | empty
   '''
-
 
 # Other
 

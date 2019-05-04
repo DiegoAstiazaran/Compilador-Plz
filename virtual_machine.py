@@ -28,7 +28,7 @@ def execute_virtual_machine(quad_list, constant_memory, subroutine_directory):
     elif operation in QuadOperations.unary or operation in Operators.unary:
       operand, result_address = quad.get_items()
       operand = memory_manager.get_memory_value(operand)
-      temporal = operations[operation](operand)
+      temporal = gv.operations[operation](operand)
       memory_manager.set_memory_value(result_address, temporal)
     elif operation == QuadOperations.WRITE:
       operand = quad.get_items()
@@ -105,10 +105,14 @@ def execute_virtual_machine(quad_list, constant_memory, subroutine_directory):
       operand_value = memory_manager.get_memory_value(operand_address)
       if operand_value == 0:
         helpers.throw_error_no_line("Can't divide by 0")
-    elif operation == QuadOperations.EQUAL_ADDRESS:
+    elif operation == QuadOperations.WRITE_ADDRESS:
       operand, result_address = quad.get_items()
       operand = memory_manager.get_memory_value(operand)
       memory_manager.set_memory_value(result_address, operand, True)
+    elif operation == QuadOperations.READ_ADDRESS:
+      operand, result_address = quad.get_items()
+      operand = memory_manager.get_memory_value(operand, True)
+      memory_manager.set_memory_value(result_address, operand)
     elif operation == QuadOperations.ERA:
       if len(quad.get_items()) == 2:
         class_block_name, block_name = quad.get_items()

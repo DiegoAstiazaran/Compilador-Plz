@@ -48,8 +48,20 @@ def p_neural_add_to_operand_stack_bool(p):
 def p_neural_add_to_operand_stack_id(p):
   '''neural_add_to_operand_stack_id :'''
   id_name = p[-1]
-  id_type, id_name, id_block, id_class = gv.function_directory.get_variable_item_deep(id_name, gv.current_block, gv.current_class_block)
-  add_to_operand_stack(id_name, id_type, id_block, id_class)
+  if gv.current_this: # Looking for attribute at current object
+    id_type, id_name, id_block, id_class = gv.function_directory. \
+      get_variable_item(id_name, Constants.GLOBAL_BLOCK, gv.current_class_block)
+    is_pending = True
+    gv.current_this = False
+  else:
+    id_type, id_name, id_block, id_class = gv.function_directory. \
+      get_variable_item_deep(id_name, gv.current_block, gv.current_class_block)
+    is_pending = False
+    # Condition true when variable is attribute of current object
+    if id_block == Constants.GLOBAL_BLOCK and gv.function_directory.is_class(id_class):
+      is_pending = True
+
+  add_to_operand_stack(id_name, id_type, id_block, id_class, is_pending)
 
 # Helper to add constants to operand stack
 # Changes constant to memory_address
@@ -58,8 +70,8 @@ def add_to_operand_stack_constant(operand_value, operand_type):
   add_to_operand_stack(operand_value, operand_type)
 
 # Helper to insert OperandItem to operand stack
-def add_to_operand_stack(operand_value, operand_type, block_name = None, class_name = None):
-  gv.stack_operands.push(OperandItem(operand_value, operand_type, block_name, class_name))
+def add_to_operand_stack(operand_value, operand_type, block_name = None, class_name = None, is_pending = False):
+  gv.stack_operands.push(OperandItem(operand_value, operand_type, block_name, class_name, is_pending))
 
 ### Check operator stack
 
@@ -155,11 +167,3 @@ def p_neural_read_unary_operator(p):
     gv.stack_operators.push(new_operator)
   gv.read_unary_operator = True
 
-# TODO: delete
-# def p_neural_operator_stack_push_false(p):
-#   '''neural_operator_stack_push_false :'''
-#   gv.stack_operators.push("(")
-
-# def p_neural_operator_stack_pop_false(p):
-#   '''neural_operator_stack_pop_false :'''
-#   gv.stack_operators.pop()
