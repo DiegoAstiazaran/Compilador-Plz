@@ -84,6 +84,4 @@ array_init_values = None
 #
 current_this = False
 
-# For debugging purposes
-# TODO: delete
-lines_read = []
+sub_call_has_return_value = None

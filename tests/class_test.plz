@@ -15,15 +15,20 @@ class Person:
       numbers[9] = 9.
     end
 
+    public sub str get_name():
+      return name.
+    end
+
+    public sub void set_name(str new_name):
+      this.name = new_name.
+    end
+
     public sub int get_age():
-      print: "this returns age" end
+      this.set_name("andres").
+      this.name = get_name() + 'astiaza'.
       return age.
     end
 
-    public sub str get_name():
-      print: "this returns name" end
-      return name.
-    end
 end
 
 Person p1("Diego", 20 + 2).
@@ -33,12 +38,23 @@ str ss.
 
 sub void printDate():
   print: 'today is sabado' end
+  print: p1$get_age() end
+  print: p1$get_name() end
+  print: p1@name end
 end
 
 a = 1.
 b = 2.
 
-p1@name = 'andres'.
+p1@name = 'astiazaran'.
+
+print: p1@name end
+
+a = p1$get_age().
+
+print: p1@name end
+
+print: a end
 
 array_global[3] = a.
 

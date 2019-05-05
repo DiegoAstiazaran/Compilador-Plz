@@ -139,8 +139,6 @@ def p_neural_check_operator_stack_equal(p):
   first = gv.stack_operands.pop()
   if not gv.stack_operators.empty() and gv.stack_operators.top() == Operators.EQUAL:
     operand_id = gv.stack_operands.pop()
-    # TODO: cheecar esto
-    # operand_id_type = operand_id.get_type() if operand_id.get_type() in Types.primitives else operand_id.get_type()[0]
     operator = gv.stack_operators.pop()
     if first.get_type() != operand_id.get_type():
       helpers.throw_error('Type mismatch')

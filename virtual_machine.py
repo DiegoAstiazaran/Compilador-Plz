@@ -15,6 +15,8 @@ def execute_virtual_machine(quad_list, constant_memory, subroutine_directory):
     quad = quad_list.get(quad_pointer)
     operation = quad.get_operation()
     gv.line_number = quad.get_line_number()
+    if quad_pointer == 84:
+      x = 9
     if operation == Operators.EQUAL:
       operand, result_address = quad.get_items()
       operand = memory_manager.get_memory_value(operand)
@@ -150,7 +152,8 @@ def execute_virtual_machine(quad_list, constant_memory, subroutine_directory):
       type, memory_address = quad.get_items()
       this_index = Types.primitives.index(type)
       arg_address = memory_manager.get_sub_call_arg_address(this_index)
-      memory_manager.set_arg_value(arg_address, memory_address)
+      value = memory_manager.get_memory_value(memory_address)
+      memory_manager.set_arg_value(arg_address, value)
     else:
       helpers.throw_error_no_line("Invalid quad operation!")
     quad_pointer += 1
