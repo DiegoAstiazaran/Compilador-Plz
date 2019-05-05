@@ -37,7 +37,7 @@ def p_statement(p):
             | condition
             | cycle
             | return
-            | sub_call
+            | sub_call neural_sub_call_no_return_value DOT
             | assignment
   '''
 
@@ -205,7 +205,7 @@ def p_operator(p):
 def p_id_calls(p):
   '''
   id_calls : id_attr_access
-           | sub_call
+           | sub_call neural_sub_call_return_value
   '''
 
 # Id or attribute of id(obj) with a possible array access
@@ -313,7 +313,7 @@ def p_return(p):
 
 def p_sub_call(p):
   '''
-  sub_call : this_operator ID neural_sub_call_first_id sub_call_p neural_sub_call sub_call_args neural_sub_call_end_no_return_value DOT
+  sub_call : this_operator ID neural_sub_call_first_id sub_call_p neural_sub_call sub_call_args
   sub_call_p : MONEY neural_check_id_is_object ID neural_sub_call_second_id
              | empty
   '''
@@ -369,7 +369,7 @@ def p_decl_init_var(p):
 
 def p_decl_init_obj(p):
   '''
-  decl_init_obj : CLASS_NAME ID neural_var_decl_id neural_constructor_call sub_call_args neural_sub_call_end_no_return_value
+  decl_init_obj : CLASS_NAME ID neural_var_decl_id neural_constructor_call sub_call_args neural_sub_call_no_return_value
   '''
 
 # Assignments grammar
@@ -400,6 +400,6 @@ def execute_parser(input):
   parser = yacc.yacc()
   parser.parse(input)
   # print(gv.quad_list)
-  gv.quad_list.print_with_number()
+  # gv.quad_list.print_with_number()
   gv.subroutine_directory.fix_for_virtual_machine()
   return gv.quad_list, gv.memory_manager.get_constants_map(), gv.subroutine_directory

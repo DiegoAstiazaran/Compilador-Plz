@@ -85,7 +85,7 @@ def p_neural_create_pointer(p):
     array_dimension_count = gv.function_directory.get_array_dimensions_count(array_address, block_name, class_name)
   
   if array_dimension_count > 0:
-    helpers.throw_error("Can't use array with index.")
+    helpers.throw_error("Can't use array without index.")
 
   pointer = gv.memory_manager.get_next_pointer(gv.current_block, gv.current_class_block)
   array_address_constant_address = gv.memory_manager.get_constant_memory_address(array_address, Types.INT)
