@@ -24,6 +24,7 @@ class Persona :
     sub Persona(bool b):
       int i_a.
       flt f_a = 5.0.
+      i_a = 1.
       age = i_a.
     end
 
@@ -130,6 +131,7 @@ repeat:
     i_a = 2.
   end
   i_a = 3.
+  print: i_a end
 while True end
 
 for i_a from 100 by /3 while i_a > 0:

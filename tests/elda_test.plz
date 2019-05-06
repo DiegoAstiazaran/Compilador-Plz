@@ -16,6 +16,8 @@ end
 sub void dos(int a, flt g):
   int i.
   i = a.
+  k = 1.
+  j = 1.
   when a > 0 repeat:
     a = a - k * j.
     uno(a*2, a + k).

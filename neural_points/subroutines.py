@@ -1,8 +1,7 @@
-from constants import Constants, Types, QuadOperations, MemoryTypes, Operators, MemoryRanges
-from structures import Quad, OperandItem, SubCall
+from constants import Constants, MemoryRanges, MemoryTypes, Operators, QuadOperations, Types 
+from structures import OperandItem, Quad, SubCall
 import global_variables as gv      # Import global variables
 import helpers
-from lexer import lexer
 
 ### Subroutine declaration
 
@@ -199,7 +198,6 @@ def p_neural_sub_call_arg(p):
 def p_neural_sub_call_args_end(p):
   '''neural_sub_call_args_end :'''
   current_sub_call = gv.stack_sub_calls.top()
-  # TODO: check what happens when extra params are sent
   if current_sub_call.get_param_count() != gv.subroutine_directory.get_param_count(current_sub_call.get_sub_name(), current_sub_call.get_block_name()):
     helpers.throw_error("Call not valid, less arguments than expected")
   

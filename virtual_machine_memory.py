@@ -1,4 +1,4 @@
-from constants import Types, Defaults, MemoryRanges, MemoryTypes
+from constants import Constants, Types, Defaults, MemoryRanges, MemoryTypes
 from structures import Stack
 import helpers
 
@@ -118,7 +118,7 @@ class VirtualMachineMemoryManager:
     for type, type_map in constants_map.items():
       for value, address in type_map.items():
         if type ==  Types.BOOL:
-          value = bool(value)
+          value = value == Constants.TRUE
         getattr(self, MemoryTypes.CONSTANTS).set_memory_value(address, value)
 
   def get_memory_address_type(self, memory_address):
@@ -131,10 +131,8 @@ class VirtualMachineMemoryManager:
     else:
       helpers.throw_error_no_line("Error in address")
 
-    # if type != MemoryTypes.LOCAL:
     upper_type = type.upper()
     new_address = memory_address - getattr(MemoryRanges, upper_type)
-    # TODO: else
 
     return new_address, type
 

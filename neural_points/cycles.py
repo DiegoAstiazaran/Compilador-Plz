@@ -1,4 +1,4 @@
-from constants import QuadOperations, Types, Operators
+from constants import Operators, QuadOperations, Types
 from structures import Quad
 import global_variables as gv
 import helpers
