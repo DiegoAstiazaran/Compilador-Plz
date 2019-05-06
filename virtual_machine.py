@@ -15,8 +15,6 @@ def execute_virtual_machine(quad_list, constant_memory, subroutine_directory):
     quad = quad_list.get(quad_pointer)
     operation = quad.get_operation()
     gv.line_number = quad.get_line_number()
-    if quad_pointer == 84:
-      x = 9
     if operation == Operators.EQUAL:
       operand, result_address = quad.get_items()
       operand = memory_manager.get_memory_value(operand)
