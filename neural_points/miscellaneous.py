@@ -1,4 +1,3 @@
-from lexer import lexer   # Import lexer
 from constants import QuadOperations
 from structures import Quad
 import global_variables as gv

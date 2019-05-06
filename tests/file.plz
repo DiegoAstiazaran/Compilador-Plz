@@ -102,6 +102,9 @@ else:
 
 end
 
+x2 = 1.
+x3 = 2.0.
+
 print: 4324, x2, x3 end
 
 when 7 > 7 repeat:
