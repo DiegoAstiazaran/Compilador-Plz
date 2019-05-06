@@ -7,10 +7,12 @@ from lexer import lexer
 from .expressions import add_to_operand_stack
 from .attribute import p_neural_at_attribute
 
+# solves expression for array or first part of matrix
 def p_neural_array_access_first(p):
   '''neural_array_access_first :'''
   array_access(0)
 
+# Solves expression for second part of matrix
 def p_neural_array_access_second(p):
   '''neural_array_access_second :'''
   array_access(1)
@@ -70,6 +72,7 @@ def p_neural_array_access_end(p):
   operand_item.set_object_reference(array_item.get_object_reference())
   operand_item.set_pending_object_reference(array_item.has_pending_object_reference())
   gv.stack_operands.push(operand_item)
+
 
 def p_neural_create_pointer(p):
   '''neural_create_pointer :'''

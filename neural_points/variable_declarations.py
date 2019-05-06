@@ -35,6 +35,7 @@ def p_neural_var_decl_id(p):
   gv.current_last_type = None
 
 # Called after each primitive type
+# Gets the last type of a variable
 def p_neural_decl_type(p):
   '''neural_decl_type :'''
   gv.current_last_type = p[-1]

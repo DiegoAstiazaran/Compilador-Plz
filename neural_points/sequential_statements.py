@@ -27,18 +27,21 @@ def p_neural_write_space(p):
 ### Read
 
 # Called after each item to be read in a read statement
+# Reads item for item in the read statement
 def p_neural_read_item(p):
   '''neural_read_item :'''
   read_item = gv.stack_operands.pop()
   read_item_helper(read_item, QuadOperations.READ_ITEM)
 
 # Called after read line statement
+# Reads entire line using quad operation READ_LN
 def p_neural_read_ln(p):
   '''neural_read_ln :'''
   read_item = gv.stack_operands.pop()
   read_item_helper(read_item, QuadOperations.READ_LN)
 
 # Called at the end of read statement
+# Reads end line of a read statement.
 def p_neural_read_end(p):
   '''neural_read_end :'''
   quad = Quad(QuadOperations.READ_END)

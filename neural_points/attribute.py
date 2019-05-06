@@ -4,6 +4,8 @@ import global_variables as gv      # Import global variables
 import helpers
 from lexer import lexer
 
+# Validates that the caller of the attribute is an object, that the attribute 
+# exists and has the correct modifier (public private)
 def p_neural_at_attribute(p):
   '''neural_at_attribute :'''
   object_item = gv.stack_operands.pop()

@@ -1,5 +1,9 @@
 int a.
 
+sub void print_data():
+  print: "PRINT DATA" end
+end
+
 class Person:
   attributes:
     public int age.
@@ -23,9 +27,23 @@ class Person:
       this.name = new_name.
     end
 
+    public sub void print_data(int start, int last):
+      int i.
+      for i from start by 3 while i <= last:
+        print: i end
+      end
+    end
+
+    private sub int private_method():
+      print: "Este metodo es privado" end
+      print_data(4,10).
+      return 1.
+    end
+
     public sub int get_age():
       this.set_name("andres").
       this.name = get_name() + 'astiaza'.
+      private_method().
       return age.
     end
 
@@ -62,3 +80,5 @@ p1@numbers[4] = 10.
 
 printDate().
 
+p1$print_data(4, 10, 60).
+print_data().
