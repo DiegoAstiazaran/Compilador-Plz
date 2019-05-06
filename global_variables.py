@@ -83,5 +83,3 @@ array_init_values = None
 
 #
 current_this = False
-
-sub_call_has_return_value = None
