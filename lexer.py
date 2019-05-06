@@ -76,7 +76,9 @@ tokens = [
   'CTE_F',
   'CTE_STR',
   'L_SQ_BRACKET',
-  'R_SQ_BRACKET'
+  'R_SQ_BRACKET',
+  'COMMENT',
+  'MULTI_LINE_COMMENT',
 ] + list(reserved.values())
 
 # Regular expressions for one character long tokens
@@ -131,6 +133,14 @@ def t_CTE_STR(t):
   r'"[^"]*" | \'[^\']*\''
   t.value = t.value[1:-1]
   return t
+
+def t_MULTI_LINE_COMMENT(t):
+  r'\#\#\#(.|\n)*\#\#\#'
+  t.lexer.lineno += t.value.count('\n')
+
+def t_COMMENT(t):
+  r'\#.*(\n|$)'
+  t.lexer.lineno += 1
 
 # Define a rule so we can track line numbers
 def t_newline(t):

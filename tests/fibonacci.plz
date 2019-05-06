@@ -1,16 +1,39 @@
 int num.
 
-sub int fib(int n):
-  if n == 1 | n == 0 :
+sub int fib_rec(int n):
+  if n < 0:
+    return -1.
+  end
+  if n == 0 | n == 1 :
     return n.
   else:
-    return fib(n-1) + fib(n-2).
+    return fib_rec(n-1) + fib_rec(n-2).
   end
+end
+
+sub int fib_iter(int n):
+  int a = 0.
+  int b = 1.
+  int c.
+  int i.
+  if n < 0:
+    return -1.
+  end
+  if n == 0 | n == 1 :
+    return n.
+  end
+  for i from 0 by 1 while i < n-1:
+    c = a + b.
+    a = b.
+    b = c.
+  end
+  return c.
 end
 
 int i.
 
 for i from 0 by 1 while i < 10:
   read: num end
-  print: 'fib of ', num, ' is ', fib(num) end
+  print: 'fib of ', num, ' is ', fib_iter(num) end
+  print: 'fib of ', num, ' is ', fib_rec(num) end
 end

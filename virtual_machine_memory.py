@@ -160,6 +160,9 @@ class VirtualMachineMemoryManager:
 
   def get_memory_type(self, memory_address):
     new_address, type = self.get_memory_address_type(memory_address)
+    if type != MemoryTypes.CONSTANTS and self.get_current_attr(type).is_pointer(new_address):
+      memory_address = self.get_current_attr(type).get_memory_value(new_address)
+      new_address, type = self.get_memory_address_type(memory_address)
     return self.get_current_attr(type).get_memory_type(new_address)
 
   def new_local_memory(self, sub_call):
