@@ -21,6 +21,9 @@ def p_neural_class_decl_inheritance(p):
   gv.function_directory.check_class_exists(class_name)
   gv.function_directory.inherit_class(gv.current_class_block, class_name)
   gv.subroutine_directory.inherit_class(gv.current_class_block, class_name)
+  class_variables_size = gv.function_directory.get_class_variables_memory_size(class_name)
+  for type, size in class_variables_size.items():
+    gv.memory_manager.increase_counter(type, size, gv.current_block, gv.current_class_block)
 
 # Called after PRIVATE in public section of class declaration
 def p_neural_class_decl_private(p):
