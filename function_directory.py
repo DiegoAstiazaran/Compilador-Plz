@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from constants import Constants, Types
 import helpers
 
@@ -318,6 +320,9 @@ class FunctionDirectory:
     return self.get_entry_directory(class_name). \
            get_entry_directory(Constants.GLOBAL_BLOCK). \
            get_variable_is_public(var_name)
+
+  def inherit_class(self, sub_class, base_class):
+    self._function_table[sub_class] = deepcopy(self._function_table[base_class])
 
   # Used for debugging and testing purposes
   def output(self):

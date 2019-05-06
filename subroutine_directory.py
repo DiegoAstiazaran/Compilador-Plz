@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from constants import Constants
 import helpers
 
@@ -135,3 +137,6 @@ class SubroutineDirectory:
   def fix_param_count(self, param_count, subroutine_name, block_name):
     block_name = self.fix_block_name(block_name)
     return param_count if block_name == Constants.GLOBAL_BLOCK else param_count + 4
+
+  def inherit_class(self, sub_class, base_class):
+    self._subroutine_directory[sub_class] = deepcopy(self._subroutine_directory[base_class])

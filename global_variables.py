@@ -83,3 +83,6 @@ array_init_values = None
 
 #
 current_this = False
+
+#
+print_new_line = None

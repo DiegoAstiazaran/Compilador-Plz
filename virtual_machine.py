@@ -44,7 +44,6 @@ def execute_virtual_machine(quad_list, constant_memory, subroutine_directory):
       memory_address = quad.get_items()
       items_to_read.append(memory_address)
     elif operation == QuadOperations.READ_END:
-      # TODO: specify how read works in documentation
       while(len(values_read) < len(items_to_read)):
         temporal_values_read = input().split()
         values_read.extend(temporal_values_read)
