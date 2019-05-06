@@ -122,7 +122,6 @@ def p_neural_sub_call(p):
   if not gv.subroutine_directory.subroutine_exists(subroutine_name, call_class_name):
     helpers.throw_error("Method " + subroutine_name + " doesn't exist.")
   
-  # TODO: check this when inheritance is included
   if call_class_name is not None and gv.current_class_block != call_class_name and not gv.subroutine_directory.is_public(subroutine_name, call_class_name):
     helpers.throw_error("Method " + subroutine_name + " is not public and cannot be called in current location.")
 

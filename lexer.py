@@ -30,6 +30,7 @@ reserved = {
   'and' : 'AND',
   'not' : 'NOT',
   'print' : 'PRINT',
+  'print_n' : 'PRINT_N',
   'int' : 'INT',
   'flt' : 'FLT',
   'bool' : 'BOOL',

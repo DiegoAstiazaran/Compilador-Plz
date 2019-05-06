@@ -1,9 +1,9 @@
 int last.
 flt start.
 
-print: 'value of start: ' end
+print_n: 'value of start: ' end
 read: start end
-print: 'value of last: ' end
+print_n: 'value of last: ' end
 read: last end
 print: '' end
 

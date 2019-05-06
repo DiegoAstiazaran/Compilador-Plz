@@ -56,10 +56,12 @@ def p_read(p):
 
 def p_write(p):
   '''
-  write : PRINT COLON write_p neural_write_new_line END
+  write : write_ppp COLON write_p neural_write_end END
   write_p : expression neural_write_expression write_pp
   write_pp : neural_write_space COMMA write_p
            | empty
+  write_ppp : PRINT neural_print_new_line
+            | PRINT_N neural_print_no_new_line
   '''
 
 # Condition grammar

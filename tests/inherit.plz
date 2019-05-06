@@ -1,0 +1,15 @@
+class Parent:
+  attributes:
+  
+  methods:
+    sub Parent():
+    end
+
+    public sub int printp():
+      return 1.
+    end
+end
+
+Parent ch().
+
+print: ch$printp() end
