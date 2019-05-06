@@ -1,11 +1,26 @@
-sub int factorial(int n):
+sub int recursive_factorial(int n):
   if n < 0:
     return 0.
   end
   if n < 2:
     return 1.
   end
-  return n * factorial(n - 1).
+  return n * recursive_factorial(n - 1).
 end
 
-print: factorial(5) end
+sub int iterative_factorial(int number):
+  int result = 1. 
+  for number from number by -1 while number > 0:
+    result = result * number.
+  end
+  return result.
+end
+
+int i.
+int num.
+
+for i from 0 by 1 while i < 10:
+  read: num end
+  print: 'factorial of', num, ' is ', recursive_factorial(num) end
+  print: 'factorial of', num, ' is ', iterative_factorial(num) end
+end

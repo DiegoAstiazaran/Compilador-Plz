@@ -6,7 +6,7 @@ int id.
 int x = -0.
 int y.
 int x5(4)(5).
-int arreglo(5) = {4,5,6,7}.
+int arreglo(5) = {4,5,6,7,0}.
 
 class Persona :
   attributes:
@@ -56,13 +56,13 @@ class Hombre under Persona :
       str x = "5 + 6" .
       int id(10).
       if (5 < 4):
-        print: 4324, x, id end
+        print: 4324, x, id[0] end
       end
     end
 end
 
 int z.
-Persona obj = Persona().
+Persona obj().
 bool b = ~True.
 int x2.
 flt x3.
@@ -86,7 +86,7 @@ sub bool funcion3(int x, bool y):
   return True.
 end
 
-read: x,y,z, x@diegooooo end
+read: x,y,z, x end
 
 read: x end
 
@@ -95,12 +95,15 @@ x = 4.
 is = 5 < 4.
 
 if (5 < 4 ):
-  print: 4324, 'string', x5 end
+  print: 4324, 'string', x5[0][1] end
 elsif ( 6< 4) :
 
 else:
 
 end
+
+x2 = 1.
+x3 = 2.0.
 
 print: 4324, x2, x3 end
 

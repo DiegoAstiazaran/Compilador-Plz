@@ -1,10 +1,9 @@
 import itertools
 
-from constants import Types, MemoryTypes, Operators
-from structures import Quad, OperandItem
+from constants import MemoryTypes, Operators, Types
+from structures import OperandItem, Quad
 import global_variables as gv      # Import global variables
 import helpers
-from lexer import lexer
 
 from .expressions import add_to_operand_stack
 
@@ -46,7 +45,6 @@ def p_neural_array_decl(p):
   dimension_size = p[-2]
   gv.function_directory.add_dimension(gv.current_last_id, gv.current_block, dimension_size, gv.current_class_block)
 
-# TODO: check if array size 0 is possible
 # Called after specifing sizes of array in declaration
 def p_neural_array_decl_end(p):
   '''neural_array_decl_end :''' 

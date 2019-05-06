@@ -1,7 +1,6 @@
 def get_input():
   try:
-    # file = input('Filename: ')
-    file = "class_test"
+    file = input('Filename: ')
     file = 'tests/' + file + '.plz'
     with open(file, 'r') as myfile:
         s = myfile.read()

@@ -3,7 +3,7 @@
 
 import ply.yacc as yacc # Import yacc module
 
-from lexer import tokens, lexer   # Import tokens and lexer defined in lexer
+from lexer import tokens   # Import tokens and lexer defined in lexer
 import global_variables as gv      # Import global variables
 import helpers
 from neural_points import *

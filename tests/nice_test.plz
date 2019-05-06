@@ -10,8 +10,8 @@ bool b_b = True.
 
 int i_array(10).
 int i_matrix(10)(10).
-int i_array2(10) = {1,2,3,4,5}.
-int i_matrix2(10)(10) = { {1,2,3,4,5}, {1,2,3,4,5} }.
+int i_array2(10) = {1,2,3,4,5, 1,2,3,4,5}.
+int i_matrix2(10)(10) = {1,2,3,4,5, 1,2,3,4,5}.
 
 class Persona :
   attributes:
@@ -24,6 +24,7 @@ class Persona :
     sub Persona(bool b):
       int i_a.
       flt f_a = 5.0.
+      i_a = 1.
       age = i_a.
     end
 
@@ -37,6 +38,10 @@ class Persona :
 
     public sub void set_age(int new_age):
       age = new_age.
+    end
+
+    public sub void set_public_attr(int x):
+       this.public_attr = x.
     end
 
 end
@@ -62,10 +67,10 @@ end
 int i_c = 1 + 2 * 3 / 4.
 flt f_c = -1.0 * 2 * 3.0.
 str s_c = "decl after classes" + 'sum'.
-bool b_c = ~True and not b_c | False.
-Persona persona1 = Persona(True).
+bool b_c = ~True and not False | False.
+Persona persona1(True).
 int i_d = persona1$get_age(1 + 2).
-Persona persona2 = Persona(True).
+Persona persona2(True).
 
 sub void writes(int a):
   print: a end
@@ -126,14 +131,18 @@ repeat:
     i_a = 2.
   end
   i_a = 3.
+  print: i_a end
 while True end
 
 for i_a from 100 by /3 while i_a > 0:
   print: i_a end
 end
 
+persona1$set_public_attr(1).
+
+
 if True:
-  print: persona1@age end
+  print: persona1@public_attr end
 end
 
 funcion(1, False).
