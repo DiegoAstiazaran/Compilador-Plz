@@ -179,3 +179,6 @@ list int f = {1,2,3,4,5}.
 * pop(index) : pops the element on given index. If no argument is given, it popos the last elememt
 
 * insert(element, index): inserts the elememt on given index. If the size is lower than the given index, the element will repeatedly be appended until the index is reached. 
+
+# Extra notes:
+Dividing an integer by an integer will return an integer! So be careful!
