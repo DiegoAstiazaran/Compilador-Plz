@@ -5,6 +5,14 @@ import helpers
 
 ### Write
 
+def p_neural_print_new_line(p):
+  '''neural_print_new_line :'''
+  gv.print_new_line = True
+
+def p_neural_print_no_new_line(p):
+  '''neural_print_no_new_line :'''
+  gv.print_new_line = False
+
 # Called after every expression to be printed
 def p_neural_write_expression(p):
   '''neural_write_expression :'''
@@ -13,8 +21,10 @@ def p_neural_write_expression(p):
   gv.quad_list.add(quad)
 
 # Called after every print statement
-def p_neural_write_new_line(p):
-  '''neural_write_new_line :'''
+def p_neural_write_end(p):
+  '''neural_write_end :'''
+  if not gv.print_new_line:
+    return
   quad = Quad(QuadOperations.WRITE_NEW_LINE)
   gv.quad_list.add(quad)
 

@@ -30,6 +30,7 @@ reserved = {
   'and' : 'AND',
   'not' : 'NOT',
   'print' : 'PRINT',
+  'print_n' : 'PRINT_N',
   'int' : 'INT',
   'flt' : 'FLT',
   'bool' : 'BOOL',
@@ -42,7 +43,20 @@ reserved = {
   'neq' : 'NEQ',
   'True' : 'TRUE',
   'False' : 'FALSE',
-  'this' : 'THIS'
+  'this' : 'THIS',
+  'list' : 'LIST',
+  'append' : 'APPEND',
+  'insert' : 'INSERT',
+  'remove' : 'REMOVE',
+  'index' : 'INDEX',
+  'count' : 'COUNT',
+  'pop' : 'POP',
+  'find' : 'FIND',
+  'reverse' : 'REVERSE',
+  'min' : 'MIN',
+  'max' : 'MAX',
+  'size' : 'SIZE',
+  'empty' : 'EMPTY',
 }
 
 # List of tokens that include reserved words tokens

@@ -4,12 +4,14 @@ from lexer import lexer
 
 # Item for operands inserted to stack
 class OperandItem:
-  def __init__(self, operand_value, operand_type, block_name = None, class_name = None, is_pending = False):
+  def __init__(self, operand_value, operand_type, block_name = None, class_name = None, is_pending = False, is_list = False):
     self._item = (operand_value, operand_type, block_name, class_name)
     # Used for 'this' reference
     self._pending_object_reference = is_pending
     # Used for object @ attribute
     self._object_reference = None
+    # Tells if item is a list
+    self._is_list = is_list
 
   def __str__(self):
     return str(self._item)
@@ -40,6 +42,12 @@ class OperandItem:
   
   def get_object_reference(self):
     return self._object_reference
+
+  def set_is_list(self, is_list):
+    self._is_list = is_list
+  
+  def is_list(self):
+    return self._is_list
 
 # Implementantion of stack
 class Stack:
@@ -163,4 +171,35 @@ class SubCall:
   
   def get_return_temporal_address(self):
     return self._return_temporal_address
+
+class ListMethodCall:
+  def __init__(self, address, type):
+    self._address = address
+    self._type = type
+    self._operator = None
+    self._args = []
+    self._return_temporal_address = None
   
+  def get_address(self):
+    return self._address
+
+  def get_type(self):
+    return self._type
+
+  def get_operator(self):
+    return self._operator
+
+  def get_args(self):
+    return self._args
+  
+  def get_return_temporal_address(self):
+    return self._return_temporal_address
+  
+  def set_operator(self, operator):
+    self._operator = operator
+  
+  def add_arg(self, arg):
+    self._args.append(arg)
+  
+  def set_return_temporal_address(self, address):
+    self._return_temporal_address = address

@@ -86,7 +86,41 @@ class QuadOperations:
   WRITE_ADDRESS   = 'write_address' 
   READ_ADDRESS    = 'read_address'
   THIS_PARAM      = 'this_param'
+  APPEND          = 'append' # Appends item
+  INSERT          = 'insert' # Inserts item in index
+  REMOVE          = 'remove' # Removes item by value
+  INDEX           = 'index' # Returns element at index
+  FIND            = 'find'  # Finds item
+  COUNT           = 'count' # Counts appearances
+  POP             = 'pop'
+  REVERSE         = 'reverse'
+  MIN             = 'min'
+  MAX             = 'max'
+  SIZE            = 'size'
+  EMPTY           = 'empty'
+  PRINT           = 'print'
   unary = [PLUS_UNARY, MINUS_UNARY]
+  list_methods = [APPEND, INSERT, REMOVE, INDEX, FIND, COUNT, POP, REVERSE, MIN, MAX, SIZE, EMPTY, PRINT]
+
+  list_method_empty = [MIN, MAX, SIZE, EMPTY, REVERSE, PRINT]
+  list_method_expression_type = [APPEND, REMOVE, COUNT, FIND]
+  list_method_expression_int = [INDEX]
+  list_method_expression = list_method_expression_type + list_method_expression_int
+  list_method_two_expression = [INSERT] # int, list_type
+  list_method_special = [POP] # empty or int
+  list_method_require_list_type = [APPEND, INSERT]
+
+  list_method_return_value = [MIN, MAX, SIZE, EMPTY, INDEX, COUNT, POP, FIND]
+  list_method_no_return_value = [REVERSE, APPEND, REMOVE, INSERT, PRINT]
+  list_method_result_type = { MIN : None,
+                              MAX : None,
+                              SIZE : Types.INT,
+                              EMPTY : Types.BOOL,
+                              INDEX : None,
+                              FIND : Types.INT,
+                              COUNT : Types.INT,
+                              POP : None, }
+
 
 class Defaults:
   INT = None

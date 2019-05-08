@@ -59,8 +59,10 @@ def p_neural_add_to_operand_stack_id(p):
     # Condition true when variable is attribute of current object
     if id_block == Constants.GLOBAL_BLOCK and gv.function_directory.is_class(id_class):
       is_pending = True
+  
+  is_list = gv.function_directory.is_list(id_name, id_block, id_class)
 
-  add_to_operand_stack(id_name, id_type, id_block, id_class, is_pending)
+  add_to_operand_stack(id_name, id_type, id_block, id_class, is_pending, is_list)
 
 # Helper to add constants to operand stack
 # Changes constant to memory_address
@@ -69,8 +71,8 @@ def add_to_operand_stack_constant(operand_value, operand_type):
   add_to_operand_stack(operand_value, operand_type)
 
 # Helper to insert OperandItem to operand stack
-def add_to_operand_stack(operand_value, operand_type, block_name = None, class_name = None, is_pending = False):
-  gv.stack_operands.push(OperandItem(operand_value, operand_type, block_name, class_name, is_pending))
+def add_to_operand_stack(operand_value, operand_type, block_name = None, class_name = None, is_pending = False, is_list = False):
+  gv.stack_operands.push(OperandItem(operand_value, operand_type, block_name, class_name, is_pending, is_list))
 
 ### Check operator stack
 

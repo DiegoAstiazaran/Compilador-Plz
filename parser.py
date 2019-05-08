@@ -4,6 +4,7 @@
 import ply.yacc as yacc # Import yacc module
 
 from lexer import tokens   # Import tokens and lexer defined in lexer
+from constants import Types, MemoryTypes
 import global_variables as gv      # Import global variables
 import helpers
 from neural_points import *
@@ -56,10 +57,12 @@ def p_read(p):
 
 def p_write(p):
   '''
-  write : PRINT COLON write_p neural_write_new_line END
+  write : write_ppp COLON write_p neural_write_end END
   write_p : expression neural_write_expression write_pp
   write_pp : neural_write_space COMMA write_p
            | empty
+  write_ppp : PRINT neural_print_new_line
+            | PRINT_N neural_print_no_new_line
   '''
 
 # Condition grammar
@@ -313,9 +316,29 @@ def p_return(p):
 
 def p_sub_call(p):
   '''
-  sub_call : this_operator ID neural_sub_call_first_id sub_call_p neural_sub_call sub_call_args
-  sub_call_p : MONEY neural_check_id_is_object ID neural_sub_call_second_id
+  sub_call : this_operator ID neural_sub_call_first_id sub_call_p
+  sub_call_p : sub_call_pp neural_sub_call sub_call_args
+             | MONEY neural_list_method_start sub_call_list neural_list_method_end
+  sub_call_pp : MONEY neural_check_id_is_object ID neural_sub_call_second_id
              | empty
+  sub_call_list : sub_call_list_operator L_PAREN list_method_args R_PAREN
+  sub_call_list_operator : MIN neural_list_operator
+                         | MAX neural_list_operator
+                         | SIZE neural_list_operator
+                         | EMPTY neural_list_operator
+                         | APPEND neural_list_operator
+                         | REMOVE neural_list_operator
+                         | INDEX neural_list_operator
+                         | COUNT neural_list_operator
+                         | FIND neural_list_operator
+                         | POP neural_list_operator
+                         | REVERSE neural_list_operator
+                         | INSERT neural_list_operator
+                         | PRINT neural_list_operator
+  list_method_args : expression neural_list_method_arg list_method_args_p
+                   | empty
+  list_method_args_p : COMMA list_method_args
+                     | empty
   '''
 
 def p_sub_call_args(p):
@@ -334,6 +357,7 @@ def p_decl_init(p):
   decl_init : decl_init_p DOT
   decl_init_p : decl_init_var neural_check_operator_stack_equal
               | decl_init_obj
+              | decl_init_list
   '''
 
 def p_decl_init_var(p):
@@ -372,6 +396,16 @@ def p_decl_init_obj(p):
   decl_init_obj : CLASS_NAME ID neural_var_decl_id neural_constructor_call sub_call_args neural_sub_call_no_return_value
   '''
 
+def p_decl_init_list(p):
+  '''
+  decl_init_list : LIST neural_list_decl type ID neural_var_decl_id decl_init_list_p neural_list_init_end
+  decl_init_list_p : EQUAL L_BRACKET list_content R_BRACKET 
+                   | empty
+  list_content : expression neural_list_init_value list_content_p
+  list_content_p : COMMA list_content
+                 | empty
+  '''
+
 # Assignments grammar
 
 def p_assignment(p):
@@ -399,7 +433,10 @@ def execute_parser(input):
   # Build the parser
   parser = yacc.yacc()
   parser.parse(input)
-  # print(gv.quad_list)
-  # gv.quad_list.print_with_number()
+  variables_sizes = []
+  for type in Types.primitives:
+    address = gv.memory_manager.get_memory_address(type, MemoryTypes.SCOPE, gv.current_block, gv.current_class_block)
+    variables_sizes.append(address)
+  gv.subroutine_directory.add_next_memory_addresses_to_block(variables_sizes, gv.current_class_block)
   gv.subroutine_directory.fix_for_virtual_machine()
   return gv.quad_list, gv.memory_manager.get_constants_map(), gv.subroutine_directory

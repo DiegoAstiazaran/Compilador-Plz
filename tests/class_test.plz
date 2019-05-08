@@ -6,7 +6,7 @@ end
 
 class Person:
   attributes:
-    public int age.
+    private int age.
     public str name.
     public int numbers(10).
 
@@ -49,6 +49,27 @@ class Person:
 
 end
 
+class Child under Person:
+  attributes:
+    public int a.
+    public int b.
+    public int c.
+  
+  methods:
+    sub Child(int a, int b, int c):
+      this.a = a.
+      this.b = b.
+      this.c = c.
+      this.age = 2.
+      this.name = "Erik".
+      this.numbers[0] = 1.
+    end
+
+    public sub int get_age():
+      return this.age.
+    end
+end
+
 Person p1("Diego", 20 + 2).
 int b.
 int array_global(15).
@@ -60,6 +81,10 @@ sub void printDate():
   print: p1$get_name() end
   print: p1@name end
 end
+
+Child c1(1,2,3).
+
+print: c1$get_age() end
 
 a = 1.
 b = 2.
@@ -80,5 +105,3 @@ p1@numbers[4] = 10.
 
 printDate().
 
-p1$print_data(4, 10, 60).
-print_data().

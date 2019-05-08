@@ -9,6 +9,7 @@ def execute_virtual_machine(quad_list, constant_memory, subroutine_directory):
   quad_pointer = 0
   memory_manager = VirtualMachineMemoryManager()
   memory_manager.add_constant_memory(constant_memory)
+  global_addresses = subroutine_directory.get_memory_addresses_of_block(Constants.GLOBAL_BLOCK)
   items_to_read = []
   values_read = []
   while(quad_pointer < quad_list.size()):
@@ -44,7 +45,6 @@ def execute_virtual_machine(quad_list, constant_memory, subroutine_directory):
       memory_address = quad.get_items()
       items_to_read.append(memory_address)
     elif operation == QuadOperations.READ_END:
-      # TODO: specify how read works in documentation
       while(len(values_read) < len(items_to_read)):
         temporal_values_read = input().split()
         values_read.extend(temporal_values_read)
@@ -154,6 +154,77 @@ def execute_virtual_machine(quad_list, constant_memory, subroutine_directory):
       arg_address = memory_manager.get_sub_call_arg_address(this_index)
       value = memory_manager.get_memory_value(memory_address)
       memory_manager.set_arg_value(arg_address, value)
+    elif operation in QuadOperations.list_methods:
+      if   operation == QuadOperations.POP:
+        if len(quad.get_items()) == 3: # index
+          list_address, index_address, return_address = quad.get_items()
+          index = memory_manager.get_memory_value(index_address)
+        elif len(quad.get_items()) == 2: # last one
+          list_address, return_address = quad.get_items()
+          list_size = len(memory_manager.list_get_items(list_address))
+          index = list_size - 1
+        pop_value = memory_manager.list_pop_node(list_address, index)
+        memory_manager.set_memory_value(return_address, pop_value)
+      elif operation == QuadOperations.APPEND:
+        list_address, list_type, value_address = quad.get_items()
+        value = memory_manager.get_memory_value(value_address)
+        memory_manager.list_append_node(list_address, list_type, value, global_addresses)
+      elif operation == QuadOperations.PRINT:
+        list_address = quad.get_items()
+        list_values = memory_manager.list_get_items(list_address)
+        print(*list_values)
+      elif operation == QuadOperations.INSERT:
+        list_address, list_type, index_address, value_address = quad.get_items()
+        index = memory_manager.get_memory_value(index_address)
+        value = memory_manager.get_memory_value(value_address)
+        memory_manager.list_insert_node(list_address, index, value, list_type, global_addresses)
+      elif operation == QuadOperations.REMOVE:
+        list_address, value_address = quad.get_items()
+        value = memory_manager.get_memory_value(value_address)
+        memory_manager.list_remove_node(list_address, value)
+      elif operation == QuadOperations.INDEX:
+        list_address, index_addreess, return_address = quad.get_items()
+        index_value = memory_manager.get_memory_value(index_addreess)
+        value_at_index = memory_manager.list_index_node(list_address, index_value)
+        memory_manager.set_memory_value(return_address, value_at_index)
+      elif operation == QuadOperations.FIND:
+        list_address, value_address, return_address = quad.get_items()
+        value = memory_manager.get_memory_value(value_address)
+        list_values = memory_manager.list_get_items(list_address)
+        find_index = -1 if value not in list_values else list_values.index(value)
+        memory_manager.set_memory_value(return_address, find_index)
+      elif operation == QuadOperations.COUNT:
+        list_address, count_address, return_address = quad.get_items()
+        list_values = memory_manager.list_get_items(list_address)
+        count_value = memory_manager.get_memory_value(count_address)
+        count_res = list_values.count(count_value)
+        memory_manager.set_memory_value(return_address, count_res)
+      elif operation == QuadOperations.REVERSE:
+        list_address = quad.get_items()
+        memory_manager.list_reverse(list_address)
+      elif operation == QuadOperations.MIN:
+        list_address, return_address = quad.get_items()
+        list_values = memory_manager.list_get_items(list_address)
+        min_value = min(list_values)
+        memory_manager.set_memory_value(return_address, min_value)
+        print(*list_values)
+      elif operation == QuadOperations.MAX:
+        list_address, return_address = quad.get_items()
+        list_values = memory_manager.list_get_items(list_address)
+        max_value = max(list_values)
+        memory_manager.set_memory_value(return_address, max_value)
+      elif operation == QuadOperations.SIZE:
+        list_address, return_address = quad.get_items()
+        list_values = memory_manager.list_get_items(list_address)
+        list_size = len(list_values)
+        memory_manager.set_memory_value(return_address, list_size)
+      elif operation == QuadOperations.EMPTY:
+        list_address, return_address = quad.get_items()
+        list_values = memory_manager.list_get_items(list_address)
+        list_empty = len(list_values) == 0
+        memory_manager.set_memory_value(return_address, list_empty)
+      else:
+        helpers.throw_error_no_line("Invalid list method!")
     else:
       helpers.throw_error_no_line("Invalid quad operation!")
     quad_pointer += 1

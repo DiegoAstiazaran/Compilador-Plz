@@ -1,5 +1,5 @@
 from constants import Constants, MemoryRanges, MemoryTypes, Operators, QuadOperations, Types 
-from structures import OperandItem, Quad, SubCall
+from structures import ListMethodCall, OperandItem, Quad, SubCall
 import global_variables as gv      # Import global variables
 import helpers
 
@@ -21,7 +21,7 @@ def p_neural_sub_decl_id(p):
   if gv.current_class_block is not None:
     for type in Types.primitives:
       memory_address = gv.memory_manager.get_memory_address(Types.INT, MemoryTypes.SCOPE, gv.current_block, gv.current_class_block)
-      gv.function_directory.add_variable('this-' + type, gv.current_block, Types.INT, None, memory_address, gv.current_class_block)
+      gv.function_directory.add_variable('this-' + type, gv.current_block, Types.INT, None, memory_address, False, gv.current_class_block)
       operand_item = OperandItem(memory_address, Types.INT)
       gv.subroutine_directory.add_param(gv.current_block, operand_item, gv.current_class_block)
 
@@ -76,6 +76,11 @@ def p_neural_sub_end(p):
     quad = Quad(QuadOperations.RETURN)
     gv.quad_list.add(quad)
   gv.current_sub_has_return_stmt = False
+  variables_sizes = []
+  for type in Types.primitives:
+    address = gv.memory_manager.get_memory_address(type, MemoryTypes.SCOPE, gv.current_block, gv.current_class_block)
+    variables_sizes.append(address)
+  gv.subroutine_directory.add_next_memory_addresses(variables_sizes, gv.current_block, gv.current_class_block)
   gv.function_directory.free_memory(gv.current_block, gv.current_class_block)
   gv.current_block = Constants.GLOBAL_BLOCK
 
@@ -128,7 +133,6 @@ def p_neural_sub_call(p):
   if not gv.subroutine_directory.subroutine_exists(subroutine_name, call_class_name):
     helpers.throw_error("Method " + subroutine_name + " doesn't exist.")
   
-  # TODO: check this when inheritance is included
   if call_class_name is not None and gv.current_class_block != call_class_name and not gv.subroutine_directory.is_public(subroutine_name, call_class_name):
     helpers.throw_error("Method " + subroutine_name + " is not public and cannot be called in current location.")
 
@@ -216,6 +220,21 @@ def p_neural_sub_call_args_end(p):
 # checks if subroutine has return value or not, in case it was trying to be an assignment
 def helper_sub_call_end(has_return_value):
   current_sub_call = gv.stack_sub_calls.pop()
+  if type(current_sub_call) is ListMethodCall:
+    list_type = current_sub_call.get_type()
+    list_method_operator = current_sub_call.get_operator()
+    if not has_return_value:
+      return
+    if list_method_operator in QuadOperations.list_method_no_return_value:
+      helpers.throw_error("List method {} can't return a value.".format(list_method_operator))
+      return
+    temporal_type = QuadOperations.list_method_result_type[list_method_operator]
+    if temporal_type is None:
+      temporal_type = list_type
+    temporal_operand = OperandItem(current_sub_call.get_return_temporal_address(), temporal_type)
+    gv.stack_operands.push(temporal_operand)
+    return
+
   return_type = gv.subroutine_directory.get_type(current_sub_call.get_sub_name(), current_sub_call.get_block_name())
   if has_return_value and return_type == Types.VOID:
     helpers.throw_error("Subcall does not have a return value.")
@@ -234,3 +253,99 @@ def p_neural_check_id_is_object(p):
   id_type = gv.function_directory.get_variable_type_deep(id_name, gv.current_block, gv.current_class_block)
   if not gv.function_directory.is_class(id_type):
     helpers.throw_error(id_name + " is not an object")
+
+# Lists
+
+def p_neural_list_decl(p):
+  '''neural_list_decl :'''
+  gv.current_is_list = True
+
+def p_neural_list_init_value(p):
+  '''neural_list_init_value :'''
+  expression = gv.stack_operands.pop()
+  gv.list_init_values.append(expression)
+
+def p_neural_list_init_end(p):
+  '''neural_list_init_end :'''
+  list_item = gv.stack_operands.pop()
+  list_address = list_item.get_value()
+  list_type = list_item.get_type()
+
+  for value in gv.list_init_values:
+    if value.get_type() != list_type:
+      helpers.throw_error("Type mismatch in initialization.")
+    quad = Quad(QuadOperations.APPEND, list_address, list_type, value.get_value())
+    gv.quad_list.add(quad)
+
+  gv.list_init_values = []
+
+def p_neural_list_method_start(p):
+  '''neural_list_method_start :'''
+  list_name = gv.sub_call_first_id  
+  if gv.current_this:
+    list_type, list_address, _, _ = gv.function_directory. \
+      get_variable_item(list_name, Constants.GLOBAL_BLOCK, gv.current_class_block)
+  else:
+    list_type, list_address, _, _ = gv.function_directory. \
+      get_variable_item_deep(list_name, gv.current_block, gv.current_class_block)
+    
+  gv.sub_call_first_id = None
+  gv.current_this = False
+
+  list_method_call = ListMethodCall(list_address, list_type)
+  gv.stack_sub_calls.push(list_method_call)
+
+def p_neural_list_operator(p):
+  '''neural_list_operator :'''
+  list_method_operator = p[-1]
+  gv.stack_sub_calls.top().set_operator(list_method_operator)
+
+def p_neural_list_method_arg(p):
+  '''neural_list_method_arg :'''
+  method_arg = gv.stack_operands.pop()
+  gv.stack_sub_calls.top().add_arg(method_arg)
+
+def p_neural_list_method_end(p):
+  '''neural_list_method_end :'''
+  list_method_call = gv.stack_sub_calls.top()
+  list_address = list_method_call.get_address()
+  list_type = list_method_call.get_type()
+  list_method_operator = list_method_call.get_operator()
+  method_args = list_method_call.get_args()
+
+  if list_method_operator == QuadOperations.POP:
+    if len(method_args) > 1:
+      helpers.throw_error("More arguments than expected in {}".format(list_method_operator))
+    if len(method_args) == 1 and (method_args[0].get_type() != Types.INT or method_args[0].is_list()):
+      helpers.throw_error("Argument in {} must be of type {}".format(list_method_operator, Types.INT))
+  
+  if list_method_operator in QuadOperations.list_method_empty and len(method_args) > 0:
+    helpers.throw_error("More arguments than expected in {}".format(list_method_operator))
+
+  if list_method_operator in QuadOperations.list_method_expression:
+    if len(method_args) != 1:
+      helpers.throw_error("{} must have 1 argument".format(list_method_operator))
+    expression_type = list_type if list_method_operator in QuadOperations.list_method_expression_type else Types.INT
+    if method_args[0].get_type() != expression_type:
+      helpers.throw_error("Argument in {} must be of type {}".format(list_method_operator, expression_type))
+
+  if list_method_operator in QuadOperations.list_method_two_expression:
+    if len(method_args) != 2:
+      helpers.throw_error("{} must have 2 argument".format(list_method_operator))
+    if method_args[0].get_type() != Types.INT:
+      helpers.throw_error("First argument in {} must be of type {}".format(list_method_operator, Types.INT))
+    if method_args[1].get_type() != list_type:
+      helpers.throw_error("Second argument in {} must be of type {}".format(list_method_operator, expression_type))
+    
+  quad = Quad(list_method_operator, list_address)
+  if list_method_operator in QuadOperations.list_method_require_list_type:
+    quad.add_element(list_type)
+  for arg in method_args:
+    quad.add_element(arg.get_value())
+  
+  if list_method_operator in QuadOperations.list_method_return_value:
+    memory_address = gv.memory_manager.get_memory_address(gv.stack_sub_calls.top().get_type(), MemoryTypes.TEMPORAL, gv.current_block, gv.current_class_block)
+    quad.add_element(memory_address)
+    gv.stack_sub_calls.top().set_return_temporal_address(memory_address)
+
+  gv.quad_list.add(quad)

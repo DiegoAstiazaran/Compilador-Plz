@@ -82,4 +82,13 @@ array_access_indices = []
 array_init_values = None
 
 #
+list_init_values = []
+
+#
 current_this = False
+
+#
+print_new_line = None
+
+#
+current_is_list = False
