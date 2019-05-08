@@ -34,6 +34,12 @@ class VariableDirectory:
     if self.variable_exists(var_name):
       return self._variable_table[var_name][3]
     return None
+  
+  # Returns is_list of variable
+  def get_is_list(self, var_name):
+    if self.variable_exists(var_name):
+      return self._variable_table[var_name][4]
+    return None
 
   # Returns type and memory address of variable
   def get_variable_type_address(self, var_name):
@@ -111,10 +117,10 @@ class VariableDirectory:
 
   # Adds a variable to dictionary
   # Type, is_public, array_dimensions, memory_address
-  def add_variable(self, var_name, type, is_public, memory_address):
+  def add_variable(self, var_name, type, is_public, memory_address, is_list):
     if var_name in self._variable_table:
       helpers.throw_error('Variable ' + var_name + ' already defined in scope.')
-    self._variable_table[var_name] = [type, is_public, [], memory_address]
+    self._variable_table[var_name] = [type, is_public, [], memory_address, is_list]
 
   # Adds a dimension to variable, used for arrays and matrices
   def add_dimension(self, var_name, dimension_size):
@@ -123,6 +129,10 @@ class VariableDirectory:
   # Checks if variable is an array or matrix
   def is_array(self, var_name):
     return len(self.get_variable_dimensions(var_name)) > 0
+
+  def is_list(self, var_name_address):
+    var_name = self.fix_var_name(var_name_address)
+    return self.get_is_list(var_name)
 
   # Checks if variable exists in directory
   def variable_exists(self, var_name):
@@ -244,9 +254,9 @@ class FunctionDirectory:
       return method(directory, *positional_arguments)
 
   # Adds a variable to a VariableDirectory of a block
-  def add_variable(self, var_name, block_name, type, is_public, memory_address, class_name = None):
+  def add_variable(self, var_name, block_name, type, is_public, memory_address, is_list, class_name = None):
     self.common_method("add_variable",
-                       [var_name, type, is_public, memory_address],
+                       [var_name, type, is_public, memory_address, is_list],
                        block_name, class_name)
   
   # Se movio block_name de posicion
@@ -282,6 +292,12 @@ class FunctionDirectory:
   # Returns var_name of address
   def get_var_name_from_address(self, memory_address, block_name, class_name = None):
     return self.common_method("get_var_name_from_address",
+                              [memory_address],
+                              block_name, class_name)
+
+  # 
+  def is_list(self, memory_address, block_name, class_name = None):
+    return self.common_method("is_list",
                               [memory_address],
                               block_name, class_name)
 

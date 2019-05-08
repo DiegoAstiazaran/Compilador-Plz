@@ -20,9 +20,13 @@ def p_neural_var_decl_id(p):
     helpers.throw_error("Class {} not declared.".format(gv.current_last_type))
 
   # if it is an object counters will not be modified, only next is returned as reference for start
-  memory_address = gv.memory_manager.get_memory_address(gv.current_last_type, MemoryTypes.SCOPE, gv.current_block, gv.current_class_block)
+  if gv.current_is_list:
+    memory_address = gv.memory_manager.get_next_pointer(gv.current_block, gv.current_class_block)
+  else:
+    memory_address = gv.memory_manager.get_memory_address(gv.current_last_type, MemoryTypes.SCOPE, gv.current_block, gv.current_class_block)
 
-  gv.function_directory.add_variable(gv.current_last_id, gv.current_block, gv.current_last_type, gv.current_is_public, memory_address, gv.current_class_block)
+  gv.function_directory.add_variable(gv.current_last_id, gv.current_block, gv.current_last_type, gv.current_is_public, memory_address, gv.current_is_list, gv.current_class_block)
+  gv.current_is_list = False
 
   # When declaring an object
   if gv.current_last_type not in Types.primitives:

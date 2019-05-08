@@ -23,6 +23,9 @@ def p_neural_create_pointer(p):
 
   if type(array_address) is not int:
     helpers.throw_error("Syntax error in input!")
+  
+  if array_item.is_list():
+    helpers.throw_error("Incorrect operation with list.")
 
   if block_name == Constants.GLOBAL_BLOCK and gv.function_directory.is_class(class_name):
     array_dimension_count = gv.function_directory.get_array_dimensions_count_(array_address, array_type, block_name, class_name)
@@ -39,6 +42,7 @@ def p_neural_create_pointer(p):
   operand_item = OperandItem(pointer, array_type, block_name, class_name)
   operand_item.set_object_reference(array_item.get_object_reference())
   operand_item.set_pending_object_reference(array_item.has_pending_object_reference())
+  operand_item.set_is_list(array_item.is_list())
   gv.stack_operands.push(operand_item)
 
 ### Object attribute
@@ -163,7 +167,9 @@ def p_neural_id_attr_access_end(p):
     gv.quad_list.add(quad)
     memory_address = temporal_pointer
   
+  is_list = operand_item.is_list()
   operand_item = OperandItem(memory_address, operand_item.get_type(), operand_item.get_block_name(), operand_item.get_class_name())
+  operand_item.set_is_list(is_list)
   gv.stack_operands.push(operand_item)
 
   gv.current_this = False
