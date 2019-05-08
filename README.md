@@ -11,6 +11,16 @@ As of now, Plz has a basic programming language functionality. This means learni
 
 Let us start with variables. Declaring and Initializing variables.
 
+Our language works in the following way:
+
+The first statements must be (in any order):
+* Declarations 
+* Initializations
+* Classes
+* Subroutines
+
+After that, once you start with your main block, you will no longer be able to declare or initialize variables, or create classes and subroutines.
+
 Declaration:
 ``` 
   int a.
@@ -34,10 +44,10 @@ Plz has several data types, including some non-primitive types such as arrays, m
   
   int a = 9.
   flt b = 9.0.
-  str c = "erik".
-  int d(10) {1,2,3,4,5,6,7,8,9,10}
-  flt e(2)(2) = {{1,2},{1,2}}
-  list int f = {1,2,3,4,5}
+  str c = "My name".
+  int d(10) = {1,2,3,4,5,6,7,8,9,10}.
+  flt e(2)(2) = {{1.0,2.0},{1.0,2.0}}.
+  list int f = {1,2,3,4,5}.
 
 ```
 
@@ -91,6 +101,17 @@ while True end
     
 ```
 
+You can read from user and print stuff!
+```
+  int a.
+  int b.
+  int c.
+  
+  read: a,b,c end
+  
+  print: a,b,c, "You can print strings", 5, 10.0 end
+```
+
 You can also declare and use classes and objects!
 ```
 int a.
@@ -138,15 +159,31 @@ to call a method, you use object$method.
 
 Person p1("John", 20 + 2).
 
-sub void printDate():
-  print: 'today is Sunday' end
-  print: p1$get_age() end
-  print: p1$get_name() end
-  print: p1@name end
-end
-
 Child c1(1,2,3).
 
 print: c1$get_age() end
 
 ```
+Lists also have some methods defined by default:
+```
+list int f = {1,2,3,4,5}.
+```
+* min() : Gets the minimum element on the list.
+* max() : Gets the maximum element on the list.
+* size() : Gets the size of the list.
+* empty() : Checks if the list is empty.
+* reverse() : Reverses the list
+* print() : prints all the element on the list. 
+
+* append(element): Adds to the end of the list the given element.
+* remove(element) : Removes all instances found of the given element
+* index(index): Gets the value of the element in given index on the list.
+* count(element): Get the amount of times the element is on the list. 
+* find(element): Gets the index if the element exists, returns -1 if it does not exists.
+* pop(index) : pops the element on given index. If no argument is given, it popos the last elememt
+
+* insert(index, element): inserts the elememt on given index. If the size is lower than the given index, the element will repeatedly be appended until the index is reached. 
+
+# Extra notes:
+* Dividing an integer by an integer will return an integer! So be careful!
+* Declared variables have no default value!
