@@ -1,15 +1,33 @@
-Marzo 12:
-- Mover operador ~/not a donde estan el +/- (positivo/negativo)
+March 12:
+- Move operators ~/not to same place where +/- (positive/negative) are
 
-Marzo 15:
-- Crear nonterminal decl_init (union de declaration y initialization)
+March 15:
+- New nonterminal decl_init for declaration with initialization
 
-Marzo 23:
-- Cambiar $ a @ para acceder a atributos de objetos; se reacomodaron algunas gramaticas donde se factorizaba para que tenga sentido con la nueva regla
+March 23:
+- Change $ to @ for object attributes access
 
-Marzo 24:
-- Cambio en gramatica de program; decl_init, class y subroutine pueden estar en cualquier orden
+March 24:
+- decl_init, class and subroutine can now be in any order and multiple times
 
-Marzo 26:
-- Agregar constante flotante a asignacion de ciclo For
-- Modificar var_cte_3, ya no se reusa var_cte_1, se ponen los valores directamente
+March 26:
+- Add constant floar to for assignment
+- Modify var_cte_3, no more reuse of var_cte_1
+
+April 5:
+- Change whole structure of class_block
+
+April 28:
+- Change constructor call syntax
+
+May 1:
+- New read statement
+
+May 2:
+- Change valid syntax for array and matrix initialization
+
+May 4:
+- Changes id_calls so it can be reused
+
+May 7:
+- Adds lists declaration and method calls

@@ -1,26 +1,67 @@
-Marzo 6
+March 6
 - Lexer
 
-Marzo 11
-- Ultima version de propuesta aceptada
-- Parser; unicamente revisión de sintaxis
+March 11
+- Proposal accepted and signed
+- Parser; only syntaxis validation
 
-Marzo 16
-- Se terminó directorio de procedimientos y tablas de variables
+March 16
+- Functions and variables directories
 
-Marzo 22
-- Cuadruplos de expresiones
+March 22
+- Expressions quads
 
-Marzo 23:
-- Cuadruplos para operador =
-- Cuadruplos para read
+March 23:
+- Assignment quads
+- Read quads
 
-Marzo 24:
-- Cuadruplos para write
-- Cuadruplos para return
+March 24:
+- Write quads
+- Return quads
 
-Marzo 26:
-- Cuadruplos para when
-- Cuadruplos para repeat
-- Cuadruplos para for
+March 26:
+- When quads
+- Repeat quads
+- For quads
+
+April 5:
+- Subroutine directory for sub headers
+
+April 6:
+- Quads for subroutine calls
+- Quads for constructor calls
+
+Apri1 15:
+- Memory structures and ranges
+
+Apri1 17:
+- First version of virtual machine
+- Creates quads to ignore executing classes and subroutines
+- VM executes operators, gotos, print and read
+
+April 23:
+- Access to arrays
+
+Apri1 29:
+- Execution of subroutines
+
+April 30:
+- Access to class attributes
+- New read statement
+
+May 2:
+- Array initialization
+
+May 3:
+- Execution constructors
+
+May 4:
+- Proper use of id's with 'this' keyword, attributes and array acccesor
+- Execution of all class subroutines
+
+May 6:
+- Class inheritance
+
+May 7:
+- Dynamic lists
 
