@@ -148,13 +148,6 @@ to call a method, you use object$method.
 
 Person p1("John", 20 + 2).
 
-sub void printDate():
-  print: 'Today is Sunday' end
-  print: p1$get_age() end
-  print: p1$get_name() end
-  print: p1@name end
-end
-
 Child c1(1,2,3).
 
 print: c1$get_age() end
@@ -178,7 +171,7 @@ list int f = {1,2,3,4,5}.
 * find(element): Gets the index if the element exists, returns -1 if it does not exists.
 * pop(index) : pops the element on given index. If no argument is given, it popos the last elememt
 
-* insert(element, index): inserts the elememt on given index. If the size is lower than the given index, the element will repeatedly be appended until the index is reached. 
+* insert(index, element): inserts the elememt on given index. If the size is lower than the given index, the element will repeatedly be appended until the index is reached. 
 
 # Extra notes:
 * Dividing an integer by an integer will return an integer! So be careful!
