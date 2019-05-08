@@ -8,12 +8,14 @@ from .expressions import add_to_operand_stack
 ### When
 
 # Called at the beggining of when cycle
+# Pushes the quad the cycle will return to when the iteration is done
 def p_neural_when_before_expression(p):
   '''neural_when_before_expression :'''
   next_quad = gv.quad_list.next()
   gv.stack_jumps.push(next_quad)
 
 # Called after repeat token in when cycle
+# Validates that the expression is boolean and creates the GOTOF quad
 def p_neural_when_repeat(p):
   '''neural_when_repeat :'''
   condition = gv.stack_operands.pop()
@@ -24,6 +26,7 @@ def p_neural_when_repeat(p):
   gv.quad_list.add(quad)
 
 # Called at the end of when cycle
+# Creates the GOTO quad to return to the beginning of the cycle
 def p_neural_when_end(p):
   '''neural_when_end :'''
   goto_f_index = gv.stack_jumps.pop()
@@ -36,12 +39,14 @@ def p_neural_when_end(p):
 ### Repeat
 
 # Called at the beggining of repeat cycle
+# Pushes the quad the cycle will return to after each iteration
 def p_neural_repeat_start(p):
   '''neural_repeat_start :'''
   next_quad = gv.quad_list.next()
   gv.stack_jumps.push(next_quad)
 
 # Called at the end of repeat cycle
+# Validates the expression is boolean and creates the GOTO_T quad
 def p_neural_repeat_end(p):
   '''neural_repeat_end :'''
   condition = gv.stack_operands.pop()
@@ -54,6 +59,7 @@ def p_neural_repeat_end(p):
 ### For
 
 # Called after id token in for cycle
+# Checks that the id is an integer or float and adds it to the stack.
 def p_neural_for_id(p):
   '''neural_for_id :'''
   id_name = p[-1]
@@ -63,6 +69,7 @@ def p_neural_for_id(p):
   add_to_operand_stack(id_name, id_type, id_block, id_class)
 
 # Called after assignment value
+# Assigns the value to the variable that will be used in the cycle
 def p_neural_for_assignment(p):
   '''neural_for_assignment :'''
   value_to_assign = gv.stack_operands.pop()
@@ -71,6 +78,8 @@ def p_neural_for_assignment(p):
   gv.quad_list.add(quad)
 
 # Called before expression in for cycle
+# Checks the operator that will affect the iterating variable each iteration, 
+# it may be plus, minus, multiplication or division.
 def p_neural_for_before_expression(p):
   '''neural_for_before_expression :'''
   operator = Operators.PLUS if gv.stack_operators.empty() else gv.stack_operators.pop()
@@ -78,6 +87,7 @@ def p_neural_for_before_expression(p):
   gv.stack_jumps.push(gv.quad_list.next())
 
 # Called after expression in for cycle
+# Checks that the expression is boolean and creates the GOTO_F of the cycle. 
 def p_neural_for_after_expression(p):
   '''neural_for_after_expression :'''
   condition = gv.stack_operands.pop()
@@ -88,6 +98,8 @@ def p_neural_for_after_expression(p):
   gv.quad_list.add(quad)
 
 # Called at the end of for cycle
+# Fills all the GOTOS and changes the value of the 
+# iterating value by its respective operation and value.
 def p_neural_for_end(p):
   '''neural_for_end :'''
   change_value = gv.stack_operands.pop()

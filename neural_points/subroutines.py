@@ -86,22 +86,28 @@ def p_neural_sub_end(p):
 
 ### Subroutine calls
 
+# keep the first id of a subcall in a global variable
 def p_neural_sub_call_first_id(p):
   '''neural_sub_call_first_id :'''
   gv.sub_call_first_id = p[-1]
 
+# keep the second id of a subcall in a global variable
 def p_neural_sub_call_second_id(p):
   '''neural_sub_call_second_id :'''
   gv.sub_call_second_id = p[-1]
 
+# subroutine has a return value, so it takes action to assign it or use it.
 def p_neural_sub_call_return_value(p):
   '''neural_sub_call_return_value :'''
   helper_sub_call_end(True)
 
+# subroutine does not hav a return value, so it cant be assigned or used as operation
 def p_neural_sub_call_no_return_value(p):
   '''neural_sub_call_no_return_value :'''
   helper_sub_call_end(False)
-
+ 
+# Checks whether an subroutine is a method or a subroutine, 
+# checks if it exists in class, global scope or parent class. 
 def p_neural_sub_call(p):
   '''neural_sub_call :'''
   if gv.sub_call_second_id is None: # It's not an object's subroutine
@@ -185,6 +191,8 @@ def p_neural_constructor_call(p):
     quad = Quad(QuadOperations.THIS_PARAM, type, constant_address)
     gv.quad_list.add(quad)
 
+# Validates that the amount and type of parameters matches with function 
+# declaration and creates the PARAM quads
 def p_neural_sub_call_arg(p):
   '''neural_sub_call_arg :'''
   arg = gv.stack_operands.pop()
@@ -199,6 +207,7 @@ def p_neural_sub_call_arg(p):
 
   param_count = gv.stack_sub_calls.top().add_param_count()
 
+# validates the number of parameters and creates the GOSUB quad
 def p_neural_sub_call_args_end(p):
   '''neural_sub_call_args_end :'''
   current_sub_call = gv.stack_sub_calls.top()
@@ -208,6 +217,7 @@ def p_neural_sub_call_args_end(p):
   quad = Quad(QuadOperations.GOSUB, current_sub_call.get_sub_name(), current_sub_call.get_block_name())
   gv.quad_list.add(quad)
 
+# checks if subroutine has return value or not, in case it was trying to be an assignment
 def helper_sub_call_end(has_return_value):
   current_sub_call = gv.stack_sub_calls.pop()
   if type(current_sub_call) is ListMethodCall:
@@ -236,6 +246,7 @@ def helper_sub_call_end(has_return_value):
     temporal_operand = OperandItem(temporal, return_type)
     gv.stack_operands.push(temporal_operand)
 
+# Check if id is an object, if not, thrown an error
 def p_neural_check_id_is_object(p):
   '''neural_check_id_is_object :'''
   id_name = gv.sub_call_first_id
