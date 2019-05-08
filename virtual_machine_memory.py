@@ -30,11 +30,11 @@ class VirtualMachineMemoryPrimitivesMap:
     new_address = memory_address - getattr(MemoryRanges, type.upper())
     return new_address, type
 
-  def get_memory_value(self, memory_address):
+  def get_memory_value(self, memory_address, return_none = False):
     new_address, type = self.get_memory_address_type(memory_address)
     self.fill(new_address, type)
     value = getattr(self, type)[new_address]
-    if value is None:
+    if value is None and not return_none:
       helpers.throw_error_no_line("Error: variable referenced before assignment")
     return value
   
@@ -68,11 +68,12 @@ class VirtualMachineMemoryScopeMap:
   def get_type(self, memory_address):
     return self.get_memory_address_type(memory_address)[1]
 
-  def get_memory_value(self, memory_address):
+  def get_memory_value(self, memory_address, return_none = False):
     new_address, type = self.get_memory_address_type(memory_address)
     if type == MemoryTypes.POINTERS:
+      self.fill_pointers(new_address)
       return getattr(self, MemoryTypes.POINTERS)[new_address]
-    return getattr(self, type).get_memory_value(new_address)
+    return getattr(self, type).get_memory_value(new_address, return_none)
   
   def set_memory_value(self, memory_address, value):
     new_address, type = self.get_memory_address_type(memory_address)
@@ -136,14 +137,14 @@ class VirtualMachineMemoryManager:
 
     return new_address, type
 
-  def get_memory_value(self, memory_address, read_address = False):
+  def get_memory_value(self, memory_address, read_address = False, return_none = False):
     new_address, type = self.get_memory_address_type(memory_address)
     if type != MemoryTypes.CONSTANTS and self.get_current_attr(type).is_pointer(new_address):
       stored_address = self.get_current_attr(type).get_memory_value(new_address)
       if read_address:
         return stored_address
       return self.get_memory_value(stored_address)
-    return self.get_current_attr(type).get_memory_value(new_address)
+    return self.get_current_attr(type).get_memory_value(new_address, return_none)
   
   def set_memory_value(self, memory_address, value, assign_address = False):
     new_address, type = self.get_memory_address_type(memory_address)
@@ -165,7 +166,7 @@ class VirtualMachineMemoryManager:
 
   def new_local_memory(self, sub_call):
     local_memory = VirtualMachineMemoryScopeMap()
-    # sub_call -> [goto, params, return_temporal_address, return_quad_position]
+    # sub_call -> [goto, params, variables_sizes, return_temporal_address, return_quad_position]
     self._pending_execution_stack.push([sub_call, local_memory])
   
   def get_current_local_memory(self):
@@ -196,13 +197,155 @@ class VirtualMachineMemoryManager:
   def set_new_local_memory(self):
     local_memory = self._pending_execution_stack.pop()
     self._execution_stack.push(local_memory)
-  
-  def get_return_position(self):
-    return self._execution_stack.top()[0][3]
-  
-  def get_return_temporal_address(self):
+
+  def get_local_variable_sizes(self):
     return self._execution_stack.top()[0][2]
+
+  def get_return_temporal_address(self):
+    return self._execution_stack.top()[0][3]
+
+  def get_return_position(self):
+    return self._execution_stack.top()[0][4]
 
   def pop_local_memory(self):
     self._execution_stack.pop()
   
+  def get_address_for_list(self, list_address, list_type, global_addresses):
+    _, type = self.get_memory_address_type(list_address)
+    type_index = Types.primitives.index(list_type)
+    if type == MemoryTypes.GLOBAL:
+      current = global_addresses[type_index]
+      global_addresses[type_index] += 1
+      return current
+    elif type == MemoryTypes.LOCAL:
+      current = self.get_local_variable_sizes()[type_index]
+      self.get_local_variable_sizes()[type_index] += 1
+  
+  def new_list_node(self, list_address, list_type, global_addresses):
+    next_block_address = self.get_address_for_list(list_address, list_type, global_addresses)
+    next_block_address_pointer = self.get_address_for_list(list_address, list_type, global_addresses)
+    return next_block_address, next_block_address_pointer
+  
+  #
+  def list_set_next(self, current_address, next_address):
+    new_address, type = self.get_memory_address_type(current_address)
+    if not self.get_current_attr(type).is_pointer(new_address):
+      current_address += 1
+    self.set_memory_value(current_address, next_address, assign_address = True)
+
+  #
+  def list_get_next(self, current_address):
+    new_address, type = self.get_memory_address_type(current_address)
+    if not self.get_current_attr(type).is_pointer(new_address):
+      current_address += 1
+    return self.get_memory_value(current_address, read_address=True, return_none=True)
+
+  #
+  def list_append_node(self, list_address, list_type, value, global_addresses):
+    next_block_address, next_block_address_pointer = self.new_list_node(list_address, list_type, global_addresses)
+
+    prev_address = list_address
+    current_address = self.list_get_next(list_address)
+    while current_address is not None:
+      prev_address = current_address
+      current_address = self.list_get_next(current_address)
+    self.list_set_next(prev_address, next_block_address)
+    self.set_memory_value(next_block_address, value)
+    self.set_memory_value(next_block_address_pointer, None)
+
+  #
+  def list_get_items(self, list_address):
+    current_address = self.list_get_next(list_address)
+    list_values = []
+    while current_address is not None:
+      current_node_value = self.get_memory_value(current_address)
+      list_values.append(current_node_value)
+      current_address = self.list_get_next(current_address)
+    return list_values
+  
+  def list_pop_node(self, list_address, index):
+    if index < 0:
+      helpers.throw_error_no_line("Index must receive a positive integer as argument.")
+    prev_address = list_address
+    current_address = self.list_get_next(list_address)
+    while current_address is not None and index > 0:
+      prev_address = current_address
+      current_address = self.list_get_next(current_address)
+      index -= 1
+    
+    if current_address is None:
+      helpers.throw_error_no_line("Not enough elements in list.")
+
+    next_address = self.list_get_next(current_address)
+    self.list_set_next(prev_address, next_address)
+
+    pop_value = self.get_memory_value(current_address)
+    return pop_value
+  
+  #
+  def list_index_node(self, list_address, index):
+    if index < 0:
+      helpers.throw_error_no_line("Index must receive a positive integer as argument.")
+    current_address = self.list_get_next(list_address)
+    while current_address is not None and index > 0:
+      current_address = self.list_get_next(current_address)
+      index -= 1
+    if current_address is None:
+      helpers.throw_error_no_line("Not enough elements in list for pop operation.")
+    pop_value = self.get_memory_value(current_address, return_none=True)
+    return pop_value
+  
+  #
+  def list_remove_node(self, list_address, remove_value):
+    prev_address = list_address
+    current_address = self.list_get_next(list_address)
+    while current_address is not None:
+      current_value = self.get_memory_value(current_address)
+      if current_value == remove_value:
+        current_next = self.list_get_next(current_address)
+        self.list_set_next(prev_address, current_next)
+        current_address = current_next
+      else:
+        prev_address = current_address
+        current_address = self.list_get_next(current_address)
+
+  #
+  def list_insert_node(self, list_address, index, value, list_type, global_addresses):
+    prev_address = list_address
+    current_address = self.list_get_next(list_address)
+    while index > 0 and current_address is not None:
+      prev_address = current_address
+      current_address = self.list_get_next(current_address)
+      index -= 1
+    for _ in range(index + 1):
+      new_address, new_address_pointer = self.new_list_node(list_address, list_type, global_addresses)
+      self.set_memory_value(new_address, value)
+      self.set_memory_value(new_address_pointer, None)
+      self.list_insert_node_aux(prev_address, new_address, current_address)
+      prev_address = new_address
+  
+  #
+  def list_insert_node_aux(self, prev_address, new_address, next_address):
+    self.list_set_next(prev_address, new_address)
+    self.list_set_next(new_address, next_address)
+  
+  #
+  def list_reverse(self, list_address):
+    prev_address = None
+    current_address = self.list_get_next(list_address)
+    while current_address is not None:
+      next_address = self.list_get_next(current_address)
+      self.list_set_next(current_address, prev_address)
+      prev_address = current_address
+      current_address = next_address
+    self.list_set_next(list_address, prev_address)
+    
+    
+      
+
+
+
+      
+
+
+
