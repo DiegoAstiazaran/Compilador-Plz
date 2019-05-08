@@ -65,7 +65,8 @@ class VariableDirectory:
     var_name = self.fix_var_name(var_name_address)
     dimensions = self.get_variable_dimensions(var_name)        
     return len(dimensions)
-  
+
+  # get the dimensions of a given array
   def get_array_dimensions_count_(self, var_address, type):
     var_name = self.get_var_name_from_address_(var_address, type)
     dimensions = self.get_variable_dimensions(var_name)        
@@ -96,6 +97,7 @@ class VariableDirectory:
       if address == self.get_variable_address(var_name):
         return var_name
   
+  # get the variable name from a given address
   def get_var_name_from_address_(self, var_address, type):
     for var_name in self._variable_table.keys():
       if var_address == self.get_variable_address(var_name) and self.get_variable_type(var_name) == type:
@@ -259,7 +261,6 @@ class FunctionDirectory:
                        [var_name, type, is_public, memory_address, is_list],
                        block_name, class_name)
   
-  # Se movio block_name de posicion
   # Adds a dimension to a variable
   def add_dimension(self, var_name, block_name, dimension_size, class_name = None):
     self.common_method("add_dimension",
@@ -272,7 +273,6 @@ class FunctionDirectory:
                               [var_name],
                               block_name, class_name)
 
-  # Se movio block_name de posicion
   # Returns indexed dimension of variable
   def get_variable_dimension(self, var_name_address, block_name, index, class_name = None):
     return self.common_method("get_variable_dimension",
@@ -285,6 +285,7 @@ class FunctionDirectory:
                               [var_name_address],
                               block_name, class_name)
 
+  # gets the amount of dimensions of the variable
   def get_array_dimensions_count_(self, var_address, type, block_name, class_name):
     return self.get_entry_directory(class_name).get_entry_directory(block_name). \
            get_array_dimensions_count_(var_address, type)
@@ -295,7 +296,7 @@ class FunctionDirectory:
                               [memory_address],
                               block_name, class_name)
 
-  # 
+  # checks if the variable is a list
   def is_list(self, memory_address, block_name, class_name = None):
     return self.common_method("is_list",
                               [memory_address],

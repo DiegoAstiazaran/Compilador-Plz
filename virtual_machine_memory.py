@@ -13,6 +13,7 @@ class VirtualMachineMemoryPrimitivesMap:
     setattr(self, Types.STR, [])
     setattr(self, Types.BOOL, [])
   
+  # fill the memory with its default values
   def fill(self, new_address, type):
     current_size = len(getattr(self, type))
     if new_address < current_size:
@@ -21,6 +22,7 @@ class VirtualMachineMemoryPrimitivesMap:
     for _ in range(new_address - current_size + 1):
       getattr(self, type).append(default_value)
 
+  # get the type of a given memory address, it can be constant, a primitive type, scope, etc. 
   def get_memory_address_type(self, memory_address):
     for current_type in Types.primitives:
       upper_type = current_type.upper()
@@ -30,6 +32,7 @@ class VirtualMachineMemoryPrimitivesMap:
     new_address = memory_address - getattr(MemoryRanges, type.upper())
     return new_address, type
 
+  # get the value of a varibale given the address. 
   def get_memory_value(self, memory_address, return_none = False):
     new_address, type = self.get_memory_address_type(memory_address)
     self.fill(new_address, type)
@@ -38,6 +41,7 @@ class VirtualMachineMemoryPrimitivesMap:
       helpers.throw_error_no_line("Error: variable referenced before assignment")
     return value
   
+  # set an address to a given value
   def set_memory_value(self, memory_address, value):
     new_address, type = self.get_memory_address_type(memory_address)
     self.fill(new_address, type)
@@ -68,6 +72,7 @@ class VirtualMachineMemoryScopeMap:
   def get_type(self, memory_address):
     return self.get_memory_address_type(memory_address)[1]
 
+  # get the value from a given address.
   def get_memory_value(self, memory_address, return_none = False):
     new_address, type = self.get_memory_address_type(memory_address)
     if type == MemoryTypes.POINTERS:
@@ -75,6 +80,7 @@ class VirtualMachineMemoryScopeMap:
       return getattr(self, MemoryTypes.POINTERS)[new_address]
     return getattr(self, type).get_memory_value(new_address, return_none)
   
+  # set the value of a given address
   def set_memory_value(self, memory_address, value):
     new_address, type = self.get_memory_address_type(memory_address)
     getattr(self, type).set_memory_value(new_address, value)
@@ -85,6 +91,7 @@ class VirtualMachineMemoryScopeMap:
     self.fill_pointers(new_address)
     pointers[new_address] = value
 
+  # fill the existing pointers with its default values.
   def fill_pointers(self, new_address):
     pointers = getattr(self, MemoryTypes.POINTERS)
     current_size = len(pointers)
@@ -233,14 +240,14 @@ class VirtualMachineMemoryManager:
       current_address += 1
     self.set_memory_value(current_address, next_address, assign_address = True)
 
-  #
+  # get the next element of a list. 
   def list_get_next(self, current_address):
     new_address, type = self.get_memory_address_type(current_address)
     if not self.get_current_attr(type).is_pointer(new_address):
       current_address += 1
     return self.get_memory_value(current_address, read_address=True, return_none=True)
 
-  #
+  # append an element to a list.
   def list_append_node(self, list_address, list_type, value, global_addresses):
     next_block_address, next_block_address_pointer = self.new_list_node(list_address, list_type, global_addresses)
 
@@ -253,7 +260,7 @@ class VirtualMachineMemoryManager:
     self.set_memory_value(next_block_address, value)
     self.set_memory_value(next_block_address_pointer, None)
 
-  #
+  # get all the items from a given list.
   def list_get_items(self, list_address):
     current_address = self.list_get_next(list_address)
     list_values = []
@@ -263,6 +270,7 @@ class VirtualMachineMemoryManager:
       current_address = self.list_get_next(current_address)
     return list_values
   
+  # pop a value from a list, given an index
   def list_pop_node(self, list_address, index):
     if index < 0:
       helpers.throw_error_no_line("Index must receive a positive integer as argument.")
@@ -295,7 +303,7 @@ class VirtualMachineMemoryManager:
     pop_value = self.get_memory_value(current_address, return_none=True)
     return pop_value
   
-  #
+  # remove a value from list. 
   def list_remove_node(self, list_address, remove_value):
     prev_address = list_address
     current_address = self.list_get_next(list_address)
@@ -309,7 +317,7 @@ class VirtualMachineMemoryManager:
         prev_address = current_address
         current_address = self.list_get_next(current_address)
 
-  #
+  # insert a new value to a list. 
   def list_insert_node(self, list_address, index, value, list_type, global_addresses):
     prev_address = list_address
     current_address = self.list_get_next(list_address)
@@ -329,7 +337,7 @@ class VirtualMachineMemoryManager:
     self.list_set_next(prev_address, new_address)
     self.list_set_next(new_address, next_address)
   
-  #
+  # reverse a list
   def list_reverse(self, list_address):
     prev_address = None
     current_address = self.list_get_next(list_address)
