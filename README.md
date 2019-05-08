@@ -11,6 +11,16 @@ As of now, Plz has a basic programming language functionality. This means learni
 
 Let us start with variables. Declaring and Initializing variables.
 
+Our language works in the following way:
+
+The first statements must be (in any order):
+* Declarations 
+* Initializations
+* Classes
+* Subroutines
+
+After that, once you start with your main block, you will no longer be able to declare or initialize variables, or create classes and subroutines.
+
 Declaration:
 ``` 
   int a.
