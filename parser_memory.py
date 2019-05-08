@@ -1,6 +1,8 @@
 from constants import MemoryRanges, Types, MemoryTypes, Constants
 import helpers
 
+# this is one of the main parser memory structures, it keeps the addresses
+# for all primitive type variables
 class ParserMemoryPrimitivesMap:
   def __init__(self, first_class, second_class = None):
     self._first = first_class
@@ -24,6 +26,7 @@ class ParserMemoryPrimitivesMap:
       type_max = type + '_max'
       setattr(self, type_max, base_address + getattr(MemoryRanges, type_max.upper()))
 
+  # gets the next address memory for a given type
   def get_next(self, type):
     if type not in Types.primitives: # When getting memory for objects
       directions = {}
@@ -36,21 +39,26 @@ class ParserMemoryPrimitivesMap:
     setattr(self, type, actual + 1)
     return actual
   
+  # gets the next available address without increasing the counter
   def get_next_no_increase(self, type):
     return getattr(self, type)
   
+  # increases the counter of the address count for a given type.
   def increase_counter(self, type, amount):
     actual = getattr(self, type)
     setattr(self, type, actual + amount)
   
+  # resets all memory structures
   def reset(self):
     ParserMemoryPrimitivesMap.__init__(self, self._first, self._second)
 
+# Memory for constants for runtime
 class ParserMemoryConstantMap(ParserMemoryPrimitivesMap):
   def __init__(self):
     ParserMemoryPrimitivesMap.__init__(self, MemoryTypes.CONSTANTS)
     self._memory = {type:{} for type in Types.primitives}
 
+  # get the memory address of a given value and type
   def get_memory_address(self, value, type):
     if value in self._memory[type].keys() :
       return self._memory[type][value]
@@ -61,6 +69,7 @@ class ParserMemoryConstantMap(ParserMemoryPrimitivesMap):
   def get_map(self):
     return self._memory
   
+  # get the value of a constant from a given address and type.
   def get_constant_from_address(self, address, type):
     constants_map = self._memory[type]
     for constant, const_address in constants_map.items():
@@ -88,6 +97,7 @@ class ParserMemoryManagerScopeMap:
   def get_memory_map(self, in_scope_type):
     return getattr(self, in_scope_type)
   
+  # get the next pointer address
   def get_next_pointer(self):
     actual = getattr(self, MemoryTypes.POINTERS)
     if actual == self.pointers_max - 1:
@@ -95,6 +105,7 @@ class ParserMemoryManagerScopeMap:
     setattr(self, MemoryTypes.POINTERS, actual + 1)
     return actual
   
+  # reset all the memory structures
   def reset(self):
     getattr(self, MemoryTypes.SCOPE).reset()
     getattr(self, MemoryTypes.TEMPORAL).reset()
@@ -150,10 +161,12 @@ class ParserMemoryManager:
                      getattr(scope_map, MemoryTypes.SCOPE)
     primitives_map.increase_counter(type, amount)
 
+  # get the next pointer address for this memory manager structure
   def get_next_pointer(self, current_block, current_class):
     memory_scope = self.get_scope_type(current_block, current_class)
     return getattr(self, memory_scope).get_next_pointer()
 
+  # get the complete structure of memory for constants.
   def get_constants_map(self):
     return getattr(self, MemoryTypes.CONSTANTS).get_map()
 

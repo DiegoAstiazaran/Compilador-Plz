@@ -140,10 +140,12 @@ class SubroutineDirectory:
     block_name = self.fix_block_name(block_name)
     self._subroutine_directory[block_name].append(addresses)
   
+  # get memory addresses of a given rubroutine
   def get_memory_addresses(self, subroutine_name, block_name):
     block_name = self.fix_block_name(block_name)
     return self.get_param_directory(block_name).get_next_memory_addresses(subroutine_name)
   
+  #get the memory address of a block
   def get_memory_addresses_of_block(self, block_name):
     block_name = self.fix_block_name(block_name)
     return self._subroutine_directory[block_name][1]
@@ -163,5 +165,6 @@ class SubroutineDirectory:
     block_name = self.fix_block_name(block_name)
     return param_count if block_name == Constants.GLOBAL_BLOCK else param_count + 4
 
+  # Copies the attributes and methods of a parent class into the child class.
   def inherit_class(self, sub_class, base_class):
     self._subroutine_directory[sub_class] = deepcopy(self._subroutine_directory[base_class])

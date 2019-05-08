@@ -72,23 +72,23 @@ stack_sub_calls = Stack()
 # List of quads
 quad_list = QuadList()
 
-#
+# The main memory manager for runtime
 memory_manager = ParserMemoryManager()
 
-#
+# Keeps the indexes that will be accessed on an array
 array_access_indices = []
 
-#
+# Keeps the initial values of an array initialization
 array_init_values = None
 
-#
+# Keeps the initial values of a list initialization
 list_init_values = []
 
-#
+# Keeps the current object being referenced
 current_this = False
 
-#
+# Checks if the print has a newline
 print_new_line = None
 
-#
+# keeps if current variable is a list
 current_is_list = False
