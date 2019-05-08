@@ -1,3 +1,5 @@
+# Gets content of file
+# Input requires file stored in tests folder and with .plz extension
 def get_input():
   try:
     file = input('Filename: ')

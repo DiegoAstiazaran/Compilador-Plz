@@ -137,7 +137,8 @@ class Quad:
       return self._quad[1]
     else:
       return None
-  
+
+# Structure used for subroutine calls 
 class SubCall:
   def __init__(self, sub_name, block_name, object_name):
     # block name is the class
@@ -172,6 +173,7 @@ class SubCall:
   def get_return_temporal_address(self):
     return self._return_temporal_address
 
+# Structure used for list method calls 
 class ListMethodCall:
   def __init__(self, address, type):
     self._address = address

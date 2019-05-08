@@ -21,7 +21,7 @@ current_class_block = None
 # Current last type read in a declaration or initialization
 current_last_type = None
 
-#
+# Current type of param
 current_param_type = None
 
 # Defines if current class block is public

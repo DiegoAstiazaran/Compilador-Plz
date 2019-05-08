@@ -1,6 +1,7 @@
 from constants import Operators, QuadOperations
 import operator
 
+# Dictionary with a operator method for each of our operators
 operations = {
   Operators.PLUS : operator.add,
   Operators.MINUS : operator.sub,
@@ -28,4 +29,5 @@ operations = {
   QuadOperations.MINUS_UNARY : operator.neg,
 }
 
+# Stores the line number in the quad being executed
 line_number = None

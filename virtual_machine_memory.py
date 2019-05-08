@@ -2,10 +2,6 @@ from constants import Constants, Types, Defaults, MemoryRanges, MemoryTypes
 from structures import Stack
 import helpers
 
-class VirtualMachineMemoryPointerMap:
-  def __init__(self):
-    self._pointers = []
-  
 class VirtualMachineMemoryPrimitivesMap:
   def __init__(self):
     setattr(self, Types.INT, [])
@@ -290,7 +286,7 @@ class VirtualMachineMemoryManager:
     pop_value = self.get_memory_value(current_address)
     return pop_value
   
-  #
+  # Return value at given index
   def list_index_node(self, list_address, index):
     if index < 0:
       helpers.throw_error_no_line("Index must receive a positive integer as argument.")
@@ -300,8 +296,8 @@ class VirtualMachineMemoryManager:
       index -= 1
     if current_address is None:
       helpers.throw_error_no_line("Not enough elements in list for pop operation.")
-    pop_value = self.get_memory_value(current_address, return_none=True)
-    return pop_value
+    index_value = self.get_memory_value(current_address, return_none=True)
+    return index_value
   
   # remove a value from list. 
   def list_remove_node(self, list_address, remove_value):
@@ -332,7 +328,7 @@ class VirtualMachineMemoryManager:
       self.list_insert_node_aux(prev_address, new_address, current_address)
       prev_address = new_address
   
-  #
+  # Helper to change pointers when node in inserted
   def list_insert_node_aux(self, prev_address, new_address, next_address):
     self.list_set_next(prev_address, new_address)
     self.list_set_next(new_address, next_address)
@@ -348,12 +344,3 @@ class VirtualMachineMemoryManager:
       current_address = next_address
     self.list_set_next(list_address, prev_address)
     
-    
-      
-
-
-
-      
-
-
-

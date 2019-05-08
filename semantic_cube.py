@@ -1,6 +1,6 @@
 from constants import Types, Operators, QuadOperations
 
-# Semantic cuve for resulting types of operations
+# Semantic cube for resulting types of operations
 class SemanticCube:
   def __init__(self):
     sum_operations = [
