@@ -172,19 +172,3 @@ def t_error(t):
 # Initializes lexer
 lexer = lex.lex()
 
-# Code needed to test lexer
-# while True:
-#   try:
-#     lexer = lex.lex()
-#     # data = input('data > ')
-#     file = input('Filename: ')
-#     with open(file, 'r') as myfile:
-#         s = myfile.read()
-#     lexer.input(s)
-#     while True:
-#       tok = lexer.token()
-#       if not tok:
-#           break
-#       print(tok)
-#   except EOFError:
-#     break

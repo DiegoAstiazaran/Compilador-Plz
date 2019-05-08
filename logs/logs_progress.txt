@@ -3,7 +3,7 @@ March 6
 
 March 11
 - Proposal accepted and signed
-- Parser; only syntaxis validation
+- Parser; only syntax validation
 
 March 16
 - Functions and variables directories
@@ -31,10 +31,10 @@ April 6:
 - Quads for subroutine calls
 - Quads for constructor calls
 
-Apri1 15:
+April 15:
 - Memory structures and ranges
 
-Apri1 17:
+April 17:
 - First version of virtual machine
 - Creates quads to ignore executing classes and subroutines
 - VM executes operators, gotos, print and read
@@ -42,7 +42,7 @@ Apri1 17:
 April 23:
 - Access to arrays
 
-Apri1 29:
+April 29:
 - Execution of subroutines
 
 April 30:
@@ -56,7 +56,7 @@ May 3:
 - Execution constructors
 
 May 4:
-- Proper use of id's with 'this' keyword, attributes and array acccesor
+- Proper use of id's with 'this' keyword, attributes and array acccessor
 - Execution of all class subroutines
 
 May 6:

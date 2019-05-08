@@ -11,7 +11,7 @@ March 24:
 - decl_init, class and subroutine can now be in any order and multiple times
 
 March 26:
-- Add constant floar to for assignment
+- Add constant float to for assignment
 - Modify var_cte_3, no more reuse of var_cte_1
 
 April 5:
