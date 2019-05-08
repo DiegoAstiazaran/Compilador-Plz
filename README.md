@@ -101,6 +101,17 @@ while True end
     
 ```
 
+You can read from user and print stuff!
+```
+  int a.
+  int b.
+  int c.
+  
+  read: a,b,c end
+  
+  print: a,b,c, "You can print strings", 5, 10.0 end
+```
+
 You can also declare and use classes and objects!
 ```
 int a.
