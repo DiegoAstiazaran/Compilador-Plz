@@ -133,6 +133,8 @@ class VariableDirectory:
     return len(self.get_variable_dimensions(var_name)) > 0
 
   def is_list(self, var_name_address):
+    if type(var_name_address) is not int:
+      return False
     var_name = self.fix_var_name(var_name_address)
     return self.get_is_list(var_name)
 

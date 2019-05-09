@@ -265,7 +265,6 @@ def execute_virtual_machine(quad_list, constant_memory, subroutine_directory):
         list_values = memory_manager.list_get_items(list_address)
         min_value = min(list_values)
         memory_manager.set_memory_value(return_address, min_value)
-        print(*list_values)
 
       # get the maximum element of a list
       elif operation == QuadOperations.MAX:

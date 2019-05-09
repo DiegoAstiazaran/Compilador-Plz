@@ -18,6 +18,7 @@ int i.
 list int l = {6,7,8,9,10,1/3}.
 
 l$print().
+print: "max:", l$max(), "min:", l$min() end
 l$reverse().
 l$print().
 l$append(1).
@@ -27,15 +28,42 @@ l$append(1).
 l$append(2).
 l$append(3).
 l$print().
+print: "count of 1:", l$count(1) end
+print: "size:", l$size() end
+print: "element at index 4:", l$index(4) end
+
 l$pop(0).
 l$print().
+
+
 l$pop().
-l$print().
 l$pop(2).
 l$print().
-l$pop(2).
+
+l$remove(1).
 l$print().
-l$pop().
+
+l$insert(4,11).
 l$print().
-l$pop().
+
+l$insert(13,100).
 l$print().
+
+print: "index of 3:", l$find(3) end
+
+if l$empty():
+  print: "list is empty" end
+else:
+  print: "List is not empty" end
+end
+
+when not l$empty() repeat:
+  l$pop().
+end
+
+
+if l$empty():
+  print: "list is empty" end
+else:
+  print: "List is not empty" end
+end

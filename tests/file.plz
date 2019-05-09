@@ -10,7 +10,7 @@ int arreglo(5) = {4,5,6,7,0}.
 
 class Persona :
   attributes:
-      private int x.
+      private int x1.
       private flt x2.
       private bool x3.
       private bool x7(1).
@@ -47,16 +47,16 @@ end
 
 class Hombre under Persona :
   attributes:
-      private int x.
-      private flt x2.
-      private bool x3.
+      private int x11.
+      private flt x21.
+      private bool x31.
   
   methods:
     sub Hombre():
-      str x = "5 + 6" .
+      str x11 = "5 + 6" .
       int id(10).
       if (5 < 4):
-        print: 4324, x, id[0] end
+        print: 4324, x1, id[0] end
       end
     end
 end
@@ -86,9 +86,7 @@ sub bool funcion3(int x, bool y):
   return True.
 end
 
-read: x,y,z, x end
-
-read: x end
+read: x,y,z end
 
 x = 4.
 
@@ -124,7 +122,7 @@ repeat:
   end
 while 7 > 8 end
 
-for diego from x by /3 while True:
+for diego from x by /3 while diego > 9:
   print: x,x2,x3 end
 end
 
