@@ -6,6 +6,12 @@
 Welcome to the Plz Tutorial.
 
 We want to give you a quick introduction to Plz. 
+First of all, the way you run the compiler is this
+Enter to your root folder and run:
+```
+ python3 shell_compiler.py
+```
+This file will call input.py, in which you can change the file you want to compile.
 
 As of now, Plz has a basic programming language functionality. This means learning it is not that hard.
 
